@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CFL Analysis - Portail de gouvernance et de navigation sémantique pour Power BI Report Server. Solution de restructuration de la plateforme BI CFL.">
+    <title>CFL Analysis — Portail de gouvernance BI</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Main Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <!-- Direct logo SVG URL from Wikimedia Commons -->
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/39/Logo_CFL_Luxembourg_%282022%29.svg" alt="Logo CFL Luxembourg" class="cfl-logo">
+                <div class="logo-separator"></div>
+                <span class="app-title">CFL Analysis</span>
+            </div>
+        </header>
+
+        <!-- Main Body -->
+        <div class="app-body">
+            <!-- Sidebar Navigation -->
+            <aside class="app-sidebar">
+                <!-- Prototype Navigation Group (Visible by default) -->
+                <div id="nav-prototype-group" class="nav-group">
+                    <span class="nav-label">Navigation BI</span>
+                    <div class="nav-item active" data-tab-target="dashboard" role="button" tabindex="0">
+                        <span class="nav-icon">🏠</span>
+                        <span>Tableau de bord</span>
+                    </div>
+                    <div class="nav-item" data-tab-target="catalog" role="button" tabindex="0">
+                        <span class="nav-icon">📁</span>
+                        <span>Catalogue Rapports</span>
+                    </div>
+                    <div class="nav-item" data-tab-target="governance" role="button" tabindex="0">
+                        <span class="nav-icon">🛡️</span>
+                        <span>Administration</span>
+                    </div>
+                </div>
+
+                <!-- Sidebar Footer -->
+                <div class="sidebar-footer">
+                    <div class="user-profile">
+                        <div class="avatar">DG</div>
+                        <div class="user-info">
+                            <span class="username">Damien G.</span>
+                            <span class="userrole">Gouvernance BI & Data</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Content Panel -->
+            <main class="app-content">
+                
+                <!-- ========================================================
+                     SECTION 1: DASHBOARD TAB
+                     ======================================================== -->
+                <section id="section-dashboard" class="content-section active">
+                    <h1>Tableau de bord CFL Analysis</h1>
+                    <p class="section-desc">Bienvenue sur votre portail de gouvernance décisionnel. Voici l'état de votre catalogue de rapports.</p>
+                    
+                    <!-- KPI Cards -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-icon-wrapper crimson">📊</div>
+                            <div class="kpi-data">
+                                <span class="kpi-value" id="kpi-total-reports">0</span>
+                                <span class="kpi-label">Rapports Indexés</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon-wrapper blue">🛡️</div>
+                            <div class="kpi-data">
+                                <span class="kpi-value" id="kpi-total-certified">0</span>
+                                <span class="kpi-label">Certifiés DWH</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon-wrapper green">🌟</div>
+                            <div class="kpi-data">
+                                <span class="kpi-value" id="kpi-total-favorites">0</span>
+                                <span class="kpi-label">Mes Favoris</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon-wrapper purple">🌌</div>
+                            <div class="kpi-data">
+                                <span class="kpi-value">Data Galaxy</span>
+                                <span class="kpi-label" style="color:#34c759; font-weight:600;">● Synchronisé</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Grid: Favorites / Most Viewed -->
+                    <div class="dashboard-grid">
+                        <!-- Left Panel: Favorites Grid -->
+                        <div class="dashboard-list-card">
+                            <div class="dashboard-list-title">
+                                <span>⭐ Mes Favoris</span>
+                                <span class="see-all-link" data-go-to="catalog" data-filter="favorites">Gérer mes favoris</span>
+                            </div>
+                            <div id="dashboard-favorites-list" class="list-container">
+                                <!-- Dynamic Content -->
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Most Viewed & History -->
+                        <div style="display: flex; flex-direction: column; gap: 24px;">
+                            <!-- Most Viewed -->
+                            <div class="dashboard-list-card">
+                                <div class="dashboard-list-title">
+                                    <span>🔥 Plus consultés</span>
+                                </div>
+                                <div id="dashboard-popular-list" class="list-container">
+                                    <!-- Dynamic Content -->
+                                </div>
+                            </div>
+                            
+                            <!-- User History -->
+                            <div class="dashboard-list-card">
+                                <div class="dashboard-list-title">
+                                    <span>🕒 Mon Historique Récents</span>
+                                </div>
+                                <div id="dashboard-history-list" class="list-container">
+                                    <!-- Dynamic Content -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ========================================================
+                     SECTION 2: CATALOG TAB
+                     ======================================================== -->
+                <section id="section-catalog" class="content-section">
+                    <h1>Catalogue des rapports BI</h1>
+                    <p class="section-desc">Recherchez et filtrez l'ensemble des rapports sans tenir compte de leur arborescence physique sur PBIRS.</p>
+                    
+                    <!-- Search and Filters Panel -->
+                    <div class="catalog-controls">
+                        <div class="search-bar-wrapper">
+                            <span class="search-icon-placeholder">🔍</span>
+                            <input type="text" id="catalog-search" class="search-input" placeholder="Rechercher par mots-clés, nom, description, tag, propriétaire...">
+                        </div>
+                        
+                        <div class="filters-row">
+                            <!-- Service Filter -->
+                            <div class="filter-group">
+                                <span class="filter-label">Service :</span>
+                                <div id="filter-services-container" class="filter-pills">
+                                    <button class="filter-pill active" data-service="all">Tous</button>
+                                    <button class="filter-pill" data-service="voyageurs">Voyageurs</button>
+                                    <button class="filter-pill" data-service="fret">Fret</button>
+                                    <button class="filter-pill" data-service="infra">Infrastructures</button>
+                                    <button class="filter-pill" data-service="rh">Ressources Humaines</button>
+                                    <button class="filter-pill" data-service="finances">Finances</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Classification Filter -->
+                            <div class="filter-group">
+                                <span class="filter-label">Classification :</span>
+                                <div id="filter-classifications-container" class="filter-pills">
+                                    <button class="filter-pill active" data-classif="all">Toutes</button>
+                                    <button class="filter-pill" data-classif="dwh">Certifié DWH</button>
+                                    <button class="filter-pill" data-classif="self-service">Self-Service</button>
+                                    <button class="filter-pill" data-classif="public">Public</button>
+                                </div>
+                            </div>
+
+                            <!-- PSSI Sensitivity Filter -->
+                            <div class="filter-group">
+                                <span class="filter-label">Sensibilité PSSI :</span>
+                                <div id="filter-pssi-container" class="filter-pills">
+                                    <button class="filter-pill active" data-pssi="all">Toutes</button>
+                                    <button class="filter-pill" data-pssi="public">Public</button>
+                                    <button class="filter-pill" data-pssi="interne">Interne</button>
+                                    <button class="filter-pill" data-pssi="restreint">Restreint</button>
+                                    <button class="filter-pill" data-pssi="confidentiel">Confidentiel</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Tags Filter -->
+                            <div class="filter-group">
+                                <span class="filter-label">Tags :</span>
+                                <div id="filter-tags-container" class="filter-pills">
+                                    <!-- Dynamic Content -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Filters Indicator -->
+                    <div id="active-filters-info" style="margin-bottom: 16px; font-size: 14px; color: var(--text-secondary); display: none;">
+                        <span>Filtres actifs : </span>
+                        <strong id="active-filters-text">Aucun</strong>
+                        <button id="clear-filters-btn" class="btn-sm-action danger" style="margin-left: 8px; padding: 2px 8px; font-size: 11px;">Réinitialiser</button>
+                    </div>
+
+                    <!-- Reports Grid -->
+                    <div id="catalog-reports-grid" class="reports-grid">
+                        <!-- Dynamic Content -->
+                    </div>
+                </section>
+
+                <!-- ========================================================
+                     SECTION 3: GOVERNANCE / ADMIN TAB
+                     ======================================================== -->
+                <section id="section-governance" class="content-section">
+                    <h1>Administration & Gouvernance</h1>
+                    <p class="section-desc">Gestion sémantique du catalogue de rapports. Stockage des tags synchronisé avec **Data Galaxy**.</p>
+                    
+                    <div class="admin-grid">
+                        <!-- Sync card -->
+                        <div class="card sync-status-card">
+                            <div>
+                                <h3 style="font-size: 16px; margin-bottom: 4px;">Synchronisation Data Galaxy</h3>
+                                <p class="text-secondary" style="font-size: 13.5px;">Statut : Référentiel synchronisé. 18 tags stockés dans Data Galaxy. SSO actif via EntraID.</p>
+                            </div>
+                            <div class="sync-badge-active">
+                                <span class="pulse-dot"></span>
+                                <span>Data Galaxy Connecté</span>
+                            </div>
+                        </div>
+
+                        <!-- Edit Report Metadata Form -->
+                        <div class="card">
+                            <h3 style="font-size: 18px; margin-bottom: 16px; color: var(--cfl-gray-dark);">Modifier les métadonnées d'un rapport</h3>
+                            <form id="admin-edit-form" onsubmit="return false;">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="admin-select-report">Sélectionner un rapport</label>
+                                        <select id="admin-select-report" class="form-control">
+                                            <!-- Dynamic Content -->
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="admin-report-owner">Propriétaire Métier (Business Owner)</label>
+                                        <input type="text" id="admin-report-owner" class="form-control" placeholder="Nom du responsable...">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="admin-report-service">Service</label>
+                                        <select id="admin-report-service" class="form-control">
+                                            <option value="voyageurs">Voyageurs</option>
+                                            <option value="fret">Fret</option>
+                                            <option value="infra">Infrastructures</option>
+                                            <option value="rh">Ressources Humaines</option>
+                                            <option value="finances">Finances</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="admin-report-classif">Classification du rapport</label>
+                                        <select id="admin-report-classif" class="form-control">
+                                            <option value="dwh">Certifié DWH</option>
+                                            <option value="self-service">Self-Service</option>
+                                            <option value="public">Public</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="admin-report-freq">Fréquence de rafraîchissement</label>
+                                        <select id="admin-report-freq" class="form-control">
+                                            <option value="Temps réel">Temps réel</option>
+                                            <option value="Quotidien">Quotidien</option>
+                                            <option value="Hebdomadaire">Hebdomadaire</option>
+                                            <option value="Mensuel">Mensuel</option>
+                                            <option value="Semestriel">Semestriel</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="admin-report-pssi">Sensibilité PSSI</label>
+                                        <select id="admin-report-pssi" class="form-control">
+                                            <option value="public">Public (Non sensible)</option>
+                                            <option value="interne">Interne (Usage interne)</option>
+                                            <option value="restreint">Restreint (Diffusion restreinte)</option>
+                                            <option value="confidentiel">Confidentiel (Strictement confidentiel)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-grid">
+                                    <div class="form-group" style="grid-column: span 2;">
+                                        <label for="admin-report-tags">Tags associés dans Data Galaxy (séparés par des virgules)</label>
+                                        <input type="text" id="admin-report-tags" class="form-control" placeholder="ex: KPI, Temps réel, RGPD, Critique">
+                                    </div>
+                                </div>
+
+                                <div class="form-group" style="margin-bottom: 24px;">
+                                    <label for="admin-report-desc">Description Métier du Rapport</label>
+                                    <textarea id="admin-report-desc" class="form-control" style="height: 100px;" placeholder="Entrez une description claire et détaillée des indicateurs..."></textarea>
+                                </div>
+
+                                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                                    <button type="button" id="admin-cancel-btn" class="btn-sm-action" style="padding: 10px 20px;">Annuler</button>
+                                    <button type="button" id="admin-save-btn" class="slide-btn primary-btn" style="padding: 10px 20px; border-radius: 4px;">Enregistrer & Pousser sur Data Galaxy</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- System Audit Log / Access Request Log -->
+                        <div class="card">
+                            <h3 style="font-size: 18px; margin-bottom: 12px; color: var(--cfl-gray-dark);">Suivi des Workflows d'approbation et Logs d'Audit</h3>
+                            <p class="section-desc">Historique des demandes de partage, des approbations AD et de la synchronisation Data Galaxy.</p>
+                            
+                            <div class="admin-table-container">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date / Heure</th>
+                                            <th>Utilisateur</th>
+                                            <th>Type d'événement</th>
+                                            <th>Rapport cible</th>
+                                            <th>Statut</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-logs-tbody">
+                                        <!-- Dynamic Content -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+            </main>
+        </div>
+    </div>
+
+    <!-- ========================================================
+         VOLET DE DÉTAILS COULISSANT (DRAWER)
+         ======================================================== -->
+    <div id="drawer-overlay" class="drawer-overlay"></div>
+    <div id="report-drawer" class="drawer" aria-hidden="true" role="dialog" aria-labelledby="drawer-report-title">
+        <div class="drawer-header">
+            <h2 id="drawer-report-title" class="drawer-title">Fiche d'identité Rapport</h2>
+            <button id="drawer-close-btn" class="close-btn" aria-label="Fermer le panneau">&times;</button>
+        </div>
+        
+        <div class="drawer-body">
+            <!-- Badges and Title -->
+            <div>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
+                    <span id="drawer-service-badge" class="service-badge voyageurs">Voyageurs</span>
+                    <span id="drawer-classification-badge" class="classif-badge dwh">Certifié DWH</span>
+                    <span id="drawer-pssi-badge" class="pssi-badge interne">PSSI: INTERNE</span>
+                </div>
+                <h3 id="drawer-title-heading" style="font-size: 20px; font-weight: 700; color: var(--cfl-gray-dark);">Nom du Rapport</h3>
+            </div>
+            
+            <!-- Description -->
+            <div>
+                <h4 class="drawer-section-title">Description métier</h4>
+                <p id="drawer-description" class="drawer-desc">Description du rapport...</p>
+            </div>
+            
+            <!-- Info Grid -->
+            <div>
+                <h4 class="drawer-section-title">Gouvernance & cycle de vie</h4>
+                <div class="drawer-info-grid">
+                    <div class="drawer-info-item">
+                        <span class="info-label">Business Owner</span>
+                        <span id="drawer-owner" class="info-value">Jean Dupont</span>
+                    </div>
+                    <div class="drawer-info-item">
+                        <span class="info-label">Fréquence de refresh</span>
+                        <span id="drawer-frequency" class="info-value">Mensuel</span>
+                    </div>
+                    <div class="drawer-info-item">
+                        <span class="info-label">Dernière Actualisation</span>
+                        <span id="drawer-last-refresh" class="info-value">Hier à 18:45</span>
+                    </div>
+                    <div class="drawer-info-item">
+                        <span class="info-label">Source Métadonnées</span>
+                        <span class="info-value" style="color: #6a1b9a;">🌌 Data Galaxy</span>
+                    </div>
+                    <div class="drawer-info-item" style="grid-column: span 2;">
+                        <span class="info-label">Emplacement technique PBIRS (masqué en prod)</span>
+                        <span id="drawer-pbirs-path" class="info-value" style="font-family: monospace; font-size: 11px;">/Voyageurs/Mensuel/KPI_Ponctualite</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tags -->
+            <div>
+                <h4 class="drawer-section-title">Tags stockés dans Data Galaxy</h4>
+                <div id="drawer-tags-container" class="drawer-tags">
+                    <span class="drawer-tag">KPI</span>
+                </div>
+            </div>
+            
+            <!-- Users with Access (Simulated AD logic) -->
+            <div>
+                <h4 class="drawer-section-title">Accès autorisés (Synchronisé AD/EntraID)</h4>
+                <ul id="drawer-access-list" class="access-user-list">
+                    <li class="access-user-item"><span class="access-user-dot"></span> Groupe AD 'CFL-Voyageurs-Editeurs'</li>
+                    <li class="access-user-item"><span class="access-user-dot"></span> Groupe AD 'CFL-Data-Analysts'</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="drawer-footer">
+            <button id="drawer-fav-action-btn" class="drawer-action-btn secondary">
+                <span id="drawer-fav-icon">☆</span> <span id="drawer-fav-text">Favori</span>
+            </button>
+            <button id="drawer-share-action-btn" class="drawer-action-btn secondary">
+                🔄 Partager (Workflow)
+            </button>
+            <a id="drawer-open-report-btn" href="#" target="_blank" class="drawer-action-btn primary">
+                🚀 Ouvrir le rapport (SSO)
+            </a>
+        </div>
+    </div>
+
+    <!-- ========================================================
+         MODAL : WORKFLOW DE PARTAGE & APPROBATION
+         ======================================================== -->
+    <div id="share-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="font-size: 18px; font-weight: 700; color: var(--cfl-gray-dark);">Workflow de Partage & Approbation</h3>
+                <button id="modal-close-btn" class="close-btn" aria-label="Fermer la boîte de dialogue">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 16px;">
+                    Ce workflow va soumettre une demande d'accès pour l'utilisateur sélectionné au **Business Owner** du rapport. Après approbation, l'utilisateur sera automatiquement ajouté au groupe AD associé.
+                </p>
+                <input type="hidden" id="modal-report-id">
+                
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label for="share-user" style="font-size:13px; font-weight:600; color:var(--text-secondary); margin-bottom:4px;">
+                        Collaborateur (Nom ou e-mail de l'agent CFL) :
+                    </label>
+                    <input type="text" id="share-user" class="form-control" placeholder="ex: Laurent.Faber@cfl.lu">
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label for="share-reason" style="font-size:13px; font-weight:600; color:var(--text-secondary); margin-bottom:4px;">
+                        Justification métier de l'accès :
+                    </label>
+                    <textarea id="share-reason" class="form-control" style="height: 70px;" placeholder="Pourquoi ce collaborateur a-t-il besoin de ce rapport ?"></textarea>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="share-workflow" style="font-size:13px; font-weight:600; color:var(--text-secondary); margin-bottom:4px;">
+                        Circuit d'approbation :
+                    </label>
+                    <select id="share-workflow" class="form-control">
+                        <option value="direct">Validation par le Business Owner uniquement (Standard)</option>
+                        <option value="double">Validation Manager + Business Owner (Rapport Sensible)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 12px; justify-content: flex-end; background-color: var(--cfl-gray-light); padding: 12px 20px; border-top: 1px solid var(--cfl-gray-border);">
+                <button id="share-cancel-btn" class="btn-sm-action" style="padding: 8px 16px;">Annuler</button>
+                <button id="share-submit-btn" class="slide-btn primary-btn" style="border-radius: 4px; padding: 8px 16px; font-size:13px;">Soumettre la demande</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
