@@ -20,11 +20,10 @@
             </div>
             <div class="header-right">
                 <!-- Data Galaxy status indicator in the top-header -->
-                <div class="header-datagalaxy-badge" title="État de la synchronisation avec le dictionnaire Data Galaxy">
-                    <svg class="icon-svg header-dg-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color: #6a1b9a; margin-right: 6px;"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
-                    <span class="dg-text">Data Galaxy : </span>
-                    <span class="dg-status-dot"></span>
-                    <span class="dg-status-text">Synchronisé</span>
+                <div class="header-datagalaxy-badge" id="header-datagalaxy-badge" title="Cliquez pour simuler une erreur de synchronisation Data Galaxy" style="cursor: pointer;">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTPKJ3gyA5rFLC2d2XaykmOm-tzmW9hrk4IvdDDtM4uCe3JyPanZ2IN2Y&s=10" alt="Data Galaxy" style="height: 22px; margin-right: 6px; border-radius: 2px; vertical-align: middle;">
+                    <span class="dg-status-text" id="header-dg-status-text">Synchronisé</span>
+                    <span class="dg-status-dot" id="header-dg-status-dot"></span>
                 </div>
             </div>
         </header>
@@ -58,6 +57,12 @@
                             <svg class="icon-svg" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                         </span>
                         <span>Gestion des rapports</span>
+                    </div>
+                    <div class="nav-item" data-tab-target="admin-console" id="nav-admin-console" role="button" tabindex="0" style="display: none;">
+                        <span class="nav-icon">
+                            <svg class="icon-svg" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                        </span>
+                        <span>Console Admin BI</span>
                     </div>
                 </div>
 
@@ -253,35 +258,40 @@
                 <!-- ========================================================
                      SECTION 3: VALIDATION WORKFLOWS TAB
                      ======================================================== -->
-                <section id="section-workflows" class="content-section">
-                    <h1>Validation des workflows</h1>
-                    <p class="section-desc">Gerez et validez les demandes d'acces aux rapports Power BI en attente d'approbation Active Directory.</p>
-                    
-                    <div class="card">
-                        <h3 style="font-size: 18px; margin-bottom: 16px; color: var(--cfl-gray-dark); display: flex; align-items: center; gap: 8px;">
-                            <svg class="icon-svg" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color: var(--cfl-crimson);"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2 2V5a2 2 0 0 1 2-2h11"></path></svg>
-                            Demandes de partage en attente d'approbation Active Directory / EntraID
-                        </h3>
-                        <div class="admin-table-container">
-                            <table class="admin-table">
-                                <thead>
-                                    <tr>
-                                        <th>Date / Heure</th>
-                                        <th>Demandeur</th>
-                                        <th>Beneficiaire</th>
-                                        <th>Rapport</th>
-                                        <th>Justification metier</th>
-                                        <th>Circuit</th>
-                                        <th style="text-align: center;">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="workflow-requests-tbody">
-                                    <!-- Dynamic Content -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
+                 <section id="section-workflows" class="content-section">
+                     <h1>Validation des workflows</h1>
+                     <p class="section-desc">Gerez et validez les demandes d'acces aux rapports Power BI en attente d'approbation Active Directory.</p>
+                     
+                     <div class="card collapsible-card" id="wf-collapsible-card">
+                         <div class="card-header-toggle" id="wf-toggle-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; margin-bottom: 16px;">
+                             <h3 style="font-size: 18px; margin: 0; color: var(--cfl-gray-dark); display: flex; align-items: center; gap: 8px;">
+                                 <svg class="icon-svg" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color: var(--cfl-crimson);"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2 2V5a2 2 0 0 1 2-2h11"></path></svg>
+                                 Demandes de partage en attente d'approbation Active Directory / EntraID
+                             </h3>
+                             <svg class="icon-svg toggle-arrow" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.3s ease;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                         </div>
+                         <div class="card-collapse-content" id="wf-collapse-content" style="transition: max-height 0.3s ease;">
+                             <div class="admin-table-container">
+                                 <table class="admin-table">
+                                     <thead>
+                                         <tr>
+                                             <th>Date / Heure</th>
+                                             <th>Demandeur</th>
+                                             <th>Beneficiaire</th>
+                                             <th>Rapport</th>
+                                             <th>Justification metier</th>
+                                             <th>Circuit</th>
+                                             <th style="text-align: center;">Actions</th>
+                                         </tr>
+                                     </thead>
+                                     <tbody id="workflow-requests-tbody">
+                                         <!-- Dynamic Content -->
+                                     </tbody>
+                                 </table>
+                             </div>
+                         </div>
+                     </div>
+                 </section>
 
                 <!-- ========================================================
                      SECTION 4: GOVERNANCE / ADMIN TAB (GESTION DES RAPPORTS)
@@ -379,27 +389,188 @@
                             </form>
                         </div>
 
+                        <!-- Campagnes de Recertification des Accès -->
+                        <div class="card collapsible-card" id="recert-collapsible-card" style="margin-bottom: 24px;">
+                            <div class="card-header-toggle" id="recert-toggle-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;">
+                                <h3 style="font-size: 18px; margin: 0; color: var(--cfl-gray-dark); display: flex; align-items: center; gap: 8px;">
+                                    <svg class="icon-svg" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color: #6a1b9a;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                    Campagnes de Recertification des Accès AD
+                                </h3>
+                                <svg class="icon-svg toggle-arrow" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.3s ease;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div class="card-collapse-content" id="recert-collapse-content" style="transition: max-height 0.3s ease; margin-top: 12px;">
+                                <p class="section-desc">Passez en revue les listes de diffusion et d'accès Active Directory associées aux rapports sensibles.</p>
+                                <div class="admin-table-container">
+                                    <table class="admin-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Rapport ciblé</th>
+                                                <th>Groupe AD habilité</th>
+                                                <th>Membres actifs</th>
+                                                <th>Dernier contrôle</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="recertification-tbody">
+                                            <!-- Dynamic content -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- System Audit Log / Access Request Log -->
+                        <div class="card collapsible-card" id="logs-collapsible-card">
+                            <div class="card-header-toggle" id="logs-toggle-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;">
+                                <h3 style="font-size: 18px; margin: 0; color: var(--cfl-gray-dark);">Suivi des Workflows d'approbation et Logs d'Audit</h3>
+                                <svg class="icon-svg toggle-arrow" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.3s ease;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <div class="card-collapse-content" id="logs-collapse-content" style="transition: max-height 0.3s ease; margin-top: 12px;">
+                                <p class="section-desc">Historique des demandes de partage, des approbations AD et de la synchronisation Data Galaxy.</p>
+                                
+                                <div class="admin-table-container">
+                                    <table class="admin-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Date / Heure</th>
+                                                <th>Utilisateur</th>
+                                                <th>Type d'evenement</th>
+                                                <th>Rapport cible</th>
+                                                <th>Statut</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="admin-logs-tbody">
+                                            <!-- Dynamic Content -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ========================================================
+                     SECTION 5: ADMIN BI CONSOLE (TÉLÉMÉTRIE, SYNCHRO & PSSI)
+                     ======================================================== -->
+                <section id="section-admin-console" class="content-section">
+                    <h1>Console Admin BI</h1>
+                    <p class="section-desc">Outil de supervision de la plateforme BI CFL, du centre de conformité PSSI et du monitoring de synchronisation.</p>
+                    
+                    <div class="admin-grid" style="margin-bottom: 24px;">
+                        <!-- Alert conformity banner if any PSSI violation is present -->
+                        <div class="card pssi-alert-card" id="pssi-compliance-alert-summary" style="display: none; border-left: 5px solid #dc3545; background-color: rgba(220, 53, 69, 0.05); padding: 16px; border-radius: 4px;">
+                            <div style="display: flex; gap: 12px; align-items: flex-start;">
+                                <svg class="icon-svg text-danger" viewBox="0 0 24 24" width="24" height="24" stroke="#dc3545" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                <div>
+                                    <h3 style="color: #dc3545; font-size: 16px; margin: 0 0 4px 0;">Alertes de conformité PSSI actives</h3>
+                                    <p class="text-secondary" style="font-size: 13px; margin: 0;" id="pssi-compliance-alert-text">Scanners actifs : 0 anomalie de droits d'accès détectée.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="admin-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 24px; display: grid;">
+                        <!-- Telemetrie Card -->
                         <div class="card">
-                            <h3 style="font-size: 18px; margin-bottom: 12px; color: var(--cfl-gray-dark);">Suivi des Workflows d'approbation et Logs d'Audit</h3>
-                            <p class="section-desc">Historique des demandes de partage, des approbations AD et de la synchronisation Data Galaxy.</p>
-                            
-                            <div class="admin-table-container">
-                                <table class="admin-table">
+                            <h3 style="font-size: 17px; margin-bottom: 16px; color: var(--cfl-gray-dark); display: flex; align-items: center; gap: 8px;">
+                                📊 Télémétrie & Usage du Serveur
+                            </h3>
+                            <div class="telemetry-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                                <div class="telemetry-item" style="background-color: var(--cfl-gray-light); padding: 12px; border-radius: 4px;">
+                                    <span class="info-label" style="font-size: 11px;">Temps de chargement moyen</span>
+                                    <span id="telemetry-load-time" class="info-value" style="font-size: 20px; font-weight: 700; color: var(--cfl-crimson); margin-top: 4px; display: block;">2.1s</span>
+                                </div>
+                                <div class="telemetry-item" style="background-color: var(--cfl-gray-light); padding: 12px; border-radius: 4px;">
+                                    <span class="info-label" style="font-size: 11px;">Requêtes actives (Sim)</span>
+                                    <span id="telemetry-active-queries" class="info-value" style="font-size: 20px; font-weight: 700; color: #00a896; margin-top: 4px; display: block;">14 / min</span>
+                                </div>
+                            </div>
+
+                            <h4 style="font-size: 13px; margin-bottom: 8px; color: var(--text-secondary);">Requêtes lentes détectées (> 3.5s)</h4>
+                            <div class="admin-table-container" style="max-height: 150px; overflow-y: auto; margin-bottom: 16px;">
+                                <table class="admin-table" style="font-size: 12px;">
                                     <thead>
                                         <tr>
-                                            <th>Date / Heure</th>
+                                            <th>Rapport</th>
                                             <th>Utilisateur</th>
-                                            <th>Type d'evenement</th>
-                                            <th>Rapport cible</th>
-                                            <th>Statut</th>
+                                            <th>Temps</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="admin-logs-tbody">
+                                    <tbody id="telemetry-slow-queries-tbody">
                                         <!-- Dynamic Content -->
                                     </tbody>
                                 </table>
                             </div>
+
+                            <h4 style="font-size: 13px; margin-bottom: 8px; color: var(--text-secondary);">Heures de forte affluence (Connexions/h)</h4>
+                            <div class="affluence-chart" style="display: flex; align-items: flex-end; justify-content: space-between; height: 60px; padding: 10px 0; border-bottom: 1px solid var(--cfl-gray-border);">
+                                <div style="display: flex; flex-direction: column; align-items: center; flex: 1;"><div style="background-color: var(--cfl-gray-border); width: 12px; height: 15px; border-radius: 2px;"></div><span style="font-size: 9px; margin-top: 4px;">08h</span></div>
+                                <div style="display: flex; flex-direction: column; align-items: center; flex: 1;"><div style="background-color: var(--cfl-crimson); width: 12px; height: 48px; border-radius: 2px;"></div><span style="font-size: 9px; margin-top: 4px;">09h</span></div>
+                                <div style="display: flex; flex-direction: column; align-items: center; flex: 1;"><div style="background-color: var(--cfl-crimson); width: 12px; height: 55px; border-radius: 2px;"></div><span style="font-size: 9px; margin-top: 4px;">10h</span></div>
+                                <div style="display: flex; flex-direction: column; align-items: center; flex: 1;"><div style="background-color: var(--cfl-gray-border); width: 12px; height: 30px; border-radius: 2px;"></div><span style="font-size: 9px; margin-top: 4px;">12h</span></div>
+                                <div style="display: flex; flex-direction: column; align-items: center; flex: 1;"><div style="background-color: var(--cfl-crimson); width: 12px; height: 45px; border-radius: 2px;"></div><span style="font-size: 9px; margin-top: 4px;">14h</span></div>
+                                <div style="display: flex; flex-direction: column; align-items: center; flex: 1;"><div style="background-color: var(--cfl-crimson); width: 12px; height: 50px; border-radius: 2px;"></div><span style="font-size: 9px; margin-top: 4px;">15h</span></div>
+                                <div style="display: flex; flex-direction: column; align-items: center; flex: 1;"><div style="background-color: var(--cfl-gray-border); width: 12px; height: 10px; border-radius: 2px;"></div><span style="font-size: 9px; margin-top: 4px;">18h</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Sync monitoring log card -->
+                        <div class="card">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                <h3 style="font-size: 17px; margin: 0; color: var(--cfl-gray-dark); display: flex; align-items: center; gap: 8px;">
+                                    🔄 Tâches & Flux de Synchronisation
+                                </h3>
+                                <button id="admin-sync-now-btn" class="btn-sm-action primary" style="font-size: 11px; padding: 4px 8px;">Forcer la synchro</button>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding-bottom: 6px; border-bottom: 1px solid var(--cfl-gray-border);">
+                                    <span>Flux Active Directory / EntraID</span>
+                                    <span class="sync-badge-active" style="background-color: rgba(52, 199, 89, 0.1); color: #248a3d; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600;">Opérationnel</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding-bottom: 6px; border-bottom: 1px solid var(--cfl-gray-border);">
+                                    <span>Flux Semantique Data Galaxy</span>
+                                    <span class="sync-badge-active" id="admin-dg-sync-badge" style="background-color: rgba(52, 199, 89, 0.1); color: #248a3d; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600;">Opérationnel</span>
+                                </div>
+                            </div>
+                            
+                            <h4 style="font-size: 13px; margin-bottom: 8px; color: var(--text-secondary);">Logs de synchronisation</h4>
+                            <div class="admin-table-container" style="max-height: 160px; overflow-y: auto;">
+                                <table class="admin-table" style="font-size: 11.5px;">
+                                    <thead>
+                                        <tr>
+                                            <th>Timestamp</th>
+                                            <th>Flux</th>
+                                            <th>Message</th>
+                                            <th>Statut</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sync-logs-tbody">
+                                        <!-- Dynamic Sync Logs -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scan conformity results table -->
+                    <div class="card">
+                        <h3 style="font-size: 17px; margin-bottom: 16px; color: var(--cfl-gray-dark);">🛡️ Centre de Conformité PSSI - Diagnostic des droits d'accès</h3>
+                        <p class="section-desc">Revue automatisée des habilitations. Les rapports sensibles (Restreints ou Confidentiels) ne doivent pas utiliser de groupes AD larges.</p>
+                        <div class="admin-table-container">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Rapport</th>
+                                        <th>Sensibilité PSSI</th>
+                                        <th>Groupes AD configurés</th>
+                                        <th>Évaluation de conformité</th>
+                                        <th style="text-align: center;">Action corrective</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pssi-compliance-tbody">
+                                    <!-- Dynamic scanner rows -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </section>
@@ -450,6 +621,10 @@
                     <div class="drawer-info-item" id="drawer-technical-path-container" style="grid-column: span 2;">
                         <span class="info-label">Emplacement technique PBIRS</span>
                         <span id="drawer-pbirs-path" class="info-value" style="font-family: monospace; font-size: 11px;">/Voyageurs/Mensuel/KPI_Ponctualite</span>
+                    </div>
+                    <div class="drawer-info-item" id="drawer-viewcount-container" style="grid-column: span 2;">
+                        <span class="info-label">Nombre de visualisations</span>
+                        <span id="drawer-viewcount" class="info-value" style="font-weight: 600; color: var(--cfl-crimson);">0</span>
                     </div>
                 </div>
             </div>
@@ -532,6 +707,77 @@
     </div>
 
     <!-- ========================================================
+         MODAL : SIGNALEMENT D'ANOMALIE (FEEDBACK LOOP)
+         ======================================================== -->
+    <div id="bug-report-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="font-size: 18px; font-weight: 700; color: var(--cfl-gray-dark);">Signaler une anomalie</h3>
+                <button id="bug-close-btn" class="close-btn" aria-label="Fermer la boite de dialogue">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 12px;">Votre signalement sera directement transmis aux stewards et propriétaires du rapport.</p>
+                <form id="bug-report-form" onsubmit="return false;">
+                    <input type="hidden" id="bug-report-id">
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label for="bug-type" style="font-size:13px; font-weight:600; color:var(--text-secondary); margin-bottom:4px;">Type d'anomalie :</label>
+                        <select id="bug-type" class="form-control">
+                            <option value="Données incorrectes">Données incorrectes (Ex: valeur erronée)</option>
+                            <option value="Bug graphique">Bug visuel / graphique (Ex: filtre bloqué)</option>
+                            <option value="Problème de performance">Problème de performance (Ex: chargement long)</option>
+                            <option value="Autre problème">Autre problème technique</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label for="bug-description" style="font-size:13px; font-weight:600; color:var(--text-secondary); margin-bottom:4px;">Description détaillée :</label>
+                        <textarea id="bug-description" class="form-control" style="height: 90px;" placeholder="Décrivez le problème rencontré avec le plus de précisions possible..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 12px; justify-content: flex-end; background-color: var(--cfl-gray-light); padding: 12px 20px; border-top: 1px solid var(--cfl-gray-border);">
+                <button id="bug-cancel-btn" class="btn-sm-action" style="padding: 8px 16px;">Annuler</button>
+                <button id="bug-submit-btn" class="slide-btn danger-btn" style="border-radius: 4px; padding: 8px 16px; font-size:13px; background-color: #dc3545; color: white; border: none; cursor: pointer;">Envoyer le signalement</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================
+         MODAL : CAMPAGNE DE RECERTIFICATION DES ACCÈS
+         ======================================================== -->
+    <div id="recertify-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 650px;">
+            <div class="modal-header">
+                <h3 style="font-size: 18px; font-weight: 700; color: var(--cfl-gray-dark);">Recertification du groupe d'accès AD</h3>
+                <button id="recert-close-btn" class="close-btn" aria-label="Fermer la boite de dialogue">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 12px;">
+                    Rapport : <strong id="recert-report-title" style="color: var(--cfl-gray-dark);">Nom du rapport</strong><br>
+                    Groupe Active Directory : <code id="recert-ad-group" style="background-color: var(--cfl-gray-light); padding: 2px 6px; border-radius: 4px; font-size: 12px; font-family: monospace;">DW_POWERBI_GROUP</code>
+                </p>
+                <div class="admin-table-container" style="max-height: 250px; overflow-y: auto; margin-bottom: 12px; border: 1px solid var(--cfl-gray-border); border-radius: 4px;">
+                    <table class="admin-table" style="font-size: 12.5px; width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Collaborateur</th>
+                                <th>Email</th>
+                                <th style="text-align: center; width: 180px;">Décision de maintien</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recert-users-tbody">
+                            <!-- Dynamic Content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 12px; justify-content: flex-end; background-color: var(--cfl-gray-light); padding: 12px 20px; border-top: 1px solid var(--cfl-gray-border);">
+                <button id="recert-cancel-btn" class="btn-sm-action" style="padding: 8px 16px;">Annuler</button>
+                <button id="recert-submit-btn" class="slide-btn primary-btn" style="border-radius: 4px; padding: 8px 16px; font-size:13px;">Valider la recertification</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================
          VISUALISEUR DE RAPPORT POWER BI INTÉGRÉ (FULL-SCREEN OVERLAY)
          ======================================================== -->
     <div id="report-viewer-container" class="report-viewer-container" style="display: none;">
@@ -545,8 +791,12 @@
                 <h2 id="viewer-report-title" class="viewer-title">Nom du Rapport</h2>
                 <span id="viewer-classif-badge" class="classif-badge dwh" style="margin-left: 12px;">Certifie DWH</span>
             </div>
-            <div class="viewer-header-right">
+            <div class="viewer-header-right" style="display: flex; align-items: center; gap: 16px;">
                 <span class="viewer-refresh-text">Donnees actualisees : <strong id="viewer-refresh-date">Aujourd'hui à 14:15</strong></span>
+                <button id="viewer-bug-report-btn" class="btn-sm-action danger" style="background-color: rgba(220, 53, 69, 0.1); color: #dc3545; border: 1px solid rgba(220, 53, 69, 0.3); padding: 6px 12px; border-radius: 4px; display: flex; align-items: center; gap: 6px; font-weight: 600; cursor: pointer;">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    Signaler une anomalie
+                </button>
             </div>
         </header>
         <div class="viewer-body iframe-mode">

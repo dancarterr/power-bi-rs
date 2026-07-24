@@ -1197,6 +1197,12 @@ textarea.form-control {
     margin-left: 6px;
     display: inline-block;
     box-shadow: 0 0 6px rgba(52, 199, 89, 0.6);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dg-status-dot.error {
+    background-color: #ff3b30 !important;
+    box-shadow: 0 0 6px rgba(255, 59, 48, 0.6) !important;
 }
 
 /* Sélecteur de rôle dans le profil */

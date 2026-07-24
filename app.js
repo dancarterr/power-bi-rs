@@ -19,7 +19,7 @@ rep-14;Internet - EN;Publication des indicateurs qualité destinés au site inte
 rep-15;Internet - FR;Publication des indicateurs qualité destinés au site internet en français.;Qualité;dwh;public;[Publication, Ponctualité];Gilles Becker;Quotidien;46169,87032;/QUALITE/PUBLIC/OLD/Internet - FR;892;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/PUBLIC/OLD/Internet%20-%20FR
 rep-16;Ponctualité;Présentation publique des résultats de ponctualité du réseau ferroviaire.;Qualité;dwh;public;[Publication, Ponctualité];Gilles Becker;Hebdomadaire;46115,92717;/QUALITE/PUBLIC/Ponctualité;885;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/PUBLIC/Ponctualité
 rep-17;Rapport de publication mensuelle de ponctualité;Rapport mensuel destiné à la communication des performances de ponctualité.;Qualité;dwh;public;[Publication, Ponctualité];Gilles Becker;Mensuel;46124,32626;/QUALITE/PUBLIC/Rapport de publication mensuelle de ponctualité;887;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/PUBLIC/Rapport%20de%20publication%20mensuelle%20de%20ponctualité
-rep-18;Qualité des données;Contrôle et suivi de la qualité des données utilisées pour le reporting.;Qualité;dwh;restreint;[Qualité des données];Sylvain Rauch;Quotidien;46149,80087;/QUALITE/Qualité des données/Qualité des données;943;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Qualité%20des%20données/Qualité%20des%20données
+rep-18;Qualité des données;Contrôle et suivi de la qualité des données utilisées pour le reporting.;Qualité;dwh;restreint;[Qualité des données];Sylvain Rauch;Quotidien;46149,80087;/QUALITE/Qualité des données/Qualité des données;943;DW_POWERBI_QUALITE_ALL_STAFF;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Qualité%20des%20données/Qualité%20des%20données
 rep-19;Vérification des heures BVU;Contrôle de cohérence des horaires et événements enregistrés dans BVU.;Qualité;dwh;interne;[Qualité des données];Sylvain Rauch;Quotidien;46100,12446;/QUALITE/Qualité des données/Vérification des heures BVU;1827;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Qualité%20des%20données/Vérification%20des%20heures%20BVU
 rep-20;Réclamations;Analyse des réclamations clients et de leur évolution dans le temps.;Qualité;dwh;interne;[Satisfaction client];Gilles Becker;Hebdomadaire;46067,99758;/QUALITE/Réclamations/Réclamations;28;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Réclamations/Réclamations
 rep-21;Roadmap IV;Suivi global des actions et indicateurs liés à l'information voyageurs.;Qualité;dwh;interne;[Information voyageurs, Pilotage direction];Sylvain Rauch;Quotidien;46069,30387;/QUALITE/ROADMAP IV/Roadmap IV;1516;DW_POWERBI_QUALITE_TBOPERATIONNELS_INFOVOY;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ROADMAP%20IV/Roadmap%20IV
@@ -395,6 +395,7 @@ async function loadConfig() {
 function updateTabPermissions() {
     const navWorkflows = document.querySelector('[data-tab-target="workflows"]');
     const navGovernance = document.querySelector('[data-tab-target="governance"]');
+    const navAdminConsole = document.querySelector('[data-tab-target="admin-console"]');
 
     // Validation des workflows: Steward, Owner, Admin
     const hasWorkflowsAccess = (currentRole === "Steward" || currentRole === "Owner" || currentRole === "Admin");
@@ -408,11 +409,20 @@ function updateTabPermissions() {
         navGovernance.style.display = hasGovernanceAccess ? "flex" : "none";
     }
 
+    // Console Admin BI: Admin ONLY
+    const hasAdminConsoleAccess = (currentRole === "Admin");
+    if (navAdminConsole) {
+        navAdminConsole.style.display = hasAdminConsoleAccess ? "flex" : "none";
+    }
+
     // Redirect to dashboard if currently on a forbidden tab
     if (activeTab === "workflows" && !hasWorkflowsAccess) {
         switchTab("dashboard");
     }
     if (activeTab === "governance" && !hasGovernanceAccess) {
+        switchTab("dashboard");
+    }
+    if (activeTab === "admin-console" && !hasAdminConsoleAccess) {
         switchTab("dashboard");
     }
 }
@@ -481,6 +491,9 @@ function loadState() {
             updateAvatarIcon();
         }
     }, 50);
+
+    loadRecertifications();
+    loadSyncLogs();
 }
 
 function saveReportsToStorage() {
@@ -516,6 +529,24 @@ function updateAvatarIcon() {
 
 // 5. DOM Event Listeners binding
 function initEventListeners() {
+    // Toggle Data Galaxy sync status simulation
+    const dgBadge = document.getElementById("header-datagalaxy-badge");
+    if (dgBadge) {
+        dgBadge.addEventListener("click", () => {
+            const dot = document.getElementById("header-dg-status-dot");
+            const text = document.getElementById("header-dg-status-text");
+            if (dot.classList.contains("error")) {
+                dot.classList.remove("error");
+                text.textContent = "Synchronisé";
+                dgBadge.setAttribute("title", "Cliquez pour simuler une erreur de synchronisation Data Galaxy");
+            } else {
+                dot.classList.add("error");
+                text.textContent = "Erreur";
+                dgBadge.setAttribute("title", "Cliquez pour reconnecter à Data Galaxy");
+            }
+        });
+    }
+
     // Tabs selection in sidebar
     document.querySelectorAll('#nav-prototype-group .nav-item').forEach(item => {
         item.addEventListener("click", (e) => {
@@ -543,6 +574,78 @@ function initEventListeners() {
             }
 
             renderAll();
+        });
+    }
+
+    // Collapsible cards toggle listeners
+    const recertToggle = document.getElementById("recert-toggle-header");
+    if (recertToggle) {
+        recertToggle.addEventListener("click", () => {
+            const content = document.getElementById("recert-collapse-content");
+            const arrow = recertToggle.querySelector(".toggle-arrow");
+            if (content.style.display === "none") {
+                content.style.display = "block";
+                arrow.style.transform = "rotate(0deg)";
+            } else {
+                content.style.display = "none";
+                arrow.style.transform = "rotate(-90deg)";
+            }
+        });
+    }
+
+    // Anomaly Bug report triggers
+    const bugBtn = document.getElementById("viewer-bug-report-btn");
+    if (bugBtn) bugBtn.addEventListener("click", openBugReportModal);
+
+    const bugClose = document.getElementById("bug-close-btn");
+    const bugCancel = document.getElementById("bug-cancel-btn");
+    if (bugClose) bugClose.addEventListener("click", closeBugReportModal);
+    if (bugCancel) bugCancel.addEventListener("click", closeBugReportModal);
+
+    const bugSubmit = document.getElementById("bug-submit-btn");
+    if (bugSubmit) bugSubmit.addEventListener("click", submitBugReport);
+
+    // Recertify modal triggers
+    const recertClose = document.getElementById("recert-close-btn");
+    const recertCancel = document.getElementById("recert-cancel-btn");
+    if (recertClose) recertClose.addEventListener("click", closeRecertifyModal);
+    if (recertCancel) recertCancel.addEventListener("click", closeRecertifyModal);
+
+    const recertSubmit = document.getElementById("recert-submit-btn");
+    if (recertSubmit) recertSubmit.addEventListener("click", submitRecertification);
+
+    // Manual sync trigger
+    const syncBtn = document.getElementById("admin-sync-now-btn");
+    if (syncBtn) syncBtn.addEventListener("click", forceManualSync);
+
+    // Collapsible cards toggle listeners
+    const wfToggle = document.getElementById("wf-toggle-header");
+    if (wfToggle) {
+        wfToggle.addEventListener("click", () => {
+            const content = document.getElementById("wf-collapse-content");
+            const arrow = wfToggle.querySelector(".toggle-arrow");
+            if (content.style.display === "none") {
+                content.style.display = "block";
+                arrow.style.transform = "rotate(0deg)";
+            } else {
+                content.style.display = "none";
+                arrow.style.transform = "rotate(-90deg)";
+            }
+        });
+    }
+
+    const logsToggle = document.getElementById("logs-toggle-header");
+    if (logsToggle) {
+        logsToggle.addEventListener("click", () => {
+            const content = document.getElementById("logs-collapse-content");
+            const arrow = logsToggle.querySelector(".toggle-arrow");
+            if (content.style.display === "none") {
+                content.style.display = "block";
+                arrow.style.transform = "rotate(0deg)";
+            } else {
+                content.style.display = "none";
+                arrow.style.transform = "rotate(-90deg)";
+            }
         });
     }
 
@@ -757,6 +860,11 @@ function switchTab(tabId) {
     document.getElementById("section-catalog").classList.remove("active");
     document.getElementById("section-workflows").classList.remove("active");
     document.getElementById("section-governance").classList.remove("active");
+    
+    const adminSec = document.getElementById("section-admin-console");
+    if (adminSec) {
+        adminSec.classList.remove("active");
+    }
 
     const targetSection = document.getElementById(`section-${tabId}`);
     if (targetSection) {
@@ -771,6 +879,8 @@ function switchTab(tabId) {
         renderWorkflowsTab();
     } else if (tabId === "governance") {
         renderAdminPanel();
+    } else if (tabId === "admin-console") {
+        renderAdminConsole();
     }
 }
 
@@ -781,6 +891,9 @@ function renderAll() {
     renderCatalog();
     renderWorkflowsTab();
     renderAdminPanel();
+    if (currentRole === "Admin") {
+        renderAdminConsole();
+    }
 }
 
 // --- DASHBOARD RENDERING ---
@@ -1278,6 +1391,7 @@ function renderAdminPanel() {
             logsTbody.appendChild(tr);
         });
     }
+    renderRecertificationTable();
 }
 
 function loadReportInAdminForm(reportId) {
@@ -1420,6 +1534,10 @@ function openDrawer(reportId) {
         });
     }
 
+    // Populate view count
+    const drawerViews = document.getElementById("drawer-viewcount");
+    if (drawerViews) drawerViews.textContent = r.viewCount;
+
     // Role-based visibility rules:
     // "Emplacement technique" and "Accès autorisés" are only visible to Steward, Owner, and Admin.
     // "Partager" button is only accessible to Steward, Owner, and Admin.
@@ -1427,10 +1545,12 @@ function openDrawer(reportId) {
     
     const pathContainer = document.getElementById("drawer-technical-path-container");
     const accessContainer = document.getElementById("drawer-access-list-container");
+    const viewCountContainer = document.getElementById("drawer-viewcount-container");
     const shareBtn = document.getElementById("drawer-share-action-btn");
 
     if (pathContainer) pathContainer.style.display = hasAdvancedAccess ? "block" : "none";
     if (accessContainer) accessContainer.style.display = hasAdvancedAccess ? "block" : "none";
+    if (viewCountContainer) viewCountContainer.style.display = hasAdvancedAccess ? "block" : "none";
     if (shareBtn) shareBtn.style.display = hasAdvancedAccess ? "flex" : "none";
 
     const favActionBtn = document.getElementById("drawer-fav-action-btn");
@@ -1752,4 +1872,393 @@ function toggleFavorite(reportId) {
     }
     saveFavoritesToStorage();
     renderAll();
+}
+
+// ========================================================
+// 15. ANOMALY REPORTING LOGIC (FEEDBACK LOOP)
+// ========================================================
+function openBugReportModal() {
+    const container = document.getElementById("report-viewer-container");
+    const reportId = container ? container.getAttribute("data-report-id") : null;
+    if (!reportId) return;
+
+    const r = reports.find(item => item.id === reportId);
+    if (!r) return;
+
+    document.getElementById("bug-report-id").value = reportId;
+    document.getElementById("bug-description").value = "";
+    document.getElementById("bug-type").value = "Données incorrectes";
+
+    const modal = document.getElementById("bug-report-modal");
+    if (modal) modal.style.display = "flex";
+}
+
+function closeBugReportModal() {
+    const modal = document.getElementById("bug-report-modal");
+    if (modal) modal.style.display = "none";
+}
+
+function submitBugReport() {
+    const reportId = document.getElementById("bug-report-id").value;
+    const type = document.getElementById("bug-type").value;
+    const desc = document.getElementById("bug-description").value.trim();
+
+    if (desc === "") {
+        alert("Veuillez saisir une description de l'anomalie.");
+        return;
+    }
+
+    const r = reports.find(item => item.id === reportId);
+    if (!r) return;
+
+    const now = new Date();
+    const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    
+    const newLog = {
+        timestamp: formattedDate,
+        user: "Damien G.",
+        event: "Signalement Anomalie",
+        target: r.title,
+        status: `Transmis (${type})`
+    };
+    logs.unshift(newLog);
+    saveLogsToStorage();
+
+    addSyncLog(formattedDate, "Feedback Loop", `Signalement anomalie transmis pour "${r.title}". Destinataires : Steward et Owner (${r.owner}).`, "Succès");
+
+    alert(`Votre signalement pour le rapport "${r.title}" a été envoyé avec succès. Le Steward et le Business Owner ont été notifiés.`);
+    closeBugReportModal();
+    renderAll();
+}
+
+// ========================================================
+// 16. ACCESS RECERTIFICATION LOGIC
+// ========================================================
+let recertifications = [
+    { id: "recert-1", reportId: "rep-1", adGroup: "DW_POWERBI_QUALITE_ANALYSESADHOC", lastControl: "12/03/2026", status: "Conforme" },
+    { id: "recert-2", reportId: "rep-4", adGroup: "DW_POWERBI_QUALITE_BO", lastControl: "18/02/2026", status: "Conforme" },
+    { id: "recert-3", reportId: "rep-12", adGroup: "DW_POWERBI_IT_ADMIN", lastControl: "04/05/2026", status: "Conforme" },
+    { id: "recert-4", reportId: "rep-18", adGroup: "DW_POWERBI_QUALITE_ALL_STAFF", lastControl: "10/01/2026", status: "Recertification requise" }
+];
+
+function loadRecertifications() {
+    const savedRecerts = localStorage.getItem("cfl_bi_recertifications");
+    if (savedRecerts) {
+        recertifications = JSON.parse(savedRecerts);
+    } else {
+        saveRecertifications();
+    }
+}
+
+function saveRecertifications() {
+    localStorage.setItem("cfl_bi_recertifications", JSON.stringify(recertifications));
+}
+
+function renderRecertificationTable() {
+    const tbody = document.getElementById("recertification-tbody");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+
+    recertifications.forEach(rec => {
+        const r = reports.find(item => item.id === rec.reportId);
+        if (!r) return;
+
+        const membersCount = rec.id === "recert-1" ? 5 : (rec.id === "recert-2" ? 3 : (rec.id === "recert-3" ? 2 : 6));
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td><strong>${r.title}</strong></td>
+            <td><code style="font-family: monospace; font-size: 11.5px; background: #e0e0e0; padding: 2px 4px; border-radius: 3px;">${rec.adGroup}</code></td>
+            <td>${membersCount} utilisateurs</td>
+            <td>${rec.lastControl}</td>
+            <td>
+                <button class="btn-sm-action primary" onclick="openRecertifyModal('${rec.id}')">Contrôler</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+let activeRecertId = null;
+const simulatedAdUsers = [
+    { name: "Laurent Leclerc", email: "laurent.leclerc@cfl.lu" },
+    { name: "Jean-Paul Weber", email: "jean-paul.weber@cfl.lu" },
+    { name: "Sophie Martin", email: "sophie.martin@cfl.lu" },
+    { name: "Michel Becker", email: "michel.becker@cfl.lu" }
+];
+
+function openRecertifyModal(recertId) {
+    const rec = recertifications.find(item => item.id === recertId);
+    if (!rec) return;
+
+    activeRecertId = recertId;
+    const r = reports.find(item => item.id === rec.reportId);
+    if (!r) return;
+
+    document.getElementById("recert-report-title").textContent = r.title;
+    document.getElementById("recert-ad-group").textContent = rec.adGroup;
+
+    const tbody = document.getElementById("recert-users-tbody");
+    if (tbody) {
+        tbody.innerHTML = "";
+        simulatedAdUsers.forEach((usr, idx) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><strong>${usr.name}</strong></td>
+                <td><code style="font-family: monospace; font-size: 11.5px;">${usr.email}</code></td>
+                <td style="text-align: center;">
+                    <div style="display: inline-flex; border: 1px solid var(--cfl-gray-border); border-radius: 4px; overflow: hidden;">
+                        <button class="btn-decision active" id="dec-keep-${idx}" onclick="setDecision(${idx}, 'keep')" style="background-color: #34c759; color: white; border: none; padding: 4px 10px; font-size: 11px; cursor: pointer; font-weight:600;">Conserver</button>
+                        <button class="btn-decision" id="dec-revoke-${idx}" onclick="setDecision(${idx}, 'revoke')" style="background-color: #f4f4f4; color: #333; border: none; padding: 4px 10px; font-size: 11px; cursor: pointer; font-weight:600;">Révoquer</button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    const modal = document.getElementById("recertify-modal");
+    if (modal) modal.style.display = "flex";
+}
+
+function setDecision(idx, type) {
+    const btnKeep = document.getElementById(`dec-keep-${idx}`);
+    const btnRevoke = document.getElementById(`dec-revoke-${idx}`);
+    if (type === "keep") {
+        btnKeep.style.backgroundColor = "#34c759";
+        btnKeep.style.color = "white";
+        btnRevoke.style.backgroundColor = "#f4f4f4";
+        btnRevoke.style.color = "#333";
+    } else {
+        btnKeep.style.backgroundColor = "#f4f4f4";
+        btnKeep.style.color = "#333";
+        btnRevoke.style.backgroundColor = "#ff3b30";
+        btnRevoke.style.color = "white";
+    }
+}
+
+function closeRecertifyModal() {
+    const modal = document.getElementById("recertify-modal");
+    if (modal) modal.style.display = "none";
+}
+
+function submitRecertification() {
+    if (!activeRecertId) return;
+
+    const rec = recertifications.find(item => item.id === activeRecertId);
+    if (!rec) return;
+
+    const r = reports.find(item => item.id === rec.reportId);
+    if (!r) return;
+
+    const now = new Date();
+    const formattedDateStr = `${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
+    const formattedTimeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+    rec.lastControl = formattedDateStr;
+    rec.status = "Conforme";
+    saveRecertifications();
+
+    const newLog = {
+        timestamp: formattedTimeStr,
+        user: currentRole === "Steward" ? "Steward BI" : "Business Owner",
+        event: "Recertification Accès",
+        target: r.title,
+        status: "Révisé (AD)"
+    };
+    logs.unshift(newLog);
+    saveLogsToStorage();
+
+    addSyncLog(formattedTimeStr, "Active Directory", `Recertification complétée pour le groupe "${rec.adGroup}" (Rapport : ${r.title}).`, "Succès");
+
+    alert(`La recertification du groupe d'accès AD "${rec.adGroup}" a été enregistrée avec succès.`);
+    closeRecertifyModal();
+    renderAll();
+}
+
+// Expose decisions helper globally
+window.openRecertifyModal = openRecertifyModal;
+window.setDecision = setDecision;
+window.resolvePssiCompliance = resolvePssiCompliance;
+
+// ========================================================
+// 17. ADMIN BI CONSOLE LOGIC (TELEMETRY, SYNC LOGS, PSSI ALERT)
+// ========================================================
+let syncLogs = [
+    { timestamp: "2026-07-24 14:00", flow: "Active Directory", message: "Synchro réussie. 182 comptes vérifiés.", status: "Succès" },
+    { timestamp: "2026-07-24 12:00", flow: "Data Galaxy", message: "Mise à jour des tags. 34 rapports synchronisés.", status: "Succès" },
+    { timestamp: "2026-07-24 10:00", flow: "Active Directory", message: "Synchro réussie. 182 comptes vérifiés.", status: "Succès" },
+    { timestamp: "2026-07-24 08:00", flow: "Data Galaxy", message: "Erreur de connexion (Timeout serveur api.datagalaxy.com). Retrying in 15min.", status: "Échec" }
+];
+
+function addSyncLog(timestamp, flow, message, status) {
+    syncLogs.unshift({ timestamp, flow, message, status });
+    if (syncLogs.length > 30) syncLogs.pop();
+    localStorage.setItem("cfl_bi_sync_logs", JSON.stringify(syncLogs));
+}
+
+function loadSyncLogs() {
+    const saved = localStorage.getItem("cfl_bi_sync_logs");
+    if (saved) {
+        syncLogs = JSON.parse(saved);
+    }
+}
+
+function renderAdminConsole() {
+    const slowQueriesTbody = document.getElementById("telemetry-slow-queries-tbody");
+    if (slowQueriesTbody) {
+        slowQueriesTbody.innerHTML = `
+            <tr>
+                <td><strong>rep-12 Analyse retards</strong></td>
+                <td>damien.g@cfl.lu</td>
+                <td style="color: #ff9500; font-weight: bold;">4.2s</td>
+            </tr>
+            <tr>
+                <td><strong>rep-18 Qualité données</strong></td>
+                <td>jean-paul.w@cfl.lu</td>
+                <td style="color: #ff3b30; font-weight: bold;">6.8s</td>
+            </tr>
+            <tr>
+                <td><strong>rep-4 Suivi RH hebdo</strong></td>
+                <td>sophie.m@cfl.lu</td>
+                <td style="color: #ff9500; font-weight: bold;">3.9s</td>
+            </tr>
+        `;
+    }
+
+    const syncTbody = document.getElementById("sync-logs-tbody");
+    if (syncTbody) {
+        syncTbody.innerHTML = "";
+        syncLogs.forEach(log => {
+            const statusClass = log.status === "Succès" ? "color: #248a3d;" : "color: #dc3545; font-weight: bold;";
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${log.timestamp}</td>
+                <td><strong>${log.flow}</strong></td>
+                <td>${log.message}</td>
+                <td style="${statusClass}">${log.status}</td>
+            `;
+            syncTbody.appendChild(tr);
+        });
+    }
+
+    const complianceTbody = document.getElementById("pssi-compliance-tbody");
+    const summaryCard = document.getElementById("pssi-compliance-alert-summary");
+    const summaryText = document.getElementById("pssi-compliance-alert-text");
+
+    if (complianceTbody) {
+        complianceTbody.innerHTML = "";
+        let violationsCount = 0;
+
+        reports.forEach(r => {
+            const isSensitive = (r.pssi === "restreint" || r.pssi === "confidentiel");
+            const hasBroadGroup = r.adGroups.some(g => 
+                g.includes("PUBLIC") || 
+                g.includes("ALL") || 
+                g.includes("STAFF") || 
+                g.includes("EVERYONE")
+            );
+
+            const tr = document.createElement("tr");
+            let evaluationCell = "";
+            let actionCell = "";
+
+            if (isSensitive && hasBroadGroup) {
+                violationsCount++;
+                evaluationCell = `<span style="color: #dc3545; font-weight: 700;">⚠️ Alerte: Groupe trop large</span>`;
+                actionCell = `<button class="btn-sm-action danger" onclick="resolvePssiCompliance('${r.id}')" style="background-color: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">Restreindre l'accès</button>`;
+            } else if (isSensitive) {
+                evaluationCell = `<span style="color: #248a3d; font-weight: 600;">✓ Conforme (Groupe restreint)</span>`;
+                actionCell = `<span style="color: var(--text-secondary); font-size: 11.5px;">Aucune action requise</span>`;
+            } else {
+                evaluationCell = `<span style="color: var(--text-secondary);">Non-sensible (PSSI: ${r.pssi.toUpperCase()})</span>`;
+                actionCell = `<span style="color: var(--text-secondary); font-size: 11.5px;">N/A</span>`;
+            }
+
+            tr.innerHTML = `
+                <td><strong>${r.title}</strong></td>
+                <td><span class="pssi-badge ${r.pssi}">${r.pssi.toUpperCase()}</span></td>
+                <td><code style="font-family: monospace; font-size: 11.5px; background: #e0e0e0; padding: 2px 4px; border-radius: 3px;">${r.adGroups.join(", ")}</code></td>
+                <td>${evaluationCell}</td>
+                <td style="text-align: center;">${actionCell}</td>
+            `;
+            complianceTbody.appendChild(tr);
+        });
+
+        if (summaryCard && summaryText) {
+            if (violationsCount > 0) {
+                summaryCard.style.display = "block";
+                summaryText.innerHTML = `Scanner PSSI : <strong>${violationsCount} anomalie(s) active(s)</strong> de droits d'accès détectée(s). Les rapports sensibles disposent de groupes AD trop ouverts.`;
+            } else {
+                summaryCard.style.display = "none";
+            }
+        }
+    }
+}
+
+function resolvePssiCompliance(reportId) {
+    const r = reports.find(item => item.id === reportId);
+    if (!r) return;
+
+    r.adGroups = r.adGroups.map(g => {
+        if (g.includes("ALL") || g.includes("STAFF") || g.includes("PUBLIC")) {
+            return g.replace("_ALL_STAFF", "_RESTRICT").replace("_PUBLIC", "_RESTRICT");
+        }
+        return g;
+    });
+
+    saveReportsToStorage();
+
+    const now = new Date();
+    const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    const newLog = {
+        timestamp: formattedDate,
+        user: "Admin BI",
+        event: "Correction PSSI",
+        target: r.title,
+        status: "Restreint (AD)"
+    };
+    logs.unshift(newLog);
+    saveLogsToStorage();
+
+    addSyncLog(formattedDate, "Active Directory", `Correction PSSI appliquée pour "${r.title}". Le groupe AD a été restreint.`, "Succès");
+
+    alert(`Action corrective appliquée. Le groupe d'accès AD pour le rapport "${r.title}" a été restreint aux seuls agents autorisés.`);
+    renderAll();
+}
+
+function forceManualSync() {
+    const btn = document.getElementById("admin-sync-now-btn");
+    const dgBadge = document.getElementById("admin-dg-sync-badge");
+
+    if (btn) {
+        const prevText = btn.textContent;
+        btn.textContent = "Synchronisation...";
+        btn.disabled = true;
+        btn.style.opacity = "0.7";
+        if (dgBadge) {
+            dgBadge.textContent = "Synchro en cours...";
+            dgBadge.style.backgroundColor = "rgba(255, 149, 0, 0.1)";
+            dgBadge.style.color = "#c67c00";
+        }
+
+        setTimeout(() => {
+            const now = new Date();
+            const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+            addSyncLog(formattedDate, "Active Directory", "Synchro manuelle forcée : 182 comptes utilisateurs AD et 44 groupes vérifiés.", "Succès");
+            addSyncLog(formattedDate, "Data Galaxy", "Synchro manuelle forcée : 44 fiches d'identité et 25 tags mis à jour.", "Succès");
+
+            btn.textContent = prevText;
+            btn.disabled = false;
+            btn.style.opacity = "";
+            if (dgBadge) {
+                dgBadge.textContent = "Opérationnel";
+                dgBadge.style.backgroundColor = "";
+                dgBadge.style.color = "";
+            }
+
+            alert("La synchronisation manuelle des habilitations Active Directory et du dictionnaire Data Galaxy s'est déroulée avec succès.");
+            renderAll();
+        }, 1200);
+    }
 }
