@@ -1,0 +1,33 @@
+# Configuration des metadonnees du portail CFL Analysis
+services:
+  - id: qualite
+    label: Qualité
+    color: "#00a896"
+  - id: informatique
+    label: Informatique
+    color: "#536dfe"
+
+classifications:
+  - id: dwh
+    label: Certifié DWH
+    class: dwh
+  - id: self-service
+    label: Self-Service
+    class: self-service
+  - id: public
+    label: Public
+    class: public
+
+pssi:
+  - id: public
+    label: Public
+    class: public
+  - id: interne
+    label: Interne
+    class: interne
+  - id: restreint
+    label: Restreint
+    class: restreint
+  - id: confidentiel
+    label: Confidentiel
+    class: confidentiel

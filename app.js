@@ -162,7 +162,26 @@ const INITIAL_WORKFLOWS = [
     }
 ];
 
-// 2. Global State Variables
+// 2. Global State Variables and Configuration
+const DEFAULT_CONFIG = {
+    services: [
+        { id: "qualite", label: "Qualité", color: "#00a896" },
+        { id: "informatique", label: "Informatique", color: "#536dfe" }
+    ],
+    classifications: [
+        { id: "dwh", label: "Certifié DWH", class: "dwh" },
+        { id: "self-service", label: "Self-Service", class: "self-service" },
+        { id: "public", label: "Public", class: "public" }
+    ],
+    pssi: [
+        { id: "public", label: "Public", class: "public" },
+        { id: "interne", label: "Interne", class: "interne" },
+        { id: "restreint", label: "Restreint", class: "restreint" },
+        { id: "confidentiel", label: "Confidentiel", class: "confidentiel" }
+    ]
+};
+
+let portalConfig = { ...DEFAULT_CONFIG };
 let reports = [];
 let logs = [];
 let pendingWorkflows = [];
@@ -176,8 +195,231 @@ let searchQuery = "";
 let favorites = [];
 let history = [];
 
+// Helper to convert hex color to rgba for style injection
+function hexToRgba(hex, alpha) {
+    hex = hex.replace('#', '');
+    let r = parseInt(hex.substring(0, 2), 16);
+    let g = parseInt(hex.substring(2, 4), 16);
+    let b = parseInt(hex.substring(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+// Dynamically inject styles based on config services
+function injectDynamicConfigStyles(config) {
+    const styleEl = document.createElement("style");
+    let css = "";
+    config.services.forEach(s => {
+        const rbgLight = hexToRgba(s.color, 0.08);
+        css += `
+            .service-badge.${s.id} {
+                background-color: ${rbgLight} !important;
+                color: ${s.color} !important;
+            }
+            .catalog-service-title.${s.id} {
+                border-bottom-color: ${s.color} !important;
+            }
+        `;
+    });
+    styleEl.textContent = css;
+    document.head.appendChild(styleEl);
+}
+
+// Parse custom lightweight YAML
+function parseYamlConfig(yamlText) {
+    const lines = yamlText.split('\n');
+    const config = { services: [], classifications: [], pssi: [] };
+    let currentSection = null;
+    let currentItem = null;
+
+    for (let line of lines) {
+        const trimmed = line.trim();
+        if (trimmed === "" || trimmed.startsWith("#")) continue;
+
+        if (trimmed.startsWith("services:")) {
+            currentSection = "services";
+            continue;
+        } else if (trimmed.startsWith("classifications:")) {
+            currentSection = "classifications";
+            continue;
+        } else if (trimmed.startsWith("pssi:")) {
+            currentSection = "pssi";
+            continue;
+        }
+
+        if (trimmed.startsWith("-")) {
+            if (currentItem && currentSection) {
+                config[currentSection].push(currentItem);
+            }
+            currentItem = {};
+        }
+
+        if (trimmed.includes(":")) {
+            const colonIdx = trimmed.indexOf(":");
+            let key = trimmed.substring(0, colonIdx).replace(/^-/, "").trim();
+            let val = trimmed.substring(colonIdx + 1).trim();
+            val = val.replace(/^["']|["']$/g, "");
+            
+            if (currentItem) {
+                currentItem[key] = val;
+            }
+        }
+    }
+    if (currentItem && currentSection) {
+        config[currentSection].push(currentItem);
+    }
+    return config;
+}
+
+// Populate HTML dynamic filters and admin form dropdowns
+function initDynamicFilters(config) {
+    // 1. Service filter pills
+    const serviceFilterContainer = document.getElementById("filter-services-container");
+    if (serviceFilterContainer) {
+        serviceFilterContainer.innerHTML = `<button class="filter-pill active" data-service="all">Tous</button>`;
+        config.services.forEach(s => {
+            const btn = document.createElement("button");
+            btn.className = "filter-pill";
+            btn.setAttribute("data-service", s.id);
+            btn.textContent = s.label;
+            serviceFilterContainer.appendChild(btn);
+        });
+        
+        // Rebind click listeners
+        document.querySelectorAll('#filter-services-container .filter-pill').forEach(pill => {
+            pill.addEventListener("click", (e) => {
+                document.querySelectorAll('#filter-services-container .filter-pill').forEach(p => p.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                selectedService = e.currentTarget.getAttribute("data-service");
+                renderCatalog();
+            });
+        });
+    }
+
+    // 2. Classification filter pills
+    const classifFilterContainer = document.getElementById("filter-classifications-container");
+    if (classifFilterContainer) {
+        classifFilterContainer.innerHTML = `<button class="filter-pill active" data-classif="all">Toutes</button>`;
+        config.classifications.forEach(c => {
+            const btn = document.createElement("button");
+            btn.className = "filter-pill";
+            btn.setAttribute("data-classif", c.id);
+            btn.textContent = c.label;
+            classifFilterContainer.appendChild(btn);
+        });
+        
+        document.querySelectorAll('#filter-classifications-container .filter-pill').forEach(pill => {
+            pill.addEventListener("click", (e) => {
+                document.querySelectorAll('#filter-classifications-container .filter-pill').forEach(p => p.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                selectedClassification = e.currentTarget.getAttribute("data-classif");
+                renderCatalog();
+            });
+        });
+    }
+
+    // 3. PSSI filter pills
+    const pssiFilterContainer = document.getElementById("filter-pssi-container");
+    if (pssiFilterContainer) {
+        pssiFilterContainer.innerHTML = `<button class="filter-pill active" data-pssi="all">Toutes</button>`;
+        config.pssi.forEach(p => {
+            const btn = document.createElement("button");
+            btn.className = "filter-pill";
+            btn.setAttribute("data-pssi", p.id);
+            btn.textContent = p.label;
+            pssiFilterContainer.appendChild(btn);
+        });
+        
+        document.querySelectorAll('#filter-pssi-container .filter-pill').forEach(pill => {
+            pill.addEventListener("click", (e) => {
+                document.querySelectorAll('#filter-pssi-container .filter-pill').forEach(p => p.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                selectedPssi = e.currentTarget.getAttribute("data-pssi");
+                renderCatalog();
+            });
+        });
+    }
+
+    // 4. Admin form options
+    const adminServiceSelect = document.getElementById("admin-report-service");
+    if (adminServiceSelect) {
+        adminServiceSelect.innerHTML = "";
+        config.services.forEach(s => {
+            const opt = document.createElement("option");
+            opt.value = s.id;
+            opt.textContent = s.label;
+            adminServiceSelect.appendChild(opt);
+        });
+    }
+
+    const adminClassifSelect = document.getElementById("admin-report-classif");
+    if (adminClassifSelect) {
+        adminClassifSelect.innerHTML = "";
+        config.classifications.forEach(c => {
+            const opt = document.createElement("option");
+            opt.value = c.id;
+            opt.textContent = c.label;
+            adminClassifSelect.appendChild(opt);
+        });
+    }
+
+    const adminPssiSelect = document.getElementById("admin-report-pssi");
+    if (adminPssiSelect) {
+        adminPssiSelect.innerHTML = "";
+        config.pssi.forEach(p => {
+            const opt = document.createElement("option");
+            opt.value = p.id;
+            opt.textContent = p.label;
+            adminPssiSelect.appendChild(opt);
+        });
+    }
+}
+
+// Fetch and load YAML config
+async function loadConfig() {
+    try {
+        const response = await fetch('config.yaml');
+        if (response.ok) {
+            const yamlText = await response.text();
+            portalConfig = parseYamlConfig(yamlText);
+            console.log("Configuration YAML chargée avec succès !");
+        }
+    } catch (e) {
+        console.warn("Impossible de charger config.yaml via fetch, utilisation des configurations par défaut.");
+    }
+    
+    injectDynamicConfigStyles(portalConfig);
+    initDynamicFilters(portalConfig);
+}
+
+// Update Role-Based Tab Permissions
+function updateTabPermissions() {
+    const navWorkflows = document.querySelector('[data-tab-target="workflows"]');
+    const navGovernance = document.querySelector('[data-tab-target="governance"]');
+
+    // Validation des workflows: Steward, Owner, Admin
+    const hasWorkflowsAccess = (currentRole === "Steward" || currentRole === "Owner" || currentRole === "Admin");
+    if (navWorkflows) {
+        navWorkflows.style.display = hasWorkflowsAccess ? "flex" : "none";
+    }
+
+    // Gestion des rapports: Steward, Owner
+    const hasGovernanceAccess = (currentRole === "Steward" || currentRole === "Owner");
+    if (navGovernance) {
+        navGovernance.style.display = hasGovernanceAccess ? "flex" : "none";
+    }
+
+    // Redirect to dashboard if currently on a forbidden tab
+    if (activeTab === "workflows" && !hasWorkflowsAccess) {
+        switchTab("dashboard");
+    }
+    if (activeTab === "governance" && !hasGovernanceAccess) {
+        switchTab("dashboard");
+    }
+}
+
 // 3. Initialize App
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadConfig();
     loadState();
     initEventListeners();
     renderAll();
@@ -371,7 +613,12 @@ function initEventListeners() {
     const drawerClose = document.getElementById("drawer-close-btn");
     const drawerOverlay = document.getElementById("drawer-overlay");
     if (drawerClose) drawerClose.addEventListener("click", closeDrawer);
-    if (drawerOverlay) drawerOverlay.addEventListener("click", closeDrawer);
+    if (drawerOverlay) {
+        drawerOverlay.addEventListener("click", () => {
+            closeDrawer();
+            closeReportViewer();
+        });
+    }
 
     // Favorite button inside Drawer
     const drawerFavBtn = document.getElementById("drawer-fav-action-btn");
@@ -529,6 +776,7 @@ function switchTab(tabId) {
 
 // 6. Rendering Engine
 function renderAll() {
+    updateTabPermissions();
     renderDashboard();
     renderCatalog();
     renderWorkflowsTab();
@@ -716,12 +964,12 @@ function renderCatalog() {
         return;
     }
 
-    // Dynamic View by service (Grouped Layout by Qualité / Informatique)
+    // Dynamic View by service (Grouped Layout dynamically populated from config)
     if (selectedService === "all") {
-        const services = {
-            qualite: { label: "Service Qualité & Exploitation", color: "qualite", list: [] },
-            informatique: { label: "Service Informatique & Gouvernance", color: "informatique", list: [] }
-        };
+        const services = {};
+        portalConfig.services.forEach(s => {
+            services[s.id] = { label: `Service ${s.label}`, color: s.id, list: [] };
+        });
 
         filteredReports.forEach(r => {
             if (services[r.service]) {
@@ -1390,12 +1638,17 @@ function openReportViewer(reportId) {
 
     closeDrawer();
 
-    // Show report viewer pop-in overlay
+    // Show report viewer pop-in drawer with sliding right transition
     const container = document.getElementById("report-viewer-container");
+    const overlay = document.getElementById("drawer-overlay");
     if (container) {
         container.style.display = "flex";
-        document.body.style.overflow = "hidden"; // disable body scrolling
+        // Force reflow
+        container.offsetWidth;
+        container.classList.add("open");
     }
+    if (overlay) overlay.classList.add("open");
+    document.body.style.overflow = "hidden"; // disable body scrolling
 }
 
 function closeReportViewer() {
@@ -1403,10 +1656,22 @@ function closeReportViewer() {
     if (iframeEl) iframeEl.src = "about:blank"; // clear iframe context
 
     const container = document.getElementById("report-viewer-container");
+    const overlay = document.getElementById("drawer-overlay");
+    const detailsDrawer = document.getElementById("report-drawer");
+    
     if (container) {
-        container.style.display = "none";
-        document.body.style.overflow = ""; // restore body scrolling
+        container.classList.remove("open");
+        setTimeout(() => {
+            if (!container.classList.contains("open")) {
+                container.style.display = "none";
+            }
+        }, 300);
     }
+    
+    if (overlay && (!detailsDrawer || !detailsDrawer.classList.contains("open"))) {
+        overlay.classList.remove("open");
+    }
+    document.body.style.overflow = ""; // restore body scrolling
     renderAll();
 }
 

@@ -1283,18 +1283,19 @@ textarea.form-control {
 .catalog-service-title.rh { border-bottom-color: var(--rh-color); }
 .catalog-service-title.finances { border-bottom-color: var(--finances-color); }
 
-/* Report Viewer Container Overlay */
+/* Report Viewer Container Overlay (Sliding Drawer from right) */
 .report-viewer-container {
     position: fixed;
     top: 0;
-    left: 0;
-    width: 100vw;
+    right: -75vw;
+    width: 75vw;
     height: 100vh;
     background-color: #f3f2f1;
-    z-index: 1000;
+    z-index: 1045;
     display: flex;
     flex-direction: column;
-    animation: fadeIn 0.3s ease;
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.2);
+    transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .viewer-header {
