@@ -1,152 +1,176 @@
 // app.js - CFL Analysis Interactive Engine
 
-// 1. Initial Mock Database of CFL Reports with Classifications and PSSI Sensitivity
-const INITIAL_REPORTS = [
-    {
-        id: "rep-1",
-        title: "Rapport Ponctualité Voyageurs",
-        desc: "Suivi quotidien du taux de ponctualité des trains de voyageurs (TER, TGV, Transfrontaliers). Analyse par ligne, par gare et par tranche horaire.",
-        service: "voyageurs",
-        classification: "dwh", // Certifié DWH
-        pssi: "interne", // PSSI: Interne
-        tags: ["KPI", "Temps réel", "Critique"],
-        owner: "Jean-Marc Muller (Service Voyageurs)",
-        frequency: "Quotidien",
-        lastRefresh: "Aujourd'hui à 14:15",
-        pbirsPath: "/Voyageurs/Exploitation/Taux_Ponctualite",
-        viewCount: 1420,
-        adGroups: ["CFL-Voyageurs-Editeurs", "CFL-Data-Analysts", "CFL-Direction-Generale"],
-        pbirsUrl: "https://pbirs.cfl.lu/reports/powerbi/Voyageurs/Taux_Ponctualite"
-    },
-    {
-        id: "rep-2",
-        title: "Suivi Maintenance Matériel Roulant",
-        desc: "État de la flotte de locomotives et voitures voyageurs. Planification de la maintenance préventive et suivi en temps réel des pannes critiques.",
-        service: "infra",
-        classification: "dwh", // Certifié DWH
-        pssi: "restreint", // PSSI: Restreint
-        tags: ["Sécurité", "KPI", "Temps réel"],
-        owner: "Marc Weber (Direction Matériel)",
-        frequency: "Quotidien",
-        lastRefresh: "Aujourd'hui à 13:50",
-        pbirsPath: "/Infra/Technique/Maintenance_Roulant",
-        viewCount: 980,
-        adGroups: ["CFL-Infra-Techniciens", "CFL-Data-Analysts", "CFL-Voyageurs-Editeurs"],
-        pbirsUrl: "https://pbirs.cfl.lu/reports/powerbi/Infra/Maintenance_Roulant"
-    },
-    {
-        id: "rep-3",
-        title: "KPI Fret Cargo - Tonnage & CA",
-        desc: "Suivi mensuel du volume de fret transporté en tonnes-kilomètres et du chiffre d'affaires associé par corridor européen de fret.",
-        service: "fret",
-        classification: "dwh", // Certifié DWH
-        pssi: "interne", // PSSI: Interne
-        tags: ["KPI", "Mensuel", "Budget"],
-        owner: "Sandrine Schultz (CFL Cargo)",
-        frequency: "Mensuel",
-        lastRefresh: "Le 12/07/2026 à 09:30",
-        pbirsPath: "/Fret/Financier/KPI_Tonnage_CA",
-        viewCount: 750,
-        adGroups: ["CFL-Fret-Managers", "CFL-Finances-Controleurs"],
-        pbirsUrl: "https://pbirs.cfl.lu/reports/powerbi/Fret/KPI_Tonnage_CA"
-    },
-    {
-        id: "rep-4",
-        title: "Registre & Conformité RGPD",
-        desc: "Suivi de la conformité du traitement des données personnelles des agents et clients CFL. Contient des informations sensibles soumises à habilitation stricte.",
-        service: "rh",
-        classification: "self-service", // Self-Service
-        pssi: "confidentiel", // PSSI: Confidentiel
-        tags: ["RGPD", "Critique", "Sécurité"],
-        owner: "Laura Ries (DPO Groupe)",
-        frequency: "Mensuel",
-        lastRefresh: "Le 01/07/2026 à 08:00",
-        pbirsPath: "/RH/Gouvernance/Registre_RGPD",
-        viewCount: 120,
-        adGroups: ["CFL-RH-Dirigeants", "CFL-DPO-Groupe"],
-        pbirsUrl: "https://pbirs.cfl.lu/reports/powerbi/RH/Registre_RGPD"
-    },
-    {
-        id: "rep-5",
-        title: "Exécution Budgétaire & Écarts",
-        desc: "Analyse budgétaire globale du groupe CFL. Comparaison entre les prévisions annuelles et les dépenses réelles par service et projet.",
-        service: "finances",
-        classification: "dwh", // Certifié DWH
-        pssi: "restreint", // PSSI: Restreint
-        tags: ["Budget", "KPI", "Mensuel"],
-        owner: "Pierre Wagner (Direction Financière)",
-        frequency: "Mensuel",
-        lastRefresh: "Le 10/07/2026 à 17:45",
-        pbirsPath: "/Finances/Controle/Suivi_Budgetaire",
-        viewCount: 1100,
-        adGroups: ["CFL-Finances-Controleurs", "CFL-Direction-Generale"],
-        pbirsUrl: "https://pbirs.cfl.lu/reports/powerbi/Finances/Suivi_Budgetaire"
-    },
-    {
-        id: "rep-6",
-        title: "Taux d'Absentéisme & Santé au Travail",
-        desc: "Indicateurs d'absentéisme par type de cause (maladie, accident de travail) et par catégorie professionnelle. Permet de piloter les plans de prévention.",
-        service: "rh",
-        classification: "self-service", // Self-Service
-        pssi: "restreint", // PSSI: Restreint
-        tags: ["KPI", "Mensuel", "RGPD"],
-        owner: "Sophie Mertens (RH Groupe)",
-        frequency: "Mensuel",
-        lastRefresh: "Le 05/07/2026 à 10:15",
-        pbirsPath: "/RH/Sante/Taux_Absenteisme",
-        viewCount: 450,
-        adGroups: ["CFL-RH-Dirigeants", "CFL-RH-Sante"],
-        pbirsUrl: "https://pbirs.cfl.lu/reports/powerbi/RH/Taux_Absenteisme"
-    },
-    {
-        id: "rep-7",
-        title: "Consommation Énergétique des Trains",
-        desc: "Analyse de la consommation d'énergie (électricité de traction, gasoil) par type de matériel roulant. Outil de pilotage de l'éco-conduite.",
-        service: "infra",
-        classification: "self-service", // Self-Service
-        pssi: "interne", // PSSI: Interne
-        tags: ["Temps réel", "KPI"],
-        owner: "Luc Nicolas (Transition Énergétique)",
-        frequency: "Quotidien",
-        lastRefresh: "Aujourd'hui à 12:00",
-        pbirsPath: "/Infra/Energie/Consommation_Traction",
-        viewCount: 680,
-        adGroups: ["CFL-Infra-Techniciens", "CFL-Data-Analysts"],
-        pbirsUrl: "https://pbirs.cfl.lu/reports/powerbi/Infra/Consommation_Traction"
-    },
-    {
-        id: "rep-8",
-        title: "Plan de Recrutement & Effectifs",
-        desc: "Suivi des recrutements en cours par rapport au plan annuel de dotation. Gestion prévisionnelle des emplois et des départs à la retraite.",
-        service: "rh",
-        classification: "public", // Public
-        pssi: "public", // PSSI: Public
-        tags: ["Budget", "Mensuel"],
-        owner: "Sophie Mertens (RH Groupe)",
-        frequency: "Mensuel",
-        lastRefresh: "Le 14/07/2026 à 15:20",
-        pbirsPath: "/RH/Recrutement/Effectifs_Recrutement",
-        viewCount: 380,
-        adGroups: ["CFL-RH-Dirigeants", "CFL-Finances-Controleurs"],
-        pbirsUrl: "https://pbirs.cfl.lu/reports/powerbi/RH/Effectifs_Recrutement"
+// Raw CSV Database with simplified tags format [tag1,tag2,...]
+const RAW_CSV_DATA = `id;title;desc;service;classification;pssi;tags;owner;frequency;lastRefresh;pbirsPath;viewcount;adGroups;pbirsUrl
+rep-1;Analyse de la ponctualité au départ;Analyse des performances de ponctualité des trains au point de départ de leur circulation.;Qualité;self-service;public;[Ponctualité, Performance opérationnelle];Sylvain Rauch;Hebdomadaire;46176,94305;/QUALITE/ANALYSES AD HOC/Analyse de la ponctualité au départ;1712;DW_POWERBI_QUALITE_ANALYSESADHOC;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Analyse%20de%20la%20ponctualité%20au%20départ
+rep-2;Analyse hebdo des causes retard;Suivi hebdomadaire des principales causes de retards observées sur le réseau.;Qualité;self-service;interne;[Ponctualité, Performance opérationnelle];Gilles Becker;Mensuel;46038,71527;/QUALITE/ANALYSES AD HOC/Analyse hebdo des causes retard;1774;DW_POWERBI_QUALITE_ANALYSESADHOC;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Analyse%20hebdo%20des%20causes%20retard
+rep-3;Analyse train;Analyse détaillée de la performance et des incidents d'un train ou d'un ensemble de trains.;Qualité;self-service;public;[Performance opérationnelle, Ponctualité];Sylvain Rauch;Hebdomadaire;46047,35143;/QUALITE/ANALYSES AD HOC/Analyse train;368;DW_POWERBI_QUALITE_ANALYSESADHOC;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Analyse%20train
+rep-4;Annonces GSM-R;Suivi des annonces et communications diffusées via le réseau GSM-R.;Qualité;self-service;public;[Information voyageurs, Performance opérationnelle];Gilles Becker;Mensuel;46024,12619;/QUALITE/ANALYSES AD HOC/Annonces GSM-R;1116;DW_POWERBI_QUALITE_ANALYSESADHOC;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Annonces%20GSM-R
+rep-5;Nb trains (planifiés) et voyageurs passant par établissement;Statistiques des trains planifiés et des flux voyageurs par établissement.;Qualité;self-service;public;[Volume d'activité, Performance opérationnelle];Gilles Becker;Mensuel;46038,85115;/QUALITE/ANALYSES AD HOC/Nb trains (planifiés) et voyageurs passant par établissement;1179;DW_POWERBI_QUALITE_ANALYSESADHOC;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Nb%20trains%20(planifiés)%20et%20voyageurs%20passant%20par%20établissement
+rep-6;Rapport forces majeures;Identification et suivi des impacts liés aux événements de force majeure.;Qualité;self-service;public;[Performance opérationnelle, Infrastructure];Gilles Becker;Hebdomadaire;46075,64475;/QUALITE/ANALYSES AD HOC/Rapport forces majeures;391;DW_POWERBI_QUALITE_ANALYSESADHOC;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Rapport%20forces%20majeures
+rep-7;Rapports ponctualité;Vue consolidée des indicateurs de ponctualité du trafic ferroviaire.;Qualité;self-service;interne;[Ponctualité, Pilotage direction];Gilles Becker;Hebdomadaire;46219,65834;/QUALITE/ANALYSES AD HOC/Rapports ponctualité;888;DW_POWERBI_QUALITE_ANALYSESADHOC;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Rapports%20ponctualité
+rep-8;Retards réguliers;Analyse des retards récurrents afin d'identifier les problématiques structurelles.;Qualité;self-service;public;[Ponctualité, Performance opérationnelle];Gilles Becker;Quotidien;46193,48031;/QUALITE/ANALYSES AD HOC/Retards réguliers;1556;DW_POWERBI_QUALITE_ANALYSESADHOC;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Retards%20réguliers
+rep-9;Clearing Code 5XX;Suivi et analyse des retards associés aux codes causes de la série 5XX.;Qualité;dwh;public;[Ponctualité, Performance opérationnelle];Gilles Becker;Hebdomadaire;46133,67525;/QUALITE/Clearing/Clearing Code 5XX;1410;DW_POWERBI_QUALITE_CLEARINGEF;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Clearing/Clearing%20Code%205XX
+rep-10;Écrans H00;Visualisation synthétique des indicateurs opérationnels utilisés lors du point H00.;Qualité;dwh;confidentiel;[Performance opérationnelle, Pilotage direction];Gilles Becker;Mensuel;46211,2153;/QUALITE/H00/Écrans H00;483;DW_POWERBI_QUALITE_H00;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/H00/Écrans%20H00
+rep-11;Quotidienne H00;Rapport quotidien des principaux indicateurs de qualité et d'exploitation.;Qualité;dwh;confidentiel;[Performance opérationnelle, Pilotage direction];Sylvain Rauch;Mensuel;46201,76182;/QUALITE/H00/Quotidienne H00;1296;DW_POWERBI_QUALITE_H01;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/H00/Quotidienne%20H00
+rep-12;Tableau de bord H00;Tableau de bord centralisant les indicateurs clés suivis lors des réunions H00.;Qualité;dwh;interne;[Performance opérationnelle, Pilotage direction];Sylvain Rauch;Hebdomadaire;46023,7002;/QUALITE/H00/Tableau de bord H00;1999;DW_POWERBI_QUALITE_H02;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/H00/Tableau%20de%20bord%20H00
+rep-13;Internet - DE;Publication des indicateurs qualité destinés au site internet en allemand.;Qualité;dwh;public;[Publication, Ponctualité];Gilles Becker;Hebdomadaire;46222,57127;/QUALITE/PUBLIC/OLD/Internet - DE;403;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/PUBLIC/OLD/Internet%20-%20DE
+rep-14;Internet - EN;Publication des indicateurs qualité destinés au site internet en anglais.;Qualité;dwh;public;[Publication, Ponctualité];Gilles Becker;Mensuel;46091,23106;/QUALITE/PUBLIC/OLD/Internet - EN;518;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/PUBLIC/OLD/Internet%20-%20EN
+rep-15;Internet - FR;Publication des indicateurs qualité destinés au site internet en français.;Qualité;dwh;public;[Publication, Ponctualité];Gilles Becker;Quotidien;46169,87032;/QUALITE/PUBLIC/OLD/Internet - FR;892;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/PUBLIC/OLD/Internet%20-%20FR
+rep-16;Ponctualité;Présentation publique des résultats de ponctualité du réseau ferroviaire.;Qualité;dwh;public;[Publication, Ponctualité];Gilles Becker;Hebdomadaire;46115,92717;/QUALITE/PUBLIC/Ponctualité;885;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/PUBLIC/Ponctualité
+rep-17;Rapport de publication mensuelle de ponctualité;Rapport mensuel destiné à la communication des performances de ponctualité.;Qualité;dwh;public;[Publication, Ponctualité];Gilles Becker;Mensuel;46124,32626;/QUALITE/PUBLIC/Rapport de publication mensuelle de ponctualité;887;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/PUBLIC/Rapport%20de%20publication%20mensuelle%20de%20ponctualité
+rep-18;Qualité des données;Contrôle et suivi de la qualité des données utilisées pour le reporting.;Qualité;dwh;restreint;[Qualité des données];Sylvain Rauch;Quotidien;46149,80087;/QUALITE/Qualité des données/Qualité des données;943;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Qualité%20des%20données/Qualité%20des%20données
+rep-19;Vérification des heures BVU;Contrôle de cohérence des horaires et événements enregistrés dans BVU.;Qualité;dwh;interne;[Qualité des données];Sylvain Rauch;Quotidien;46100,12446;/QUALITE/Qualité des données/Vérification des heures BVU;1827;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Qualité%20des%20données/Vérification%20des%20heures%20BVU
+rep-20;Réclamations;Analyse des réclamations clients et de leur évolution dans le temps.;Qualité;dwh;interne;[Satisfaction client];Gilles Becker;Hebdomadaire;46067,99758;/QUALITE/Réclamations/Réclamations;28;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Réclamations/Réclamations
+rep-21;Roadmap IV;Suivi global des actions et indicateurs liés à l'information voyageurs.;Qualité;dwh;interne;[Information voyageurs, Pilotage direction];Sylvain Rauch;Quotidien;46069,30387;/QUALITE/ROADMAP IV/Roadmap IV;1516;DW_POWERBI_QUALITE_TBOPERATIONNELS_INFOVOY;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ROADMAP%20IV/Roadmap%20IV
+rep-22;Roadmap IV - 2024;Suivi des objectifs et réalisations de la Roadmap IV pour l'année 2024.;Qualité;dwh;interne;[Information voyageurs, Pilotage direction];Sylvain Rauch;Hebdomadaire;46218,73013;/QUALITE/ROADMAP IV/Roadmap IV - 2024;1857;DW_POWERBI_QUALITE_TBOPERATIONNELS_INFOVOY;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ROADMAP%20IV/Roadmap%20IV%20-%202024
+rep-23;Roadmap IV - 2025;Suivi des objectifs et réalisations de la Roadmap IV pour l'année 2025.;Qualité;dwh;public;[Information voyageurs, Pilotage direction];Gilles Becker;Mensuel;46043,25597;/QUALITE/ROADMAP IV/Roadmap IV - 2025;396;DW_POWERBI_QUALITE_TBOPERATIONNELS_INFOVOY;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ROADMAP%20IV/Roadmap%20IV%20-%202025
+rep-24;Barometre Qualite;Suivi des indicateurs de satisfaction et de perception de la qualité de service.;Qualité;dwh;confidentiel;[Satisfaction client, Pilotage direction];Sylvain Rauch;Quotidien;46035,45123;/QUALITE/Satisfaction Clients/Barometre Qualite;1142;DW_POWERBI_QUALITE_BAROMETRE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Satisfaction%20Clients/Barometre%20Qualite
+rep-25;Satisfaction clients des espaces sanitaires;Mesure de la satisfaction des voyageurs concernant les installations sanitaires.;Qualité;dwh;confidentiel;[Satisfaction client];Gilles Becker;Quotidien;46211,62882;/QUALITE/Satisfaction Clients/Satisfaction clients des espaces sanitaires;1688;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Satisfaction%20Clients/Satisfaction%20clients%20des%20espaces%20sanitaires
+rep-26;1 Objectifs;Suivi des objectifs stratégiques et de leur niveau d'atteinte.;Qualité;dwh;confidentiel;[Pilotage direction];Sylvain Rauch;Quotidien;46111,20149;/QUALITE/TB Direction/1 Objectifs;684;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Direction/1%20Objectifs
+rep-27;2 Ponctualité et continuité;Tableau de bord des indicateurs de ponctualité et de continuité de service.;Qualité;dwh;public;[Pilotage direction, Ponctualité];Sylvain Rauch;Quotidien;46048,90617;/QUALITE/TB Direction/2 Ponctualité et continuité;820;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/TB%20Direction/2%20Ponctualité%20et%20continuité
+rep-28;2b Ponctualité - Commentaires détaillés;Analyse détaillée et commentaires explicatifs des résultats de ponctualité.;Qualité;dwh;confidentiel;[Pilotage direction, Ponctualité];Gilles Becker;Mensuel;46107,4707;/QUALITE/TB Direction/2b Ponctualité - Commentaires détaillés;260;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Direction/2b%20Ponctualité%20-%20Commentaires%20détaillés
+rep-29;3 Causes de retards et de suppressions - Vue client voyageur;Analyse des retards et suppressions selon leur impact sur les voyageurs.;Qualité;dwh;public;[Ponctualité, Satisfaction client];Sylvain Rauch;Quotidien;46065,61122;/QUALITE/TB Direction/3 Causes de retards et de suppressions - Vue client voyageur;301;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/TB%20Direction/3%20Causes%20de%20retards%20et%20de%20suppressions%20-%20Vue%20client%20voyageur
+rep-30;4 Ponctualité des trains transfrontaliers;Suivi des performances de ponctualité des trains internationaux.;Qualité;dwh;confidentiel;[Ponctualité, Coopération externe];Sylvain Rauch;Hebdomadaire;46086,66902;/QUALITE/TB Direction/4 Ponctualité des trains transfrontaliers;502;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/TB%20Direction/4%20Ponctualité%20des%20trains%20transfrontaliers
+rep-31;5 Rapport Commun CFL-SNCB;Rapport partagé entre CFL et SNCB sur les indicateurs communs de performance.;Qualité;dwh;restreint;[Coopération externe, Pilotage direction];Sylvain Rauch;Quotidien;46036,46642;/QUALITE/TB Direction/5 Rapport Commun CFL-SNCB;1287;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Direction/5%20Rapport%20Commun%20CFL-SNCB
+rep-32;6 Correspondances train-train;Analyse de la qualité des correspondances entre trains.;Qualité;dwh;restreint;[Ponctualité, Satisfaction client];Sylvain Rauch;Hebdomadaire;46039,44452;/QUALITE/TB Direction/6 Correspondances train-train;1092;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Direction/6%20Correspondances%20train-train
+rep-33;1 Objectifs 2024;Historique du suivi des objectifs stratégiques pour l'année 2024.;Qualité;dwh;public;[Pilotage direction];Gilles Becker;Quotidien;46186,09696;/QUALITE/TB Direction/Années précédentes/1 Objectifs 2024;170;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Direction/Années%20précédentes/1%20Objectifs%202024
+rep-34;1 Objectifs 2025;Historique du suivi des objectifs stratégiques pour l'année 2025.;Qualité;dwh;public;[Pilotage direction];Sylvain Rauch;Hebdomadaire;46163,0743;/QUALITE/TB Direction/Années précédentes/1 Objectifs 2025;1989;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Direction/Années%20précédentes/1%20Objectifs%202025
+rep-35;Indicateurs info voy basés sur les messages UIC;Suivi des indicateurs d'information voyageurs issus des messages UIC.;Qualité;dwh;interne;[Information voyageurs, Performance opérationnelle];Sylvain Rauch;Hebdomadaire;46190,21106;/QUALITE/TB Opérationnels – Info Voy/Indicateurs info voy basés sur les messages UIC;1654;DW_POWERBI_QUALITE_TBOPERATIONNELS;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Opérationnels%20–%20Info%20Voy/Indicateurs%20info%20voy%20basés%20sur%20les%20messages%20UIC
+rep-36;Info voy app CFL;Analyse de l'information voyageurs diffusée via l'application CFL.;Qualité;dwh;public;[Information voyageurs, Satisfaction client];Sylvain Rauch;Quotidien;46191,54686;/QUALITE/TB Opérationnels – Info Voy/Info voy app CFL;1154;DW_POWERBI_QUALITE_TBOPERATIONNELS;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Opérationnels%20–%20Info%20Voy/Info%20voy%20app%20CFL
+rep-37;Info voy en situation normale;Évaluation de la qualité de l'information voyageurs en exploitation normale.;Qualité;dwh;interne;[Information voyageurs, Performance opérationnelle];Gilles Becker;Mensuel;46034,15417;/QUALITE/TB Opérationnels – Info Voy/Info voy en situation normale;1100;DW_POWERBI_QUALITE_TBOPERATIONNELS;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Opérationnels%20–%20Info%20Voy/Info%20voy%20en%20situation%20normale
+rep-38;Info voy en situation perturbée;Évaluation de la qualité de l'information voyageurs lors des perturbations.;Qualité;dwh;restreint;[Information voyageurs, Performance opérationnelle];Gilles Becker;Mensuel;46176,19528;/QUALITE/TB Opérationnels – Info Voy/Info voy en situation perturbée;1951;DW_POWERBI_QUALITE_TBOPERATIONNELS;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Opérationnels%20–%20Info%20Voy/Info%20voy%20en%20situation%20perturbée
+rep-39;Objectifs EF sur les causes de retards et de suppressions;Suivi des objectifs de l'Entreprise Ferroviaire relatifs aux causes de retards et suppressions.;Qualité;dwh;interne;[Ponctualité, Pilotage direction];Gilles Becker;Mensuel;46133,97229;/QUALITE/TB Opérationnels - Ponctualité/Objectifs EF sur les causes de retards et de suppressions;690;DW_POWERBI_QUALITE_TBOPERATIONNELS;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Opérationnels%20-%20Ponctualité/Objectifs%20EF%20sur%20les%20causes%20de%20retards%20et%20de%20suppressions
+rep-40;Objectifs GI sur les causes de retards et de suppressions;Suivi des objectifs du Gestionnaire d'Infrastructure relatifs aux causes de retards et suppressions.;Qualité;dwh;restreint;[Ponctualité, Infrastructure];Gilles Becker;Mensuel;46214,17105;/QUALITE/TB Opérationnels - Ponctualité/Objectifs GI sur les causes de retards et de suppressions;265;DW_POWERBI_QUALITE_TBOPERATIONNELS;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Opérationnels%20-%20Ponctualité/Objectifs%20GI%20sur%20les%20causes%20de%20retards%20et%20de%20suppressions
+rep-41;Rapport hebdomadaire sur les codes causes;Analyse hebdomadaire de la répartition des causes de retards et suppressions.;Qualité;dwh;restreint;[Ponctualité, Performance opérationnelle];Sylvain Rauch;Hebdomadaire;46181,15494;/QUALITE/TB Opérationnels - Ponctualité/Rapport hebdomadaire sur les codes causes;1116;DW_POWERBI_QUALITE_TBOPERATIONNELS;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Opérationnels%20-%20Ponctualité/Rapport%20hebdomadaire%20sur%20les%20codes%20causes
+rep-42;Analyse des périodes de travaux;Étude de l'impact des périodes de travaux sur l'exploitation ferroviaire et la qualité de service.;Qualité;dwh;restreint;[Infrastructure, Performance opérationnelle];Sylvain Rauch;Quotidien;46180,19542;/QUALITE/Travaux/Analyse des périodes de travaux;803;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Travaux/Analyse%20des%20périodes%20de%20travaux
+rep-43;Suivi plateforme BI;Suivi des droits et accès sur la plateforme BI, et gestion des incohérences des droits;Informatique;dwh;restreint;[Informatique, Dashbaord];Stephane Hoff;Quotidien;46169,87032;/SUIVI PLATEFORME BI/Suivi plateforme BI;2524;DW_POWERBI_CONTENT_MANAGERS_PROD;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/SUIVI%20PLATEFORME%20BI/Suivi%20plateforme%20BI
+rep-44;Revue des accès Teams et SharePoint 2026 - DM Maison Mère;Rapport de suivi de projet sur la revue des Teams et Sharepoint;Informatique;dwh;restreint;[Informatique, Dashbaord];Pauline Bouard;Hebdomadaire;46111,20149;/Data Gouvernance/Revue des accès/Data Manager;718;DW_POWERBI_CONTENT_MANAGERS_PROD;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/Data%20Gouvernance/Revue%20des%20acc%C3%A8s/Data%20Manager/Revue%20des%20acc%C3%A8s%20Teams%20et%20SharePoint%202026%20-%20DM%20Maison%20M%C3%A8re`;
+
+// Parse CSV Reports to Object Array
+function parseCSVReports(csvText) {
+    const lines = csvText.trim().split("\n");
+    const reportsList = [];
+    
+    // Excel serial date to JS string helper
+    const excelDateToStr = (serialStr) => {
+        try {
+            const serial = parseFloat(serialStr.replace(",", "."));
+            // Dec 30, 1899 + serial days
+            const date = new Date((serial - 25569) * 86400 * 1000);
+            
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            
+            return `${day}/${month}/${year} à ${hours}:${minutes}`;
+        } catch (e) {
+            return "Récemment";
+        }
+    };
+
+    for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (line === "") continue;
+
+        const parts = line.split(";");
+        if (parts.length < 14) continue;
+
+        const id = parts[0];
+        const title = parts[1];
+        const desc = parts[2];
+        // Strip accents and lowercase the service to match CSS badges (Qualité -> qualite, Informatique -> informatique)
+        const service = parts[3].toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const classification = parts[4];
+        const pssi = parts[5];
+        
+        // Robust tags parser splitting bracketed comma-separated strings [tag1, tag2]
+        let tags = [];
+        let tagsRaw = parts[6].trim();
+        // Remove outer quotes if present
+        if (tagsRaw.startsWith('"') && tagsRaw.endsWith('"')) {
+            tagsRaw = tagsRaw.slice(1, -1);
+        }
+        // Remove brackets
+        if (tagsRaw.startsWith('[') && tagsRaw.endsWith(']')) {
+            tagsRaw = tagsRaw.slice(1, -1);
+        }
+        // Split by comma and clean up double-quotes or remaining spaces
+        tags = tagsRaw.split(",")
+            .map(t => t.trim().replace(/^["']|["']$/g, "").replace(/""/g, "").replace(/"/g, ""))
+            .filter(t => t !== "");
+
+        const owner = parts[7];
+        const frequency = parts[8];
+        const lastRefresh = excelDateToStr(parts[9]);
+        const pbirsPath = parts[10];
+        const viewCount = parseInt(parts[11]) || 0;
+        const adGroups = [parts[12]];
+        const pbirsUrl = parts[13];
+
+        reportsList.push({
+            id,
+            title,
+            desc,
+            service,
+            classification,
+            pssi,
+            tags,
+            owner,
+            frequency,
+            lastRefresh,
+            pbirsPath,
+            viewCount,
+            adGroups,
+            pbirsUrl
+        });
     }
+    return reportsList;
+}
+
+// Audit logs base adjusted for Qualité / Informatique reports
+const INITIAL_LOGS = [
+    { timestamp: "2026-07-24 10:10", user: "Damien G.", event: "Sync Data Galaxy", target: "Clearing Code 5XX", status: "Succès" },
+    { timestamp: "2026-07-24 09:32", user: "Sophie M.", event: "Workflow Partage", target: "Tableau de bord H00 -> L.Faber", status: "Approuvé" },
+    { timestamp: "2026-07-24 08:15", user: "Marc W.", event: "Modif. Métadonnées", target: "Qualité des données", status: "Succès" },
+    { timestamp: "2026-07-24 07:05", user: "System", event: "Auto-sync Data Galaxy", target: "18 tags synchronisés", status: "Succès" }
 ];
 
-// Audit logs base
-const INITIAL_LOGS = [
-    { timestamp: "2026-07-16 15:10", user: "Damien G.", event: "Sync Data Galaxy", target: "Rapport Ponctualité Voyageurs", status: "Succès" },
-    { timestamp: "2026-07-16 14:32", user: "Sophie M.", event: "Workflow Partage", target: "Plan de Recrutement -> L.Faber", status: "Approuvé" },
-    { timestamp: "2026-07-16 11:15", user: "Marc W.", event: "Modif. Métadonnées", target: "Suivi Maintenance Matériel Roulant", status: "Succès" },
-    { timestamp: "2026-07-16 09:05", user: "System", event: "Auto-sync Data Galaxy", target: "18 tags synchronisés", status: "Succès" }
+// Initial sharing workflows in queue
+const INITIAL_WORKFLOWS = [
+    {
+        id: "wf-1",
+        timestamp: "2026-07-24 09:15",
+        requester: "Damien G.",
+        beneficiary: "Laurent Faber (Laurent.Faber@cfl.lu)",
+        reportId: "rep-12",
+        reportTitle: "Tableau de bord H00",
+        reason: "Besoin de suivre les KPIs de ponctualité pour le comité H00 hebdomadaire.",
+        workflowType: "direct"
+    },
+    {
+        id: "wf-2",
+        timestamp: "2026-07-24 08:30",
+        requester: "Marc W.",
+        beneficiary: "Jean-Paul Weber (Jean-Paul.Weber@cfl.lu)",
+        reportId: "rep-18",
+        reportTitle: "Qualité des données",
+        reason: "Audit de conformité des heures saisies dans BVU.",
+        workflowType: "double"
+    }
 ];
 
 // 2. Global State Variables
 let reports = [];
 let logs = [];
-let activeTab = "dashboard"; // "dashboard", "catalog", "governance"
+let pendingWorkflows = [];
+let currentRole = "Standard"; // Standard, Steward, Owner, Admin
+let activeTab = "dashboard"; // dashboard, catalog, workflows, governance
 let selectedService = "all";
 let selectedClassification = "all";
-let selectedPssi = "all"; // PSSI filter
+let selectedPssi = "all"; 
 let selectedTags = [];
 let searchQuery = "";
 let favorites = [];
@@ -164,8 +188,13 @@ function loadState() {
     const savedReports = localStorage.getItem("cfl_bi_reports");
     if (savedReports) {
         reports = JSON.parse(savedReports);
+        // Force refresh if database was not matching simplified tags syntax
+        if (reports.length > 0 && reports[0].tags.some(t => t.includes('"') || t.startsWith('['))) {
+            reports = parseCSVReports(RAW_CSV_DATA);
+            saveReportsToStorage();
+        }
     } else {
-        reports = [...INITIAL_REPORTS];
+        reports = parseCSVReports(RAW_CSV_DATA);
         saveReportsToStorage();
     }
 
@@ -177,11 +206,39 @@ function loadState() {
         saveLogsToStorage();
     }
 
+    const savedWorkflows = localStorage.getItem("cfl_bi_workflows");
+    if (savedWorkflows) {
+        pendingWorkflows = JSON.parse(savedWorkflows);
+    } else {
+        pendingWorkflows = [...INITIAL_WORKFLOWS];
+        saveWorkflowsToStorage();
+    }
+
+    const savedRole = localStorage.getItem("cfl_bi_current_role");
+    currentRole = savedRole ? savedRole : "Standard";
+
     const savedFavs = localStorage.getItem("cfl_bi_favorites");
-    favorites = savedFavs ? JSON.parse(savedFavs) : ["rep-1", "rep-2"];
+    favorites = savedFavs ? JSON.parse(savedFavs) : ["rep-12", "rep-18"];
+    favorites = favorites.filter(id => reports.some(r => r.id === id));
+    if (favorites.length === 0 && reports.length >= 2) {
+        favorites = [reports[11].id, reports[17].id]; // rep-12, rep-18
+    }
 
     const savedHist = localStorage.getItem("cfl_bi_history");
-    history = savedHist ? JSON.parse(savedHist) : ["rep-1", "rep-3", "rep-5"];
+    history = savedHist ? JSON.parse(savedHist) : ["rep-12", "rep-9", "rep-21"];
+    history = history.filter(id => reports.some(r => r.id === id));
+    if (history.length === 0 && reports.length >= 3) {
+        history = [reports[11].id, reports[8].id, reports[20].id]; // rep-12, rep-9, rep-21
+    }
+
+    // Update Role Selector UI
+    setTimeout(() => {
+        const selector = document.getElementById("user-role-selector");
+        if (selector) {
+            selector.value = currentRole;
+            updateAvatarIcon();
+        }
+    }, 50);
 }
 
 function saveReportsToStorage() {
@@ -192,12 +249,27 @@ function saveLogsToStorage() {
     localStorage.setItem("cfl_bi_logs", JSON.stringify(logs));
 }
 
+function saveWorkflowsToStorage() {
+    localStorage.setItem("cfl_bi_workflows", JSON.stringify(pendingWorkflows));
+}
+
 function saveFavoritesToStorage() {
     localStorage.setItem("cfl_bi_favorites", JSON.stringify(favorites));
 }
 
 function saveHistoryToStorage() {
     localStorage.setItem("cfl_bi_history", JSON.stringify(history));
+}
+
+function updateAvatarIcon() {
+    const avatar = document.getElementById("user-avatar");
+    if (!avatar) return;
+    switch (currentRole) {
+        case "Steward": avatar.textContent = "DS"; break;
+        case "Owner": avatar.textContent = "BO"; break;
+        case "Admin": avatar.textContent = "AB"; break;
+        default: avatar.textContent = "DG"; break;
+    }
 }
 
 // 5. DOM Event Listeners binding
@@ -209,6 +281,28 @@ function initEventListeners() {
             switchTab(tabId);
         });
     });
+
+    // Role Switcher Simulator
+    const roleSelector = document.getElementById("user-role-selector");
+    if (roleSelector) {
+        roleSelector.addEventListener("change", (e) => {
+            currentRole = e.target.value;
+            localStorage.setItem("cfl_bi_current_role", currentRole);
+            updateAvatarIcon();
+            
+            // Refresh details drawer if open (permissions changes layout)
+            const drawer = document.getElementById("report-drawer");
+            if (drawer && drawer.classList.contains("open")) {
+                const favBtn = document.getElementById("drawer-fav-action-btn");
+                if (favBtn) {
+                    const activeId = favBtn.getAttribute("data-report-id");
+                    openDrawer(activeId);
+                }
+            }
+
+            renderAll();
+        });
+    }
 
     // Dashboard Links
     document.querySelectorAll('[data-go-to]').forEach(link => {
@@ -298,6 +392,77 @@ function initEventListeners() {
         });
     }
 
+    // Direct Report Viewer Triggers
+    const openReportBtn = document.getElementById("drawer-open-report-btn");
+    if (openReportBtn) {
+        openReportBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            const reportId = drawerFavBtn.getAttribute("data-report-id");
+            openReportViewer(reportId);
+        });
+    }
+
+    const viewerBackBtn = document.getElementById("viewer-back-btn");
+    if (viewerBackBtn) {
+        viewerBackBtn.addEventListener("click", closeReportViewer);
+    }
+
+    // Power BI Sidebar navigation inside viewer
+    document.querySelectorAll('.viewer-sidebar .viewer-page-item').forEach(item => {
+        item.addEventListener("click", (e) => {
+            document.querySelectorAll('.viewer-sidebar .viewer-page-item').forEach(p => p.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            
+            const targetPage = e.currentTarget.getAttribute("data-page");
+            document.querySelectorAll('.viewer-canvas .sim-page').forEach(page => page.classList.remove('active'));
+            const targetPageEl = document.getElementById(`sim-${targetPage}`);
+            if (targetPageEl) targetPageEl.classList.add('active');
+        });
+    });
+
+    // Copy integration URL button
+    const copyUrlBtn = document.getElementById("viewer-copy-url-btn");
+    if (copyUrlBtn) {
+        copyUrlBtn.addEventListener("click", () => {
+            const urlText = document.getElementById("viewer-display-url").textContent;
+            navigator.clipboard.writeText(urlText).then(() => {
+                const prevText = copyUrlBtn.textContent;
+                copyUrlBtn.textContent = "Copié !";
+                copyUrlBtn.style.backgroundColor = "#34c759";
+                copyUrlBtn.style.color = "#ffffff";
+                setTimeout(() => {
+                    copyUrlBtn.textContent = prevText;
+                    copyUrlBtn.style.backgroundColor = "";
+                    copyUrlBtn.style.color = "";
+                }, 2000);
+            }).catch(err => {
+                alert("Erreur lors de la copie de l'URL : " + err);
+            });
+        });
+    }
+
+    // Toggle simulator view button
+    const toggleSimBtn = document.getElementById("viewer-toggle-simulator-btn");
+    if (toggleSimBtn) {
+        toggleSimBtn.addEventListener("click", () => {
+            const simulator = document.getElementById("fallback-report-simulator");
+            const iframe = document.getElementById("report-iframe");
+            if (simulator.style.display === "none") {
+                simulator.style.display = "block";
+                iframe.style.opacity = "0.1";
+                toggleSimBtn.textContent = "Revenir à l'iframe en direct";
+                toggleSimBtn.style.backgroundColor = "#fff3cd";
+                toggleSimBtn.style.color = "#856404";
+            } else {
+                simulator.style.display = "none";
+                iframe.style.opacity = "1";
+                toggleSimBtn.textContent = "Utiliser le simulateur offline";
+                toggleSimBtn.style.backgroundColor = "";
+                toggleSimBtn.style.color = "";
+            }
+        });
+    }
+
     // Modal Close
     const modalCloseBtn = document.getElementById("modal-close-btn");
     const modalCancelBtn = document.getElementById("share-cancel-btn");
@@ -343,6 +508,7 @@ function switchTab(tabId) {
 
     document.getElementById("section-dashboard").classList.remove("active");
     document.getElementById("section-catalog").classList.remove("active");
+    document.getElementById("section-workflows").classList.remove("active");
     document.getElementById("section-governance").classList.remove("active");
 
     const targetSection = document.getElementById(`section-${tabId}`);
@@ -354,15 +520,18 @@ function switchTab(tabId) {
         renderDashboard();
     } else if (tabId === "catalog") {
         renderCatalog();
+    } else if (tabId === "workflows") {
+        renderWorkflowsTab();
     } else if (tabId === "governance") {
         renderAdminPanel();
     }
 }
 
-// 8. Rendering Engine
+// 6. Rendering Engine
 function renderAll() {
     renderDashboard();
     renderCatalog();
+    renderWorkflowsTab();
     renderAdminPanel();
 }
 
@@ -374,6 +543,7 @@ function renderDashboard() {
     document.getElementById("kpi-total-certified").textContent = certifiedReports.length;
     
     document.getElementById("kpi-total-favorites").textContent = favorites.length;
+    document.getElementById("kpi-total-workflows").textContent = pendingWorkflows.length;
 
     // Render Favorites List (Dashboard Panel)
     const favListContainer = document.getElementById("dashboard-favorites-list");
@@ -390,7 +560,9 @@ function renderDashboard() {
             item.className = "list-item-row";
             item.innerHTML = `
                 <div class="item-left">
-                    <span class="nav-icon">⭐</span>
+                    <span class="nav-icon" style="color: #ff9500;">
+                        <svg class="icon-svg" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    </span>
                     <div>
                         <span class="item-title">${r.title}</span>
                         <span class="item-meta"> | Classif: <strong>${classifLabel}</strong> | PSSI: <strong style="color:var(--cfl-crimson);">${pssiLabel}</strong></span>
@@ -425,7 +597,7 @@ function renderDashboard() {
         popularContainer.appendChild(item);
     });
 
-    // Render Recently Viewed History
+    // Render Recently Viewed History (5 elements as requested)
     const historyContainer = document.getElementById("dashboard-history-list");
     historyContainer.innerHTML = "";
     
@@ -436,17 +608,19 @@ function renderDashboard() {
             .map(id => reports.find(r => r.id === id))
             .filter(r => r !== undefined)
             .reverse()
-            .slice(0, 3);
+            .slice(0, 5); // Extended to 5 elements
 
         historyReports.forEach(r => {
             const item = document.createElement("div");
             item.className = "list-item-row";
             item.innerHTML = `
                 <div class="item-left">
-                    <span class="nav-icon">🕒</span>
+                    <span class="nav-icon" style="color: var(--voyageurs-color);">
+                        <svg class="icon-svg" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </span>
                     <span class="item-title">${r.title}</span>
                 </div>
-                <span class="item-meta">Refresh: ${r.frequency}</span>
+                <span class="item-meta">PSSI: <strong>${r.pssi.toUpperCase()}</strong></span>
             `;
             item.addEventListener("click", () => openDrawer(r.id));
             historyContainer.appendChild(item);
@@ -539,50 +713,96 @@ function renderCatalog() {
                 <p class="text-secondary" style="font-size: 14px;">Ajustez vos filtres ou modifiez votre requête de recherche.</p>
             </div>
         `;
-    } else {
+        return;
+    }
+
+    // Dynamic View by service (Grouped Layout by Qualité / Informatique)
+    if (selectedService === "all") {
+        const services = {
+            qualite: { label: "Service Qualité & Exploitation", color: "qualite", list: [] },
+            informatique: { label: "Service Informatique & Gouvernance", color: "informatique", list: [] }
+        };
+
         filteredReports.forEach(r => {
-            const isFav = favorites.includes(r.id);
-            const classifLabel = r.classification === "dwh" ? "Certifié DWH" : (r.classification === "self-service" ? "Self-Service" : "Public");
-            const classifClass = r.classification;
-            const pssiLabel = `PSSI: ${r.pssi.toUpperCase()}`;
-            const pssiClass = r.pssi;
-            
-            const card = document.createElement("div");
-            card.className = "report-card";
-            card.innerHTML = `
-                <div class="report-header">
-                    <div class="report-title-area">
-                        <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom: 6px;">
-                            <span class="classif-badge ${classifClass}" style="padding: 2px 6px; font-size: 9px;">${classifLabel}</span>
-                            <span class="pssi-badge ${pssiClass}" style="padding: 2px 6px; font-size: 9px;">${pssiLabel}</span>
-                        </div>
-                        <span class="report-card-title">${r.title}</span>
-                    </div>
-                    <button class="fav-btn ${isFav ? 'active' : ''}" data-report-id="${r.id}" aria-label="Favori">
-                        ${isFav ? '★' : '☆'}
-                    </button>
+            if (services[r.service]) {
+                services[r.service].list.push(r);
+            }
+        });
+
+        Object.keys(services).forEach(key => {
+            const group = services[key];
+            if (group.list.length === 0) return;
+
+            const section = document.createElement("div");
+            section.className = "catalog-service-section";
+            section.innerHTML = `
+                <div class="catalog-service-title ${group.color}">
+                    <span>${group.label}</span>
+                    <span class="tag-badge" style="font-size: 11px; padding: 2px 8px; border-radius: 10px; background-color: var(--cfl-gray-light); color: var(--text-secondary);">${group.list.length}</span>
                 </div>
-                <p class="report-card-desc">${r.desc}</p>
-                <div class="report-meta-row">
-                    <span class="service-badge ${r.service}">${r.service.toUpperCase()}</span>
-                    <div class="card-tags">
-                        ${r.tags.map(t => `<span class="tag-badge">${t}</span>`).join('')}
-                    </div>
-                </div>
+                <div class="reports-grid" id="service-grid-${key}"></div>
             `;
-            
-            card.addEventListener("click", (e) => {
-                if (e.target.classList.contains("fav-btn")) {
-                    e.stopPropagation();
-                    toggleFavorite(r.id);
-                    return;
-                }
-                openDrawer(r.id);
+            grid.appendChild(section);
+
+            const sectionGrid = section.querySelector(`#service-grid-${key}`);
+            group.list.forEach(r => {
+                const card = createReportCardDOM(r);
+                sectionGrid.appendChild(card);
             });
-            
-            grid.appendChild(card);
+        });
+    } else {
+        const singleGrid = document.createElement("div");
+        singleGrid.className = "reports-grid";
+        grid.appendChild(singleGrid);
+
+        filteredReports.forEach(r => {
+            const card = createReportCardDOM(r);
+            singleGrid.appendChild(card);
         });
     }
+}
+
+function createReportCardDOM(r) {
+    const isFav = favorites.includes(r.id);
+    const classifLabel = r.classification === "dwh" ? "Certifié DWH" : (r.classification === "self-service" ? "Self-Service" : "Public");
+    const classifClass = r.classification;
+    const pssiLabel = `PSSI: ${r.pssi.toUpperCase()}`;
+    const pssiClass = r.pssi;
+    
+    const card = document.createElement("div");
+    card.className = "report-card";
+    card.innerHTML = `
+        <div class="report-header">
+            <div class="report-title-area">
+                <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom: 6px;">
+                    <span class="classif-badge ${classifClass}" style="padding: 2px 6px; font-size: 9px;">${classifLabel}</span>
+                    <span class="pssi-badge ${pssiClass}" style="padding: 2px 6px; font-size: 9px;">${pssiLabel}</span>
+                </div>
+                <span class="report-card-title">${r.title}</span>
+            </div>
+            <button class="fav-btn ${isFav ? 'active' : ''}" data-report-id="${r.id}" aria-label="Favori">
+                ${isFav ? '★' : '☆'}
+            </button>
+        </div>
+        <p class="report-card-desc">${r.desc}</p>
+        <div class="report-meta-row">
+            <span class="service-badge ${r.service}">${r.service.toUpperCase()}</span>
+            <div class="card-tags">
+                ${r.tags.map(t => `<span class="tag-badge">${t}</span>`).join('')}
+            </div>
+        </div>
+    `;
+    
+    card.addEventListener("click", (e) => {
+        if (e.target.classList.contains("fav-btn")) {
+            e.stopPropagation();
+            toggleFavorite(r.id);
+            return;
+        }
+        openDrawer(r.id);
+    });
+    
+    return card;
 }
 
 function filterCatalogByFavorites() {
@@ -622,43 +842,13 @@ function filterCatalogByFavorites() {
             </div>
         `;
     } else {
+        const singleGrid = document.createElement("div");
+        singleGrid.className = "reports-grid";
+        grid.appendChild(singleGrid);
+
         filteredReports.forEach(r => {
-            const classifLabel = r.classification === "dwh" ? "Certifié DWH" : (r.classification === "self-service" ? "Self-Service" : "Public");
-            const classifClass = r.classification;
-            const pssiLabel = `PSSI: ${r.pssi.toUpperCase()}`;
-            const pssiClass = r.pssi;
-            
-            const card = document.createElement("div");
-            card.className = "report-card";
-            card.innerHTML = `
-                <div class="report-header">
-                    <div class="report-title-area">
-                        <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom: 4px;">
-                            <span class="classif-badge ${classifClass}" style="padding: 2px 6px; font-size: 9px;">${classifLabel}</span>
-                            <span class="pssi-badge ${pssiClass}" style="padding: 2px 6px; font-size: 9px;">${pssiLabel}</span>
-                        </div>
-                        <span class="report-card-title">${r.title}</span>
-                    </div>
-                    <button class="fav-btn active" data-report-id="${r.id}" aria-label="Favori">★</button>
-                </div>
-                <p class="report-card-desc">${r.desc}</p>
-                <div class="report-meta-row">
-                    <span class="service-badge ${r.service}">${r.service.toUpperCase()}</span>
-                    <div class="card-tags">
-                        ${r.tags.map(t => `<span class="tag-badge">${t}</span>`).join('')}
-                    </div>
-                </div>
-            `;
-            card.addEventListener("click", (e) => {
-                if (e.target.classList.contains("fav-btn")) {
-                    e.stopPropagation();
-                    toggleFavorite(r.id);
-                    filterCatalogByFavorites();
-                    return;
-                }
-                openDrawer(r.id);
-            });
-            grid.appendChild(card);
+            const card = createReportCardDOM(r);
+            singleGrid.appendChild(card);
         });
     }
 }
@@ -698,7 +888,109 @@ function clearCatalogFilters() {
     renderCatalog();
 }
 
-// --- ADMIN / GOVERNANCE TAB RENDERING ---
+// --- WORKFLOW VALIDATION RENDERING ---
+function renderWorkflowsTab() {
+    const tbody = document.getElementById("workflow-requests-tbody");
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+
+    // Update workflow KPI counter on dashboard
+    const counter = document.getElementById("kpi-total-workflows");
+    if (counter) counter.textContent = pendingWorkflows.length;
+
+    if (pendingWorkflows.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 30px;">
+                    Aucune demande de partage Active Directory en attente de validation.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    pendingWorkflows.forEach(wf => {
+        const tr = document.createElement("tr");
+        const circuitLabel = wf.workflowType === "direct" ? "BO uniquement" : "Double Validation";
+        tr.innerHTML = `
+            <td><strong>${wf.timestamp}</strong></td>
+            <td>${wf.requester}</td>
+            <td>${wf.beneficiary}</td>
+            <td><strong>${wf.reportTitle}</strong></td>
+            <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${wf.reason}">${wf.reason}</td>
+            <td><span class="tag-badge" style="background-color: var(--cfl-crimson-light); color: var(--cfl-crimson); font-weight:600;">${circuitLabel}</span></td>
+            <td style="text-align: center; white-space: nowrap;">
+                <button class="btn-approve" onclick="approveWorkflow('${wf.id}')">Approuver</button>
+                <button class="btn-reject" onclick="rejectWorkflow('${wf.id}')">Rejeter</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function approveWorkflow(wfId) {
+    const idx = pendingWorkflows.findIndex(w => w.id === wfId);
+    if (idx === -1) return;
+
+    const wf = pendingWorkflows[idx];
+    const r = reports.find(item => item.id === wf.reportId);
+
+    // Simulate appending beneficiary name to AD Habilitations group log
+    const now = new Date();
+    const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+    const newLog = {
+        timestamp: formattedDate,
+        user: "Damien G. (Admin)",
+        event: "Workflow Partage",
+        target: `${r ? r.title : wf.reportTitle} -> ${wf.beneficiary.split(' (')[0]}`,
+        status: "Approuvé (AD Synchronisé)"
+    };
+
+    logs.unshift(newLog);
+    saveLogsToStorage();
+
+    pendingWorkflows.splice(idx, 1);
+    saveWorkflowsToStorage();
+
+    renderAll();
+    alert(`La demande d'accès pour "${wf.beneficiary}" sur le rapport "${wf.reportTitle}" a été approuvée. L'utilisateur a été ajouté au groupe Active Directory de sécurité.`);
+}
+
+function rejectWorkflow(wfId) {
+    const idx = pendingWorkflows.findIndex(w => w.id === wfId);
+    if (idx === -1) return;
+
+    const wf = pendingWorkflows[idx];
+    const r = reports.find(item => item.id === wf.reportId);
+
+    const now = new Date();
+    const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+    const newLog = {
+        timestamp: formattedDate,
+        user: "Damien G. (Admin)",
+        event: "Workflow Partage",
+        target: `${r ? r.title : wf.reportTitle} -> ${wf.beneficiary.split(' (')[0]}`,
+        status: "Rejeté par Admin"
+    };
+
+    logs.unshift(newLog);
+    saveLogsToStorage();
+
+    pendingWorkflows.splice(idx, 1);
+    saveWorkflowsToStorage();
+
+    renderAll();
+    alert(`La demande d'accès pour "${wf.beneficiary}" sur le rapport "${wf.reportTitle}" a été rejetée.`);
+}
+
+// Expose workflow actions globally
+window.approveWorkflow = approveWorkflow;
+window.rejectWorkflow = rejectWorkflow;
+
+// --- ADMIN / GESTION DES RAPPORTS TAB RENDERING ---
 function renderAdminPanel() {
     const adminSelect = document.getElementById("admin-select-report");
     if (!adminSelect) return;
@@ -792,7 +1084,7 @@ function saveReportMetadataFromAdmin() {
     const newLog = {
         timestamp: formattedDate,
         user: "Damien G.",
-        event: "Sync Data Galaxy",
+        event: "Modif. Métadonnées",
         target: reports[rIdx].title,
         status: "Succès"
     };
@@ -802,7 +1094,7 @@ function saveReportMetadataFromAdmin() {
 
     renderAll();
     
-    alert(`Les métadonnées du rapport "${reports[rIdx].title}" ont été enregistrées et synchronisées avec Data Galaxy !`);
+    alert(`Les métadonnées du rapport "${reports[rIdx].title}" ont été enregistrées avec succès.`);
 }
 
 // 9. Drawer Actions (Open, Populate, Close)
@@ -818,7 +1110,7 @@ function openDrawer(reportId) {
         history.splice(histIdx, 1);
     }
     history.push(reportId);
-    if (history.length > 10) history.shift();
+    if (history.length > 15) history.shift();
     saveHistoryToStorage();
 
     const drawerTitle = document.getElementById("drawer-report-title");
@@ -830,11 +1122,9 @@ function openDrawer(reportId) {
     
     const drawerOwner = document.getElementById("drawer-owner");
     const drawerFreq = document.getElementById("drawer-frequency");
-    const drawerRefresh = document.getElementById("drawer-last-refresh");
     const drawerPath = document.getElementById("drawer-pbirs-path");
     const drawerTags = document.getElementById("drawer-tags-container");
     const drawerAccessList = document.getElementById("drawer-access-list");
-    const pbirsLinkBtn = document.getElementById("drawer-open-report-btn");
 
     if (drawerTitle) drawerTitle.textContent = "Fiche d'identité Rapport";
     if (drawerTitleHeading) drawerTitleHeading.textContent = r.title;
@@ -860,7 +1150,6 @@ function openDrawer(reportId) {
     
     if (drawerOwner) drawerOwner.textContent = r.owner;
     if (drawerFreq) drawerFreq.textContent = r.frequency;
-    if (drawerRefresh) drawerRefresh.textContent = r.lastRefresh;
     if (drawerPath) drawerPath.textContent = r.pbirsPath;
     
     if (drawerTags) {
@@ -883,23 +1172,18 @@ function openDrawer(reportId) {
         });
     }
 
-    if (pbirsLinkBtn) {
-        pbirsLinkBtn.href = r.pbirsUrl;
-        pbirsLinkBtn.onclick = () => {
-            const now = new Date();
-            const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-            const linkLog = {
-                timestamp: formattedDate,
-                user: "Damien G.",
-                event: "Accès SSO Rapport",
-                target: r.title,
-                status: "Succès"
-            };
-            logs.unshift(linkLog);
-            saveLogsToStorage();
-            renderAdminPanel();
-        };
-    }
+    // Role-based visibility rules:
+    // "Emplacement technique" and "Accès autorisés" are only visible to Steward, Owner, and Admin.
+    // "Partager" button is only accessible to Steward, Owner, and Admin.
+    const hasAdvancedAccess = (currentRole === "Steward" || currentRole === "Owner" || currentRole === "Admin");
+    
+    const pathContainer = document.getElementById("drawer-technical-path-container");
+    const accessContainer = document.getElementById("drawer-access-list-container");
+    const shareBtn = document.getElementById("drawer-share-action-btn");
+
+    if (pathContainer) pathContainer.style.display = hasAdvancedAccess ? "block" : "none";
+    if (accessContainer) accessContainer.style.display = hasAdvancedAccess ? "block" : "none";
+    if (shareBtn) shareBtn.style.display = hasAdvancedAccess ? "flex" : "none";
 
     const favActionBtn = document.getElementById("drawer-fav-action-btn");
     if (favActionBtn) {
@@ -948,7 +1232,185 @@ function closeDrawer() {
     renderAll();
 }
 
-// 10. Share Modal Logic
+// 10. Report Viewer Simulator Logic (Direct Visualization)
+// Build URL with rs:Embed=true, active filters and user RLS roles
+function buildEmbedUrl(r) {
+    let embedUrl = r.pbirsUrl;
+    
+    // Check for query parameters and append rs:Embed=true
+    const separator = embedUrl.includes('?') ? '&' : '?';
+    embedUrl += `${separator}rs:Embed=true`;
+    
+    // Construct OData active filters
+    let odataFilters = [];
+    if (selectedService !== "all") {
+        const servName = selectedService === "qualite" ? "Qualité" : "Informatique";
+        odataFilters.push(`Service/Name eq '${servName}'`);
+    }
+    if (selectedClassification !== "all") {
+        odataFilters.push(`Classification/Type eq '${selectedClassification}'`);
+    }
+    if (selectedPssi !== "all") {
+        odataFilters.push(`PSSI/Sensitivity eq '${selectedPssi}'`);
+    }
+    
+    if (odataFilters.length > 0) {
+        embedUrl += `&$filter=${encodeURIComponent(odataFilters.join(' and '))}`;
+    }
+    
+    // Append RLS simulation parameters
+    embedUrl += `&username=damien.g@cfl.lu&roles=${encodeURIComponent(currentRole)}`;
+    
+    return embedUrl;
+}
+
+// 10. Report Viewer Simulator Logic (Direct Visualization)
+function openReportViewer(reportId) {
+    const r = reports.find(item => item.id === reportId);
+    if (!r) return;
+
+    // Log the SSO report access event
+    const now = new Date();
+    const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    const accessLog = {
+        timestamp: formattedDate,
+        user: "Damien G.",
+        event: "Visualisation Rapport",
+        target: r.title,
+        status: "Succès (SSO Actif)"
+    };
+    logs.unshift(accessLog);
+    saveLogsToStorage();
+
+    // Populate metadata in report viewer header
+    const viewerTitle = document.getElementById("viewer-report-title");
+    const viewerClassBadge = document.getElementById("viewer-classif-badge");
+    const viewerRefreshDate = document.getElementById("viewer-refresh-date");
+    
+    if (viewerTitle) viewerTitle.textContent = r.title;
+    if (viewerRefreshDate) viewerRefreshDate.textContent = r.lastRefresh;
+    
+    if (viewerClassBadge) {
+        const classifLabel = r.classification === "dwh" ? "Certifié DWH" : (r.classification === "self-service" ? "Self-Service" : "Public");
+        viewerClassBadge.className = `classif-badge ${r.classification}`;
+        viewerClassBadge.textContent = classifLabel;
+    }
+
+    // Build embed URL and update iframe
+    const embedUrl = buildEmbedUrl(r);
+    const iframeEl = document.getElementById("report-iframe");
+    if (iframeEl) iframeEl.src = embedUrl;
+
+    const displayUrlEl = document.getElementById("viewer-display-url");
+    if (displayUrlEl) {
+        displayUrlEl.textContent = embedUrl;
+        displayUrlEl.setAttribute("title", embedUrl);
+    }
+
+    // Update status bar RLS & Filters indicators
+    const rlsRoleEl = document.getElementById("viewer-rls-role");
+    if (rlsRoleEl) rlsRoleEl.textContent = currentRole;
+
+    const filtersIndicator = document.getElementById("viewer-integration-filters");
+    let activeFilters = [];
+    if (selectedService !== "all") activeFilters.push(`Service: ${selectedService.toUpperCase()}`);
+    if (selectedClassification !== "all") {
+        const classifLabel = selectedClassification === "dwh" ? "DWH" : "Self-Service";
+        activeFilters.push(`Classif: ${classifLabel}`);
+    }
+    if (selectedPssi !== "all") activeFilters.push(`PSSI: ${selectedPssi.toUpperCase()}`);
+    if (searchQuery.trim() !== "") activeFilters.push(`Recherche: "${searchQuery}"`);
+    
+    if (filtersIndicator) {
+        filtersIndicator.textContent = activeFilters.length > 0 ? activeFilters.join(", ") : "Aucun filtre actif";
+    }
+
+    // Populate RLS & Filters inside offline simulator fallback
+    const simRlsRoleVal = document.getElementById("sim-rls-role-val");
+    if (simRlsRoleVal) simRlsRoleVal.textContent = currentRole;
+
+    const simRlsGroupsVal = document.getElementById("sim-rls-groups-val");
+    if (simRlsGroupsVal) simRlsGroupsVal.textContent = r.adGroups.join(", ");
+
+    const simMetric3 = document.getElementById("sim-metric-3");
+    if (simMetric3) {
+        switch (currentRole) {
+            case "Steward": simMetric3.textContent = "Data Steward"; break;
+            case "Owner": simMetric3.textContent = "Business Owner"; break;
+            case "Admin": simMetric3.textContent = "Admin BI"; break;
+            default: simMetric3.textContent = "Standard User"; break;
+        }
+    }
+
+    const simMetric2 = document.getElementById("sim-metric-2");
+    if (simMetric2) {
+        // Adjust mocked rows count based on RLS role
+        if (currentRole === "Admin" || currentRole === "Owner") {
+            simMetric2.textContent = "1.8M lignes";
+        } else if (currentRole === "Steward") {
+            simMetric2.textContent = "1.2M lignes";
+        } else {
+            simMetric2.textContent = "324K lignes";
+        }
+    }
+
+    const simFiltersList = document.getElementById("sim-applied-filters-list");
+    if (simFiltersList) {
+        simFiltersList.innerHTML = "";
+        if (activeFilters.length === 0) {
+            simFiltersList.innerHTML = `<li><em>Aucun filtre de catalogue n'est actuellement actif.</em></li>`;
+        } else {
+            activeFilters.forEach(f => {
+                const li = document.createElement("li");
+                li.innerHTML = `Paramètre d'URL : <strong>${f}</strong>`;
+                simFiltersList.appendChild(li);
+            });
+        }
+    }
+
+    // Reset Offline Simulator display to off by default
+    const simulator = document.getElementById("fallback-report-simulator");
+    const toggleSimBtn = document.getElementById("viewer-toggle-simulator-btn");
+    if (simulator) simulator.style.display = "none";
+    if (iframeEl) iframeEl.style.opacity = "1";
+    if (toggleSimBtn) {
+        toggleSimBtn.textContent = "Utiliser le simulateur offline";
+        toggleSimBtn.style.backgroundColor = "";
+        toggleSimBtn.style.color = "";
+    }
+
+    // Reset simulator active tab
+    document.querySelectorAll('.viewer-sidebar .viewer-page-item').forEach(p => p.classList.remove('active'));
+    const firstTab = document.querySelector('.viewer-sidebar [data-page="page-1"]');
+    if (firstTab) firstTab.classList.add('active');
+
+    document.querySelectorAll('.viewer-canvas .sim-page').forEach(page => page.classList.remove('active'));
+    const firstPage = document.getElementById("sim-page-1");
+    if (firstPage) firstPage.classList.add('active');
+
+    closeDrawer();
+
+    // Show report viewer pop-in overlay
+    const container = document.getElementById("report-viewer-container");
+    if (container) {
+        container.style.display = "flex";
+        document.body.style.overflow = "hidden"; // disable body scrolling
+    }
+}
+
+function closeReportViewer() {
+    const iframeEl = document.getElementById("report-iframe");
+    if (iframeEl) iframeEl.src = "about:blank"; // clear iframe context
+
+    const container = document.getElementById("report-viewer-container");
+    if (container) {
+        container.style.display = "none";
+        document.body.style.overflow = ""; // restore body scrolling
+    }
+    renderAll();
+}
+
+// 11. Share Modal Logic
 function openShareModal(reportId) {
     const r = reports.find(item => item.id === reportId);
     if (!r) return;
@@ -984,12 +1446,27 @@ function submitShareWorkflow() {
     const now = new Date();
     const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
     
+    // Add to pending workflows queue
+    const newWf = {
+        id: "wf-" + Date.now(),
+        timestamp: formattedDate,
+        requester: "Damien G.",
+        beneficiary: shareUser,
+        reportId: reportId,
+        reportTitle: r.title,
+        reason: shareReason,
+        workflowType: workflowType
+    };
+    pendingWorkflows.push(newWf);
+    saveWorkflowsToStorage();
+
+    // Log the request
     const workflowLog = {
         timestamp: formattedDate,
         user: "Damien G.",
         event: "Workflow Partage",
         target: `${r.title} -> ${shareUser}`,
-        status: "En attente d'approbation"
+        status: "En attente de validation AD"
     };
 
     logs.unshift(workflowLog);
@@ -998,7 +1475,7 @@ function submitShareWorkflow() {
     closeShareModal();
     renderAll();
 
-    alert(`Le workflow de partage pour "${r.title}" vers "${shareUser}" a été initié. Le Business Owner (${r.owner.split(' (')[0]}) a été notifié par e-mail pour approbation.`);
+    alert(`Le workflow de partage pour "${r.title}" vers "${shareUser}" a été initié et ajouté aux tâches de validation.`);
 }
 
 function toggleFavorite(reportId) {
