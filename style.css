@@ -1283,12 +1283,12 @@ textarea.form-control {
 .catalog-service-title.rh { border-bottom-color: var(--rh-color); }
 .catalog-service-title.finances { border-bottom-color: var(--finances-color); }
 
-/* Report Viewer Container Overlay (Sliding Drawer from right) */
+/* Report Viewer Container Overlay (Sliding Drawer from right - Full Screen Width) */
 .report-viewer-container {
     position: fixed;
     top: 0;
-    right: -75vw;
-    width: 75vw;
+    right: -100vw;
+    width: 100vw;
     height: 100vh;
     background-color: #f3f2f1;
     z-index: 1045;
@@ -1296,6 +1296,10 @@ textarea.form-control {
     flex-direction: column;
     box-shadow: -5px 0 25px rgba(0, 0, 0, 0.2);
     transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.report-viewer-container.open {
+    right: 0 !important;
 }
 
 .viewer-header {
