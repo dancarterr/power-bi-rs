@@ -46,11 +46,11 @@
                         </span>
                         <span>Catalogue Rapports</span>
                     </div>
-                    <div class="nav-item" data-tab-target="workflows" role="button" tabindex="0">
+                    <div class="nav-item" data-tab-target="rights" id="nav-rights" role="button" tabindex="0" style="display: none;">
                         <span class="nav-icon">
-                            <svg class="icon-svg" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><polyline points="9 15 11 17 15 13"></polyline></svg>
+                            <svg class="icon-svg" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>
                         </span>
-                        <span>Validation des workflows</span>
+                        <span>Gestion des droits</span>
                     </div>
                     <div class="nav-item" data-tab-target="governance" role="button" tabindex="0">
                         <span class="nav-icon">
@@ -122,15 +122,6 @@
                             <div class="kpi-data">
                                 <span class="kpi-value" id="kpi-total-favorites">0</span>
                                 <span class="kpi-label">Mes Favoris</span>
-                            </div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="kpi-icon-wrapper purple">
-                                <svg class="icon-svg" viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                            </div>
-                            <div class="kpi-data">
-                                <span class="kpi-value" id="kpi-total-workflows">0</span>
-                                <span class="kpi-label">Workflows en attente</span>
                             </div>
                         </div>
                     </div>
@@ -256,42 +247,100 @@
                 </section>
 
                 <!-- ========================================================
-                     SECTION 3: VALIDATION WORKFLOWS TAB
+                     SECTION 3: GESTION DES DROITS D'ACCÈS
                      ======================================================== -->
-                 <section id="section-workflows" class="content-section">
-                     <h1>Validation des workflows</h1>
-                     <p class="section-desc">Gerez et validez les demandes d'acces aux rapports Power BI en attente d'approbation Active Directory.</p>
-                     
-                     <div class="card collapsible-card" id="wf-collapsible-card">
-                         <div class="card-header-toggle" id="wf-toggle-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; margin-bottom: 16px;">
-                             <h3 style="font-size: 18px; margin: 0; color: var(--cfl-gray-dark); display: flex; align-items: center; gap: 8px;">
-                                 <svg class="icon-svg" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color: var(--cfl-crimson);"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2 2V5a2 2 0 0 1 2-2h11"></path></svg>
-                                 Demandes de partage en attente d'approbation Active Directory / EntraID
-                             </h3>
-                             <svg class="icon-svg toggle-arrow" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.3s ease;"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                         </div>
-                         <div class="card-collapse-content" id="wf-collapse-content" style="transition: max-height 0.3s ease;">
-                             <div class="admin-table-container">
-                                 <table class="admin-table">
-                                     <thead>
-                                         <tr>
-                                             <th>Date / Heure</th>
-                                             <th>Demandeur</th>
-                                             <th>Beneficiaire</th>
-                                             <th>Rapport</th>
-                                             <th>Justification metier</th>
-                                             <th>Circuit</th>
-                                             <th style="text-align: center;">Actions</th>
-                                         </tr>
-                                     </thead>
-                                     <tbody id="workflow-requests-tbody">
-                                         <!-- Dynamic Content -->
-                                     </tbody>
-                                 </table>
-                             </div>
-                         </div>
-                     </div>
-                 </section>
+                <section id="section-rights" class="content-section">
+                    <h1>Gestion des droits d'accès</h1>
+                    <p class="section-desc">Gérez les habilitations d'accès pour les rapports Power BI. Les Stewards et Owners peuvent attribuer des accès aux groupes/utilisateurs existants. Les Admins BI peuvent également créer de nouveaux groupes d'accès AD.</p>
+                    
+                    <div class="admin-grid" style="margin-bottom: 20px;">
+                        <!-- Form to Add Access -->
+                        <div class="card">
+                            <h3 style="font-size: 18px; margin-bottom: 16px; color: var(--cfl-gray-dark);">Octroyer un accès</h3>
+                            <form id="rights-add-form" onsubmit="return false;">
+                                <div class="form-group" style="margin-bottom: 12px;">
+                                    <label for="rights-select-report">Sélectionner un rapport</label>
+                                    <select id="rights-select-report" class="form-control">
+                                        <!-- Populate dynamically (alphabetical) -->
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group" style="margin-bottom: 12px;">
+                                    <label for="rights-entity-type">Type d'entité</label>
+                                    <select id="rights-entity-type" class="form-control">
+                                        <option value="user">Collaborateur individuel (E-mail)</option>
+                                        <option value="group-exist">Groupe AD existant</option>
+                                        <option value="group-new" id="rights-option-new-group" style="display: none;">Nouveau Groupe AD (Réservé Admin)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group" style="margin-bottom: 16px;">
+                                    <label for="rights-entity-name">Nom ou E-mail de l'entité</label>
+                                    <input type="text" id="rights-entity-name" class="form-control" placeholder="ex: Laurent.Faber@cfl.lu" list="rights-existing-groups-datalist">
+                                    <datalist id="rights-existing-groups-datalist">
+                                        <!-- Populated dynamically with unique existing groups -->
+                                    </datalist>
+                                </div>
+                                
+                                <div style="display: flex; justify-content: flex-end;">
+                                    <button type="button" id="rights-grant-btn" class="slide-btn primary-btn" style="padding: 10px 20px; border-radius: 4px;">Octroyer l'accès</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- List of current access for selected report -->
+                        <div class="card">
+                            <h3 style="font-size: 18px; margin-bottom: 16px; color: var(--cfl-gray-dark);">Habilitations actives</h3>
+                            <div class="admin-table-container" style="max-height: 230px; overflow-y: auto;">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Nom / Identifiant</th>
+                                            <th style="text-align: center; width: 100px;">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="rights-current-tbody">
+                                        <!-- Dynamic content -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Global Matrix 360 (Only visible to Admin) -->
+                    <div class="card" id="rights-matrix-card" style="display: none;">
+                        <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--cfl-gray-dark); display: flex; align-items: center; gap: 8px;">
+                            <svg class="icon-svg" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color: var(--cfl-crimson);"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>
+                            Matrice Globale 360° (Vue Administrateur)
+                        </h3>
+                        <p class="text-secondary" style="font-size: 13.5px; margin-bottom: 16px;">Consultez les accès croisés entre tous les collaborateurs, groupes AD et rapports Power BI de l'organisation.</p>
+                        
+                        <div style="margin-bottom: 16px; display: flex; gap: 12px; align-items: center;">
+                            <input type="text" id="matrix-search-input" class="form-control" style="max-width: 400px;" placeholder="Rechercher un utilisateur, un groupe ou un rapport...">
+                            <select id="matrix-filter-type" class="form-control" style="max-width: 200px;">
+                                <option value="all">Tous types</option>
+                                <option value="user">Utilisateurs uniquement</option>
+                                <option value="group">Groupes AD uniquement</option>
+                            </select>
+                        </div>
+                        
+                        <div class="admin-table-container">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Entité (Utilisateur ou Groupe AD)</th>
+                                        <th>Type</th>
+                                        <th>Rapports autorisés (Droit d'accès direct ou via groupe)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="matrix-tbody">
+                                    <!-- Dynamic matrix list -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
 
                 <!-- ========================================================
                      SECTION 4: GOVERNANCE / ADMIN TAB (GESTION DES RAPPORTS)
@@ -301,17 +350,7 @@
                     <p class="section-desc">Gestion semantique du catalogue de rapports. Stockage des tags synchronise avec **Data Galaxy**.</p>
                     
                     <div class="admin-grid">
-                        <!-- Sync card -->
-                        <div class="card sync-status-card">
-                            <div>
-                                <h3 style="font-size: 16px; margin-bottom: 4px;">Synchronisation Data Galaxy</h3>
-                                <p class="text-secondary" style="font-size: 13.5px;">Statut : Referentiel synchronise. 18 tags stockes dans Data Galaxy. SSO actif via EntraID.</p>
-                            </div>
-                            <div class="sync-badge-active">
-                                <span class="pulse-dot"></span>
-                                <span>Data Galaxy Connecte</span>
-                            </div>
-                        </div>
+
 
                         <!-- Edit Report Metadata Form -->
                         <div class="card">
@@ -330,6 +369,25 @@
                                     </div>
                                 </div>
                                 
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="admin-report-steward">Data Steward (Synchro Data Galaxy)</label>
+                                        <input type="text" id="admin-report-steward" list="stewards-datalist" class="form-control" placeholder="Rechercher ou saisir un steward...">
+                                        <datalist id="stewards-datalist">
+                                            <option value="Sylvain Rauch"></option>
+                                            <option value="Gilles Becker"></option>
+                                            <option value="Damien G."></option>
+                                            <option value="Sophie Martin"></option>
+                                            <option value="Laurent Leclerc"></option>
+                                            <option value="Marc Weber"></option>
+                                        </datalist>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="admin-report-summary">Résumé du rapport</label>
+                                        <input type="text" id="admin-report-summary" class="form-control" placeholder="Entrez un résumé court...">
+                                    </div>
+                                </div>
+
                                 <div class="form-grid">
                                     <div class="form-group">
                                         <label for="admin-report-service">Service</label>
@@ -372,14 +430,26 @@
 
                                 <div class="form-grid">
                                     <div class="form-group" style="grid-column: span 2;">
-                                        <label for="admin-report-tags">Tags associes dans Data Galaxy (separes par des virgules)</label>
-                                        <input type="text" id="admin-report-tags" class="form-control" placeholder="ex: KPI, Temps reel, RGPD, Critique">
+                                        <label>Tags associés dans Data Galaxy</label>
+                                        <div id="admin-tags-pill-editor" class="modern-tag-editor" style="display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; border: 1px solid var(--cfl-gray-border); border-radius: 4px; background: #fff; min-height: 42px; align-items: center;">
+                                            <!-- Dynamic tags pills will be rendered here -->
+                                            <input type="text" id="admin-tag-input" style="border: none; outline: none; flex: 1; min-width: 120px; font-size: 13.5px; padding: 4px 8px;" placeholder="Ajouter un tag et appuyer sur Entrée...">
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div class="form-group" style="margin-bottom: 24px;">
-                                    <label for="admin-report-desc">Description Metier du Rapport</label>
-                                    <textarea id="admin-report-desc" class="form-control" style="height: 100px;" placeholder="Entrez une description claire et detaillee des indicateurs..."></textarea>
+                                    <label>Description Métier du Rapport (Éditeur de texte)</label>
+                                    <div class="text-formatter-container" style="border: 1px solid var(--cfl-gray-border); border-radius: 4px; overflow: hidden; background: #fff;">
+                                        <div class="text-formatter-toolbar" style="background: var(--cfl-gray-light); border-bottom: 1px solid var(--cfl-gray-border); padding: 6px; display: flex; gap: 8px;">
+                                            <button type="button" class="format-btn" onclick="document.execCommand('bold', false, null)" style="font-weight: bold; width: 28px; height: 28px; border: 1px solid #ccc; background: white; cursor: pointer; border-radius: 3px; outline: none; font-size:12px;">B</button>
+                                            <button type="button" class="format-btn" onclick="document.execCommand('italic', false, null)" style="font-style: italic; width: 28px; height: 28px; border: 1px solid #ccc; background: white; cursor: pointer; border-radius: 3px; outline: none; font-size:12px;">I</button>
+                                            <button type="button" class="format-btn" onclick="document.execCommand('underline', false, null)" style="text-decoration: underline; width: 28px; height: 28px; border: 1px solid #ccc; background: white; cursor: pointer; border-radius: 3px; outline: none; font-size:12px;">U</button>
+                                            <button type="button" class="format-btn" onclick="document.execCommand('insertUnorderedList', false, null)" style="width: 28px; height: 28px; border: 1px solid #ccc; background: white; cursor: pointer; border-radius: 3px; outline: none; font-size:12px;">•=</button>
+                                            <button type="button" class="format-btn" onclick="document.execCommand('removeFormat', false, null)" style="width: 50px; height: 28px; border: 1px solid #ccc; background: white; cursor: pointer; border-radius: 3px; outline: none; font-size:10px;">Effacer</button>
+                                        </div>
+                                        <div id="admin-report-desc-editor" contenteditable="true" style="height: 120px; padding: 12px; overflow-y: auto; outline: none; font-size: 14px; line-height: 1.5; background: #fff;" placeholder="Saisir la description..."></div>
+                                    </div>
                                 </div>
 
                                 <div style="display: flex; gap: 12px; justify-content: flex-end;">
@@ -422,11 +492,11 @@
                         <!-- System Audit Log / Access Request Log -->
                         <div class="card collapsible-card" id="logs-collapsible-card">
                             <div class="card-header-toggle" id="logs-toggle-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;">
-                                <h3 style="font-size: 18px; margin: 0; color: var(--cfl-gray-dark);">Suivi des Workflows d'approbation et Logs d'Audit</h3>
+                                <h3 style="font-size: 18px; margin: 0; color: var(--cfl-gray-dark);">Historique et Logs d'Audit de Sécurité</h3>
                                 <svg class="icon-svg toggle-arrow" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.3s ease;"><polyline points="6 9 12 15 18 9"></polyline></svg>
                             </div>
                             <div class="card-collapse-content" id="logs-collapse-content" style="transition: max-height 0.3s ease; margin-top: 12px;">
-                                <p class="section-desc">Historique des demandes de partage, des approbations AD et de la synchronisation Data Galaxy.</p>
+                                <p class="section-desc">Historique des octrois/révocations d'accès, des connexions et des modifications de métadonnées.</p>
                                 
                                 <div class="admin-table-container">
                                     <table class="admin-table">
@@ -454,16 +524,16 @@
                      ======================================================== -->
                 <section id="section-admin-console" class="content-section">
                     <h1>Console Admin BI</h1>
-                    <p class="section-desc">Outil de supervision de la plateforme BI CFL, du centre de conformité PSSI et du monitoring de synchronisation.</p>
+                    <p class="section-desc">Outil de supervision de la plateforme BI CFL, du monitoring de synchronisation et de la gouvernance de la qualité des rapports.</p>
                     
                     <div class="admin-grid" style="margin-bottom: 24px;">
-                        <!-- Alert conformity banner if any PSSI violation is present -->
+                        <!-- Alert conformity banner if any Quality violation is present -->
                         <div class="card pssi-alert-card" id="pssi-compliance-alert-summary" style="display: none; border-left: 5px solid #dc3545; background-color: rgba(220, 53, 69, 0.05); padding: 16px; border-radius: 4px;">
                             <div style="display: flex; gap: 12px; align-items: flex-start;">
                                 <svg class="icon-svg text-danger" viewBox="0 0 24 24" width="24" height="24" stroke="#dc3545" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                                 <div>
-                                    <h3 style="color: #dc3545; font-size: 16px; margin: 0 0 4px 0;">Alertes de conformité PSSI actives</h3>
-                                    <p class="text-secondary" style="font-size: 13px; margin: 0;" id="pssi-compliance-alert-text">Scanners actifs : 0 anomalie de droits d'accès détectée.</p>
+                                    <h3 style="color: #dc3545; font-size: 16px; margin: 0 0 4px 0;">Alertes de gouvernance et qualité des rapports actives</h3>
+                                    <p class="text-secondary" style="font-size: 13px; margin: 0;" id="pssi-compliance-alert-text">Scanners actifs : 0 anomalie de qualité détectée.</p>
                                 </div>
                             </div>
                         </div>
@@ -554,20 +624,20 @@
 
                     <!-- Scan conformity results table -->
                     <div class="card">
-                        <h3 style="font-size: 17px; margin-bottom: 16px; color: var(--cfl-gray-dark);">🛡️ Centre de Conformité PSSI - Diagnostic des droits d'accès</h3>
-                        <p class="section-desc">Revue automatisée des habilitations. Les rapports sensibles (Restreints ou Confidentiels) ne doivent pas utiliser de groupes AD larges.</p>
+                        <h3 style="font-size: 17px; margin-bottom: 16px; color: var(--cfl-gray-dark);">📊 Gouvernance et Qualité des Rapports</h3>
+                        <p class="section-desc">Revue automatisée des critères d'obsolescence et de conformité du cycle de vie des rapports (inactivité > 24 mois, versioning, dossiers temporaires, années dépassées).</p>
                         <div class="admin-table-container">
                             <table class="admin-table">
                                 <thead>
                                     <tr>
                                         <th>Rapport</th>
-                                        <th>Sensibilité PSSI</th>
-                                        <th>Groupes AD configurés</th>
-                                        <th>Évaluation de conformité</th>
-                                        <th style="text-align: center;">Action corrective</th>
+                                        <th>Emplacement technique</th>
+                                        <th>Règle de Qualité</th>
+                                        <th>Critère Déclencheur</th>
+                                        <th style="text-align: center; width: 220px;">Action corrective</th>
                                     </tr>
                                 </thead>
-                                <tbody id="pssi-compliance-tbody">
+                                <tbody id="governance-quality-tbody">
                                     <!-- Dynamic scanner rows -->
                                 </tbody>
                             </table>
@@ -603,7 +673,13 @@
             <!-- Description -->
             <div>
                 <h4 class="drawer-section-title">Description metier</h4>
-                <p id="drawer-description" class="drawer-desc">Description du rapport...</p>
+                <div id="drawer-description" class="drawer-desc" style="font-size: 13.5px; line-height: 1.5; color: var(--cfl-gray-dark);">Description du rapport...</div>
+            </div>
+
+            <!-- Summary -->
+            <div style="margin-top: 12px; margin-bottom: 12px; padding: 10px; border-left: 3px solid var(--cfl-crimson); background-color: var(--cfl-gray-light); border-radius: 0 4px 4px 0;">
+                <h4 class="drawer-section-title" style="margin-bottom: 4px; font-size: 12px; text-transform: uppercase; color: var(--text-secondary);">Résumé</h4>
+                <p id="drawer-summary" style="font-size: 13.5px; line-height: 1.5; color: var(--cfl-gray-dark); margin: 0; font-style: italic;">Résumé analytique du rapport...</p>
             </div>
             
             <!-- Info Grid -->
@@ -617,6 +693,14 @@
                     <div class="drawer-info-item">
                         <span class="info-label">Frequence de refresh</span>
                         <span id="drawer-frequency" class="info-value">Mensuel</span>
+                    </div>
+                    <div class="drawer-info-item">
+                        <span class="info-label">Data Steward</span>
+                        <span id="drawer-steward" class="info-value">Damien G.</span>
+                    </div>
+                    <div class="drawer-info-item">
+                        <span class="info-label">Data Custodian</span>
+                        <span id="drawer-custodian" class="info-value">Damien G.</span>
                     </div>
                     <div class="drawer-info-item" id="drawer-technical-path-container" style="grid-column: span 2;">
                         <span class="info-label">Emplacement technique PBIRS</span>
@@ -651,60 +735,13 @@
             <button id="drawer-fav-action-btn" class="drawer-action-btn secondary">
                 <span id="drawer-fav-icon">☆</span> <span id="drawer-fav-text">Favori</span>
             </button>
-            <button id="drawer-share-action-btn" class="drawer-action-btn secondary">
-                🔄 Partager (Workflow)
-            </button>
             <a id="drawer-open-report-btn" href="#" class="drawer-action-btn primary">
-                🚀 Ouvrir le rapport (SSO)
+                🚀 Visualiser le rapport
             </a>
         </div>
     </div>
 
-    <!-- ========================================================
-         MODAL : WORKFLOW DE PARTAGE & APPROBATION
-         ======================================================== -->
-    <div id="share-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 style="font-size: 18px; font-weight: 700; color: var(--cfl-gray-dark);">Workflow de Partage & Approbation</h3>
-                <button id="modal-close-btn" class="close-btn" aria-label="Fermer la boite de dialogue">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 16px;">
-                    Ce workflow va soumettre une demande d'acces pour l'utilisateur selectionne au **Business Owner** du rapport. Apres approbation, l'utilisateur sera automatiquement ajoute au groupe AD associe.
-                </p>
-                <input type="hidden" id="modal-report-id">
-                
-                <div class="form-group" style="margin-bottom: 12px;">
-                    <label for="share-user" style="font-size:13px; font-weight:600; color:var(--text-secondary); margin-bottom:4px;">
-                        Collaborateur (Nom ou e-mail de l'agent CFL) :
-                    </label>
-                    <input type="text" id="share-user" class="form-control" placeholder="ex: Laurent.Faber@cfl.lu">
-                </div>
-                
-                <div class="form-group" style="margin-bottom: 12px;">
-                    <label for="share-reason" style="font-size:13px; font-weight:600; color:var(--text-secondary); margin-bottom:4px;">
-                        Justification metier de l'acces :
-                    </label>
-                    <textarea id="share-reason" class="form-control" style="height: 70px;" placeholder="Pourquoi ce collaborateur a-t-il besoin de ce rapport ?"></textarea>
-                </div>
-                
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <label for="share-workflow" style="font-size:13px; font-weight:600; color:var(--text-secondary); margin-bottom:4px;">
-                        Circuit d'approbation :
-                    </label>
-                    <select id="share-workflow" class="form-control">
-                        <option value="direct">Validation par le Business Owner uniquement (Standard)</option>
-                        <option value="double">Validation Manager + Business Owner (Rapport Sensible)</option>
-                    </select>
-                </div>
-            </div>
-            <div class="modal-footer" style="display: flex; gap: 12px; justify-content: flex-end; background-color: var(--cfl-gray-light); padding: 12px 20px; border-top: 1px solid var(--cfl-gray-border);">
-                <button id="share-cancel-btn" class="btn-sm-action" style="padding: 8px 16px;">Annuler</button>
-                <button id="share-submit-btn" class="slide-btn primary-btn" style="border-radius: 4px; padding: 8px 16px; font-size:13px;">Soumettre la demande</button>
-            </div>
-        </div>
-    </div>
+
 
     <!-- ========================================================
          MODAL : SIGNALEMENT D'ANOMALIE (FEEDBACK LOOP)

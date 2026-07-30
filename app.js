@@ -109,6 +109,9 @@ function parseCSVReports(csvText) {
         const viewCount = parseInt(parts[11]) || 0;
         const adGroups = [parts[12]];
         const pbirsUrl = parts[13];
+        const steward = service === "qualite" ? (i % 2 === 0 ? "Sylvain Rauch" : "Gilles Becker") : "Damien G.";
+        const custodian = service === "qualite" ? "Marc Weber" : "Stephane Hoff";
+        const summary = `Résumé analytique du rapport : Suivi et pilotage de l'activité ${title} pour les équipes CFL.`;
 
         reportsList.push({
             id,
@@ -124,7 +127,10 @@ function parseCSVReports(csvText) {
             pbirsPath,
             viewCount,
             adGroups,
-            pbirsUrl
+            pbirsUrl,
+            steward,
+            custodian,
+            summary
         });
     }
     return reportsList;
@@ -138,29 +144,7 @@ const INITIAL_LOGS = [
     { timestamp: "2026-07-24 07:05", user: "System", event: "Auto-sync Data Galaxy", target: "18 tags synchronisés", status: "Succès" }
 ];
 
-// Initial sharing workflows in queue
-const INITIAL_WORKFLOWS = [
-    {
-        id: "wf-1",
-        timestamp: "2026-07-24 09:15",
-        requester: "Damien G.",
-        beneficiary: "Laurent Faber (Laurent.Faber@cfl.lu)",
-        reportId: "rep-12",
-        reportTitle: "Tableau de bord H00",
-        reason: "Besoin de suivre les KPIs de ponctualité pour le comité H00 hebdomadaire.",
-        workflowType: "direct"
-    },
-    {
-        id: "wf-2",
-        timestamp: "2026-07-24 08:30",
-        requester: "Marc W.",
-        beneficiary: "Jean-Paul Weber (Jean-Paul.Weber@cfl.lu)",
-        reportId: "rep-18",
-        reportTitle: "Qualité des données",
-        reason: "Audit de conformité des heures saisies dans BVU.",
-        workflowType: "double"
-    }
-];
+
 
 // 2. Global State Variables and Configuration
 const DEFAULT_CONFIG = {
@@ -184,9 +168,8 @@ const DEFAULT_CONFIG = {
 let portalConfig = { ...DEFAULT_CONFIG };
 let reports = [];
 let logs = [];
-let pendingWorkflows = [];
 let currentRole = "Standard"; // Standard, Steward, Owner, Admin
-let activeTab = "dashboard"; // dashboard, catalog, workflows, governance
+let activeTab = "dashboard"; // dashboard, catalog, rights, governance
 let selectedService = "all";
 let selectedClassification = "all";
 let selectedPssi = "all"; 
@@ -393,14 +376,14 @@ async function loadConfig() {
 
 // Update Role-Based Tab Permissions
 function updateTabPermissions() {
-    const navWorkflows = document.querySelector('[data-tab-target="workflows"]');
+    const navRights = document.getElementById("nav-rights");
     const navGovernance = document.querySelector('[data-tab-target="governance"]');
     const navAdminConsole = document.querySelector('[data-tab-target="admin-console"]');
 
-    // Validation des workflows: Steward, Owner, Admin
-    const hasWorkflowsAccess = (currentRole === "Steward" || currentRole === "Owner" || currentRole === "Admin");
-    if (navWorkflows) {
-        navWorkflows.style.display = hasWorkflowsAccess ? "flex" : "none";
+    // Gestion des droits: Steward, Owner, Admin
+    const hasRightsAccess = (currentRole === "Steward" || currentRole === "Owner" || currentRole === "Admin");
+    if (navRights) {
+        navRights.style.display = hasRightsAccess ? "flex" : "none";
     }
 
     // Gestion des rapports: Steward, Owner
@@ -416,7 +399,7 @@ function updateTabPermissions() {
     }
 
     // Redirect to dashboard if currently on a forbidden tab
-    if (activeTab === "workflows" && !hasWorkflowsAccess) {
+    if (activeTab === "rights" && !hasRightsAccess) {
         switchTab("dashboard");
     }
     if (activeTab === "governance" && !hasGovernanceAccess) {
@@ -438,32 +421,78 @@ document.addEventListener("DOMContentLoaded", async () => {
 // 4. State Persistence Helpers
 function loadState() {
     const savedReports = localStorage.getItem("cfl_bi_reports");
+    let needsParse = true;
     if (savedReports) {
-        reports = JSON.parse(savedReports);
-        // Force refresh if database was not matching simplified tags syntax
-        if (reports.length > 0 && reports[0].tags.some(t => t.includes('"') || t.startsWith('['))) {
-            reports = parseCSVReports(RAW_CSV_DATA);
-            saveReportsToStorage();
+        try {
+            reports = JSON.parse(savedReports);
+            if (Array.isArray(reports) && reports.length > 0 && reports[0].tags && Array.isArray(reports[0].tags) && !reports[0].tags.some(t => typeof t === "string" && (t.includes('"') || t.startsWith('[')))) {
+                needsParse = false;
+            }
+        } catch (e) {
+            console.error("Error loading reports state, resetting database:", e);
         }
-    } else {
+    }
+    
+    if (needsParse) {
         reports = parseCSVReports(RAW_CSV_DATA);
+    }
+
+    let needsSave = needsParse;
+    reports.forEach((r, idx) => {
+        if (!r.steward) {
+            r.steward = r.service === "qualite" ? (idx % 2 === 0 ? "Sylvain Rauch" : "Gilles Becker") : "Damien G.";
+            needsSave = true;
+        }
+        if (!r.custodian) {
+            r.custodian = r.service === "qualite" ? "Marc Weber" : "Stephane Hoff";
+            needsSave = true;
+        }
+        if (!r.summary) {
+            r.summary = `Résumé analytique du rapport : Suivi et pilotage de l'activité ${r.title || ""} pour les équipes CFL.`;
+            needsSave = true;
+        }
+        if (!r.tags || !Array.isArray(r.tags)) {
+            r.tags = [];
+            needsSave = true;
+        }
+        if (!r.users || !Array.isArray(r.users)) {
+            r.users = idx === 0 ? ["laurent.leclerc@cfl.lu"] : (idx === 3 ? ["jean-paul.weber@cfl.lu"] : []);
+            needsSave = true;
+        }
+        // Seeding for report quality rules simulation
+        if (r.id === "rep-13") {
+            if (!r.title.includes("(OLD)")) {
+                r.title = "Internet - DE (OLD)";
+                needsSave = true;
+            }
+            if (r.lastRefresh !== "14/12/2023 à 10:15") {
+                r.lastRefresh = "14/12/2023 à 10:15";
+                needsSave = true;
+            }
+        }
+        if (r.id === "rep-33") {
+            if (r.lastRefresh !== "02/02/2024 à 09:30") {
+                r.lastRefresh = "02/02/2024 à 09:30";
+                needsSave = true;
+            }
+        }
+    });
+
+    if (needsSave) {
         saveReportsToStorage();
     }
 
     const savedLogs = localStorage.getItem("cfl_bi_logs");
     if (savedLogs) {
-        logs = JSON.parse(savedLogs);
+        try {
+            logs = JSON.parse(savedLogs);
+        } catch(e) {
+            logs = [...INITIAL_LOGS];
+            saveLogsToStorage();
+        }
     } else {
         logs = [...INITIAL_LOGS];
         saveLogsToStorage();
-    }
-
-    const savedWorkflows = localStorage.getItem("cfl_bi_workflows");
-    if (savedWorkflows) {
-        pendingWorkflows = JSON.parse(savedWorkflows);
-    } else {
-        pendingWorkflows = [...INITIAL_WORKFLOWS];
-        saveWorkflowsToStorage();
     }
 
     const savedRole = localStorage.getItem("cfl_bi_current_role");
@@ -472,15 +501,20 @@ function loadState() {
     const savedFavs = localStorage.getItem("cfl_bi_favorites");
     favorites = savedFavs ? JSON.parse(savedFavs) : ["rep-12", "rep-18"];
     favorites = favorites.filter(id => reports.some(r => r.id === id));
-    if (favorites.length === 0 && reports.length >= 2) {
-        favorites = [reports[11].id, reports[17].id]; // rep-12, rep-18
+    if (favorites.length === 0 && reports.length >= 18) {
+        const rep12 = reports.find(r => r.id === "rep-12") || reports[0];
+        const rep18 = reports.find(r => r.id === "rep-18") || reports[1];
+        favorites = [rep12.id, rep18.id];
     }
 
     const savedHist = localStorage.getItem("cfl_bi_history");
     history = savedHist ? JSON.parse(savedHist) : ["rep-12", "rep-9", "rep-21"];
     history = history.filter(id => reports.some(r => r.id === id));
-    if (history.length === 0 && reports.length >= 3) {
-        history = [reports[11].id, reports[8].id, reports[20].id]; // rep-12, rep-9, rep-21
+    if (history.length === 0 && reports.length >= 22) {
+        const rep12 = reports.find(r => r.id === "rep-12") || reports[0];
+        const rep9 = reports.find(r => r.id === "rep-9") || reports[1];
+        const rep21 = reports.find(r => r.id === "rep-21") || reports[2];
+        history = [rep12.id, rep9.id, rep21.id];
     }
 
     // Update Role Selector UI
@@ -504,9 +538,7 @@ function saveLogsToStorage() {
     localStorage.setItem("cfl_bi_logs", JSON.stringify(logs));
 }
 
-function saveWorkflowsToStorage() {
-    localStorage.setItem("cfl_bi_workflows", JSON.stringify(pendingWorkflows));
-}
+
 
 function saveFavoritesToStorage() {
     localStorage.setItem("cfl_bi_favorites", JSON.stringify(favorites));
@@ -733,15 +765,6 @@ function initEventListeners() {
         });
     }
 
-    // Share button inside Drawer -> Open Modal
-    const drawerShareBtn = document.getElementById("drawer-share-action-btn");
-    if (drawerShareBtn) {
-        drawerShareBtn.addEventListener("click", () => {
-            const reportId = drawerFavBtn.getAttribute("data-report-id");
-            openShareModal(reportId);
-        });
-    }
-
     // Direct Report Viewer Triggers
     const openReportBtn = document.getElementById("drawer-open-report-btn");
     if (openReportBtn) {
@@ -757,72 +780,27 @@ function initEventListeners() {
         viewerBackBtn.addEventListener("click", closeReportViewer);
     }
 
-    // Power BI Sidebar navigation inside viewer
-    document.querySelectorAll('.viewer-sidebar .viewer-page-item').forEach(item => {
-        item.addEventListener("click", (e) => {
-            document.querySelectorAll('.viewer-sidebar .viewer-page-item').forEach(p => p.classList.remove('active'));
-            e.currentTarget.classList.add('active');
-            
-            const targetPage = e.currentTarget.getAttribute("data-page");
-            document.querySelectorAll('.viewer-canvas .sim-page').forEach(page => page.classList.remove('active'));
-            const targetPageEl = document.getElementById(`sim-${targetPage}`);
-            if (targetPageEl) targetPageEl.classList.add('active');
-        });
-    });
-
-    // Copy integration URL button
-    const copyUrlBtn = document.getElementById("viewer-copy-url-btn");
-    if (copyUrlBtn) {
-        copyUrlBtn.addEventListener("click", () => {
-            const urlText = document.getElementById("viewer-display-url").textContent;
-            navigator.clipboard.writeText(urlText).then(() => {
-                const prevText = copyUrlBtn.textContent;
-                copyUrlBtn.textContent = "Copié !";
-                copyUrlBtn.style.backgroundColor = "#34c759";
-                copyUrlBtn.style.color = "#ffffff";
-                setTimeout(() => {
-                    copyUrlBtn.textContent = prevText;
-                    copyUrlBtn.style.backgroundColor = "";
-                    copyUrlBtn.style.color = "";
-                }, 2000);
-            }).catch(err => {
-                alert("Erreur lors de la copie de l'URL : " + err);
-            });
+    // Rights Management Panel Event Listeners
+    const rightsSelect = document.getElementById("rights-select-report");
+    if (rightsSelect) {
+        rightsSelect.addEventListener("change", () => {
+            renderCurrentRightsTable();
         });
     }
 
-    // Toggle simulator view button
-    const toggleSimBtn = document.getElementById("viewer-toggle-simulator-btn");
-    if (toggleSimBtn) {
-        toggleSimBtn.addEventListener("click", () => {
-            const simulator = document.getElementById("fallback-report-simulator");
-            const iframe = document.getElementById("report-iframe");
-            if (simulator.style.display === "none") {
-                simulator.style.display = "block";
-                iframe.style.opacity = "0.1";
-                toggleSimBtn.textContent = "Revenir à l'iframe en direct";
-                toggleSimBtn.style.backgroundColor = "#fff3cd";
-                toggleSimBtn.style.color = "#856404";
-            } else {
-                simulator.style.display = "none";
-                iframe.style.opacity = "1";
-                toggleSimBtn.textContent = "Utiliser le simulateur offline";
-                toggleSimBtn.style.backgroundColor = "";
-                toggleSimBtn.style.color = "";
-            }
-        });
+    const rightsGrantBtn = document.getElementById("rights-grant-btn");
+    if (rightsGrantBtn) {
+        rightsGrantBtn.addEventListener("click", grantAccess);
     }
 
-    // Modal Close
-    const modalCloseBtn = document.getElementById("modal-close-btn");
-    const modalCancelBtn = document.getElementById("share-cancel-btn");
-    if (modalCloseBtn) modalCloseBtn.addEventListener("click", closeShareModal);
-    if (modalCancelBtn) modalCancelBtn.addEventListener("click", closeShareModal);
+    const matrixSearchInput = document.getElementById("matrix-search-input");
+    if (matrixSearchInput) {
+        matrixSearchInput.addEventListener("input", renderGlobalMatrix);
+    }
 
-    // Modal Submit
-    const modalSubmitBtn = document.getElementById("share-submit-btn");
-    if (modalSubmitBtn) {
-        modalSubmitBtn.addEventListener("click", submitShareWorkflow);
+    const matrixFilterType = document.getElementById("matrix-filter-type");
+    if (matrixFilterType) {
+        matrixFilterType.addEventListener("change", renderGlobalMatrix);
     }
 
     // Administration Form
@@ -844,6 +822,9 @@ function initEventListeners() {
             if (adminSelect) loadReportInAdminForm(adminSelect.value);
         });
     }
+
+    // Modern Tag Pills Editor
+    initTagEditorEvents();
 }
 
 function switchTab(tabId) {
@@ -858,7 +839,10 @@ function switchTab(tabId) {
 
     document.getElementById("section-dashboard").classList.remove("active");
     document.getElementById("section-catalog").classList.remove("active");
-    document.getElementById("section-workflows").classList.remove("active");
+    
+    const rightsSec = document.getElementById("section-rights");
+    if (rightsSec) rightsSec.classList.remove("active");
+    
     document.getElementById("section-governance").classList.remove("active");
     
     const adminSec = document.getElementById("section-admin-console");
@@ -875,8 +859,8 @@ function switchTab(tabId) {
         renderDashboard();
     } else if (tabId === "catalog") {
         renderCatalog();
-    } else if (tabId === "workflows") {
-        renderWorkflowsTab();
+    } else if (tabId === "rights") {
+        renderRightsPanel();
     } else if (tabId === "governance") {
         renderAdminPanel();
     } else if (tabId === "admin-console") {
@@ -889,7 +873,9 @@ function renderAll() {
     updateTabPermissions();
     renderDashboard();
     renderCatalog();
-    renderWorkflowsTab();
+    if (currentRole === "Steward" || currentRole === "Owner" || currentRole === "Admin") {
+        renderRightsPanel();
+    }
     renderAdminPanel();
     if (currentRole === "Admin") {
         renderAdminConsole();
@@ -904,7 +890,6 @@ function renderDashboard() {
     document.getElementById("kpi-total-certified").textContent = certifiedReports.length;
     
     document.getElementById("kpi-total-favorites").textContent = favorites.length;
-    document.getElementById("kpi-total-workflows").textContent = pendingWorkflows.length;
 
     // Render Favorites List (Dashboard Panel)
     const favListContainer = document.getElementById("dashboard-favorites-list");
@@ -1249,107 +1234,326 @@ function clearCatalogFilters() {
     renderCatalog();
 }
 
-// --- WORKFLOW VALIDATION RENDERING ---
-function renderWorkflowsTab() {
-    const tbody = document.getElementById("workflow-requests-tbody");
-    if (!tbody) return;
+// --- RIGHTS MANAGEMENT MODULE LOGIC ---
+const SIMULATED_USER_GROUPS = {
+    "laurent.leclerc@cfl.lu": ["CFL-Voyageurs-Editeurs", "DW_POWERBI_QUALITE_BO"],
+    "jean-paul.weber@cfl.lu": ["CFL-Data-Analysts", "DW_POWERBI_QUALITE_ALL_STAFF"],
+    "sophie.martin@cfl.lu": ["DW_POWERBI_IT_ADMIN"],
+    "michel.becker@cfl.lu": ["DW_POWERBI_QUALITE_ANALYSESADHOC"],
+    "damien.g@cfl.lu": ["DW_POWERBI_IT_ADMIN"]
+};
+
+function renderRightsPanel() {
+    const reportSelect = document.getElementById("rights-select-report");
+    if (!reportSelect) return;
+
+    // 1. Populate reports dropdown sorted alphabetically
+    const prevVal = reportSelect.value;
+    reportSelect.innerHTML = "";
+    const sortedReports = [...reports].sort((a, b) => a.title.localeCompare(b.title));
+    sortedReports.forEach(r => {
+        const opt = document.createElement("option");
+        opt.value = r.id;
+        opt.textContent = `${r.title} [${r.service.toUpperCase()}]`;
+        reportSelect.appendChild(opt);
+    });
+
+    if (prevVal && reports.some(r => r.id === prevVal)) {
+        reportSelect.value = prevVal;
+    } else if (sortedReports.length > 0) {
+        reportSelect.value = sortedReports[0].id;
+    }
+
+    // 2. Adjust role specific UI elements in Rights form
+    const newGroupOption = document.getElementById("rights-option-new-group");
+    if (newGroupOption) {
+        newGroupOption.style.display = currentRole === "Admin" ? "block" : "none";
+    }
+
+    // Populate existing groups datalist
+    const groupsDatalist = document.getElementById("rights-existing-groups-datalist");
+    if (groupsDatalist) {
+        const uniqueGroups = new Set();
+        reports.forEach(r => {
+            if (r.adGroups) {
+                r.adGroups.forEach(g => uniqueGroups.add(g));
+            }
+        });
+        groupsDatalist.innerHTML = "";
+        uniqueGroups.forEach(g => {
+            const opt = document.createElement("option");
+            opt.value = g;
+            groupsDatalist.appendChild(opt);
+        });
+    }
+
+    // 3. Render current rights table for selected report
+    renderCurrentRightsTable();
+
+    // 4. Render Matrix 360 (Only visible to Admin)
+    const matrixCard = document.getElementById("rights-matrix-card");
+    if (matrixCard) {
+        if (currentRole === "Admin") {
+            matrixCard.style.display = "block";
+            renderGlobalMatrix();
+        } else {
+            matrixCard.style.display = "none";
+        }
+    }
+}
+
+function renderCurrentRightsTable() {
+    const reportSelect = document.getElementById("rights-select-report");
+    if (!reportSelect) return;
+    const reportId = reportSelect.value;
+    const r = reports.find(item => item.id === reportId);
+    const tbody = document.getElementById("rights-current-tbody");
+    if (!tbody || !r) return;
 
     tbody.innerHTML = "";
 
-    // Update workflow KPI counter on dashboard
-    const counter = document.getElementById("kpi-total-workflows");
-    if (counter) counter.textContent = pendingWorkflows.length;
-
-    if (pendingWorkflows.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="7" style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 30px;">
-                    Aucune demande de partage Active Directory en attente de validation.
+    // Show active groups
+    if (r.adGroups) {
+        r.adGroups.forEach(g => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><span style="background-color: rgba(52, 199, 89, 0.1); color: #34c759; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">Groupe AD</span></td>
+                <td><code style="font-family: monospace; font-size: 12px;">${g}</code></td>
+                <td style="text-align: center;">
+                    <button class="btn-sm-action danger" onclick="revokeAccess('${r.id}', 'group', '${g}')" style="padding: 4px 8px; font-size: 11px;">Révoquer</button>
                 </td>
-            </tr>
-        `;
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Show active individual users
+    if (r.users) {
+        r.users.forEach(u => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><span style="background-color: rgba(0, 122, 255, 0.1); color: #007aff; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">Utilisateur</span></td>
+                <td><code style="font-family: monospace; font-size: 12px;">${u}</code></td>
+                <td style="text-align: center;">
+                    <button class="btn-sm-action danger" onclick="revokeAccess('${r.id}', 'user', '${u}')" style="padding: 4px 8px; font-size: 11px;">Révoquer</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    if ((!r.adGroups || r.adGroups.length === 0) && (!r.users || r.users.length === 0)) {
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-secondary); font-style: italic;">Aucun droit configuré sur ce rapport.</td></tr>`;
+    }
+}
+
+function grantAccess() {
+    const reportSelect = document.getElementById("rights-select-report");
+    if (!reportSelect) return;
+    const reportId = reportSelect.value;
+    const rIdx = reports.findIndex(item => item.id === reportId);
+    if (rIdx === -1) return;
+
+    const entityType = document.getElementById("rights-entity-type").value;
+    const entityName = document.getElementById("rights-entity-name").value.trim();
+
+    if (!entityName) {
+        alert("Veuillez saisir un nom ou un e-mail d'entité.");
         return;
     }
 
-    pendingWorkflows.forEach(wf => {
+    if (entityType === "group-new" && currentRole !== "Admin") {
+        alert("Seuls les administrateurs BI peuvent créer de nouveaux groupes AD.");
+        return;
+    }
+
+    if (entityType === "group-exist") {
+        // Verify group exists
+        const uniqueGroups = new Set();
+        reports.forEach(r => {
+            if (r.adGroups) {
+                r.adGroups.forEach(g => uniqueGroups.add(g));
+            }
+        });
+        if (!uniqueGroups.has(entityName)) {
+            alert(`Le groupe AD "${entityName}" n'existe pas. Les stewards/owners peuvent uniquement associer des groupes existants. Si vous devez créer un nouveau groupe AD, veuillez contacter un administrateur BI.`);
+            return;
+        }
+    }
+
+    // Add access
+    let added = false;
+    if (entityType === "user") {
+        if (!reports[rIdx].users) reports[rIdx].users = [];
+        if (!reports[rIdx].users.includes(entityName)) {
+            reports[rIdx].users.push(entityName);
+            added = true;
+        }
+    } else { // group-exist or group-new
+        if (!reports[rIdx].adGroups) reports[rIdx].adGroups = [];
+        if (!reports[rIdx].adGroups.includes(entityName)) {
+            reports[rIdx].adGroups.push(entityName);
+            added = true;
+        }
+    }
+
+    if (added) {
+        saveReportsToStorage();
+        
+        // Log event
+        const now = new Date();
+        const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+        logs.unshift({
+            timestamp: formattedDate,
+            user: "Damien G.",
+            event: "Ajout Accès",
+            target: `${reports[rIdx].title} (${entityType === 'user' ? 'User' : 'Group'}: ${entityName})`,
+            status: "Succès"
+        });
+        saveLogsToStorage();
+        
+        document.getElementById("rights-entity-name").value = "";
+        renderRightsPanel();
+        alert(`L'accès pour "${entityName}" a été octroyé avec succès au rapport "${reports[rIdx].title}".`);
+    } else {
+        alert(`"${entityName}" possède déjà cet accès.`);
+    }
+}
+
+function revokeAccess(reportId, type, name) {
+    const rIdx = reports.findIndex(item => item.id === reportId);
+    if (rIdx === -1) return;
+
+    if (!confirm(`Confirmez-vous la révocation de l'accès de "${name}" au rapport "${reports[rIdx].title}" ?`)) {
+        return;
+    }
+
+    if (type === "user") {
+        reports[rIdx].users = reports[rIdx].users.filter(u => u !== name);
+    } else {
+        reports[rIdx].adGroups = reports[rIdx].adGroups.filter(g => g !== name);
+    }
+
+    saveReportsToStorage();
+
+    // Log event
+    const now = new Date();
+    const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    logs.unshift({
+        timestamp: formattedDate,
+        user: "Damien G.",
+        event: "Révoc. Accès",
+        target: `${reports[rIdx].title} (${type === 'user' ? 'User' : 'Group'}: ${name})`,
+        status: "Succès"
+    });
+    saveLogsToStorage();
+
+    renderRightsPanel();
+}
+
+function renderGlobalMatrix() {
+    const tbody = document.getElementById("matrix-tbody");
+    if (!tbody) return;
+
+    const searchQuery = (document.getElementById("matrix-search-input")?.value || "").toLowerCase().trim();
+    const filterType = document.getElementById("matrix-filter-type")?.value || "all";
+
+    tbody.innerHTML = "";
+
+    // Gather unique entities
+    const entitiesMap = new Map();
+
+    reports.forEach(r => {
+        if (r.adGroups) {
+            r.adGroups.forEach(g => {
+                if (!entitiesMap.has(g)) {
+                    entitiesMap.set(g, { name: g, type: "group", reports: new Set() });
+                }
+                entitiesMap.get(g).reports.add(r.title);
+            });
+        }
+        if (r.users) {
+            r.users.forEach(u => {
+                if (!entitiesMap.has(u)) {
+                    entitiesMap.set(u, { name: u, type: "user", reports: new Set() });
+                }
+                entitiesMap.get(u).reports.add(r.title);
+            });
+        }
+    });
+
+    Object.keys(SIMULATED_USER_GROUPS).forEach(u => {
+        if (!entitiesMap.has(u)) {
+            entitiesMap.set(u, { name: u, type: "user", reports: new Set() });
+        }
+        const userGroups = SIMULATED_USER_GROUPS[u];
+        reports.forEach(r => {
+            if (r.adGroups && r.adGroups.some(g => userGroups.includes(g))) {
+                entitiesMap.get(u).reports.add(r.title);
+            }
+        });
+    });
+
+    let entities = Array.from(entitiesMap.values());
+    entities.sort((a, b) => a.name.localeCompare(b.name));
+
+    if (filterType === "user") {
+        entities = entities.filter(e => e.type === "user");
+    } else if (filterType === "group") {
+        entities = entities.filter(e => e.type === "group");
+    }
+
+    if (searchQuery !== "") {
+        entities = entities.filter(e => {
+            const matchName = e.name.toLowerCase().includes(searchQuery);
+            const matchReports = Array.from(e.reports).some(title => title.toLowerCase().includes(searchQuery));
+            return matchName || matchReports;
+        });
+    }
+
+    entities.forEach(e => {
         const tr = document.createElement("tr");
-        const circuitLabel = wf.workflowType === "direct" ? "BO uniquement" : "Double Validation";
+        const typeBadge = e.type === "user" 
+            ? `<span style="background-color: rgba(0, 122, 255, 0.1); color: #007aff; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">Utilisateur</span>`
+            : `<span style="background-color: rgba(52, 199, 89, 0.1); color: #34c759; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">Groupe AD</span>`;
+        
+        let reportPills = "";
+        if (e.reports.size === 0) {
+            reportPills = `<em style="color: var(--text-secondary);">Aucun rapport accessible</em>`;
+        } else {
+            Array.from(e.reports).forEach(title => {
+                let indirectText = "";
+                if (e.type === "user") {
+                    const r = reports.find(item => item.title === title);
+                    const isDirect = r && r.users && r.users.includes(e.name);
+                    if (!isDirect) {
+                        const userGroups = SIMULATED_USER_GROUPS[e.name] || [];
+                        const groupSrc = r && r.adGroups ? r.adGroups.find(g => userGroups.includes(g)) : null;
+                        indirectText = groupSrc ? ` (via ${groupSrc})` : " (via Groupe)";
+                    } else {
+                        indirectText = " (Direct)";
+                    }
+                }
+                reportPills += `<span style="display: inline-block; background-color: var(--cfl-gray-light); color: var(--cfl-gray-dark); border: 1px solid var(--cfl-gray-border); padding: 2px 8px; border-radius: 4px; font-size: 11.5px; margin: 2px; font-weight: 500;">${title}<small style="color: var(--text-secondary); font-weight:normal;">${indirectText}</small></span>`;
+            });
+        }
+
         tr.innerHTML = `
-            <td><strong>${wf.timestamp}</strong></td>
-            <td>${wf.requester}</td>
-            <td>${wf.beneficiary}</td>
-            <td><strong>${wf.reportTitle}</strong></td>
-            <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${wf.reason}">${wf.reason}</td>
-            <td><span class="tag-badge" style="background-color: var(--cfl-crimson-light); color: var(--cfl-crimson); font-weight:600;">${circuitLabel}</span></td>
-            <td style="text-align: center; white-space: nowrap;">
-                <button class="btn-approve" onclick="approveWorkflow('${wf.id}')">Approuver</button>
-                <button class="btn-reject" onclick="rejectWorkflow('${wf.id}')">Rejeter</button>
-            </td>
+            <td><strong>${e.name}</strong></td>
+            <td>${typeBadge}</td>
+            <td>${reportPills}</td>
         `;
         tbody.appendChild(tr);
     });
+
+    if (entities.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-secondary); font-style: italic;">Aucune entité ne correspond à la recherche.</td></tr>`;
+    }
 }
 
-function approveWorkflow(wfId) {
-    const idx = pendingWorkflows.findIndex(w => w.id === wfId);
-    if (idx === -1) return;
-
-    const wf = pendingWorkflows[idx];
-    const r = reports.find(item => item.id === wf.reportId);
-
-    // Simulate appending beneficiary name to AD Habilitations group log
-    const now = new Date();
-    const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-
-    const newLog = {
-        timestamp: formattedDate,
-        user: "Damien G. (Admin)",
-        event: "Workflow Partage",
-        target: `${r ? r.title : wf.reportTitle} -> ${wf.beneficiary.split(' (')[0]}`,
-        status: "Approuvé (AD Synchronisé)"
-    };
-
-    logs.unshift(newLog);
-    saveLogsToStorage();
-
-    pendingWorkflows.splice(idx, 1);
-    saveWorkflowsToStorage();
-
-    renderAll();
-    alert(`La demande d'accès pour "${wf.beneficiary}" sur le rapport "${wf.reportTitle}" a été approuvée. L'utilisateur a été ajouté au groupe Active Directory de sécurité.`);
-}
-
-function rejectWorkflow(wfId) {
-    const idx = pendingWorkflows.findIndex(w => w.id === wfId);
-    if (idx === -1) return;
-
-    const wf = pendingWorkflows[idx];
-    const r = reports.find(item => item.id === wf.reportId);
-
-    const now = new Date();
-    const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-
-    const newLog = {
-        timestamp: formattedDate,
-        user: "Damien G. (Admin)",
-        event: "Workflow Partage",
-        target: `${r ? r.title : wf.reportTitle} -> ${wf.beneficiary.split(' (')[0]}`,
-        status: "Rejeté par Admin"
-    };
-
-    logs.unshift(newLog);
-    saveLogsToStorage();
-
-    pendingWorkflows.splice(idx, 1);
-    saveWorkflowsToStorage();
-
-    renderAll();
-    alert(`La demande d'accès pour "${wf.beneficiary}" sur le rapport "${wf.reportTitle}" a été rejetée.`);
-}
-
-// Expose workflow actions globally
-window.approveWorkflow = approveWorkflow;
-window.rejectWorkflow = rejectWorkflow;
+window.grantAccess = grantAccess;
+window.revokeAccess = revokeAccess;
+window.renderCurrentRightsTable = renderCurrentRightsTable;
 
 // --- ADMIN / GESTION DES RAPPORTS TAB RENDERING ---
 function renderAdminPanel() {
@@ -1359,7 +1563,9 @@ function renderAdminPanel() {
     const prevSelectedValue = adminSelect.value;
     adminSelect.innerHTML = "";
 
-    reports.forEach(r => {
+    // Sort reports alphabetically by title
+    const sortedReports = [...reports].sort((a, b) => a.title.localeCompare(b.title));
+    sortedReports.forEach(r => {
         const opt = document.createElement("option");
         opt.value = r.id;
         opt.textContent = `${r.title} [${r.service.toUpperCase()}]`;
@@ -1369,7 +1575,7 @@ function renderAdminPanel() {
     if (prevSelectedValue && reports.some(r => r.id === prevSelectedValue)) {
         adminSelect.value = prevSelectedValue;
     } else if (reports.length > 0) {
-        adminSelect.value = reports[0].id;
+        adminSelect.value = sortedReports[0].id;
     }
 
     if (adminSelect.value) {
@@ -1398,13 +1604,28 @@ function loadReportInAdminForm(reportId) {
     const r = reports.find(item => item.id === reportId);
     if (!r) return;
 
-    document.getElementById("admin-report-owner").value = r.owner;
+    document.getElementById("admin-report-owner").value = r.owner || "";
     document.getElementById("admin-report-service").value = r.service;
     document.getElementById("admin-report-classif").value = r.classification;
     document.getElementById("admin-report-pssi").value = r.pssi;
     document.getElementById("admin-report-freq").value = r.frequency;
-    document.getElementById("admin-report-desc").value = r.desc;
-    document.getElementById("admin-report-tags").value = r.tags.join(", ");
+    
+    // Steward, summary
+    const stewardEl = document.getElementById("admin-report-steward");
+    if (stewardEl) stewardEl.value = r.steward || "";
+    
+    const summaryEl = document.getElementById("admin-report-summary");
+    if (summaryEl) summaryEl.value = r.summary || "";
+
+    // Contenteditable rich text editor
+    const descEditor = document.getElementById("admin-report-desc-editor");
+    if (descEditor) {
+        descEditor.innerHTML = r.desc || "";
+    }
+
+    // Modern tags
+    currentEditingTags = [...(r.tags || [])];
+    renderTagPills();
 }
 
 function saveReportMetadataFromAdmin() {
@@ -1417,12 +1638,17 @@ function saveReportMetadataFromAdmin() {
     const classif = document.getElementById("admin-report-classif").value;
     const pssi = document.getElementById("admin-report-pssi").value;
     const freq = document.getElementById("admin-report-freq").value;
-    const desc = document.getElementById("admin-report-desc").value.trim();
     
-    const rawTags = document.getElementById("admin-report-tags").value;
-    const tags = rawTags.split(",")
-        .map(t => t.trim())
-        .filter(t => t !== "");
+    const stewardEl = document.getElementById("admin-report-steward");
+    const steward = stewardEl ? stewardEl.value.trim() : "";
+    
+    const summaryEl = document.getElementById("admin-report-summary");
+    const summary = summaryEl ? summaryEl.value.trim() : "";
+
+    const descEditor = document.getElementById("admin-report-desc-editor");
+    const desc = descEditor ? descEditor.innerHTML.trim() : "";
+    
+    const tags = [...currentEditingTags];
 
     if (owner === "" || desc === "") {
         alert("Veuillez remplir le propriétaire métier et la description.");
@@ -1435,6 +1661,8 @@ function saveReportMetadataFromAdmin() {
     reports[rIdx].pssi = pssi;
     reports[rIdx].frequency = freq;
     reports[rIdx].desc = desc;
+    reports[rIdx].steward = steward;
+    reports[rIdx].summary = summary;
     reports[rIdx].tags = tags;
     reports[rIdx].lastRefresh = "Modifié à l'instant (Sync Data Galaxy)";
 
@@ -1508,11 +1736,19 @@ function openDrawer(reportId) {
         drawerPssiBadge.textContent = pssiLabel;
     }
 
-    if (drawerDesc) drawerDesc.textContent = r.desc;
+    if (drawerDesc) drawerDesc.innerHTML = r.desc;
+    
+    const drawerSummary = document.getElementById("drawer-summary");
+    if (drawerSummary) drawerSummary.textContent = r.summary || `Résumé analytique du rapport : Suivi et pilotage de l'activité ${r.title || ""} pour les équipes CFL.`;
     
     if (drawerOwner) drawerOwner.textContent = r.owner;
     if (drawerFreq) drawerFreq.textContent = r.frequency;
     if (drawerPath) drawerPath.textContent = r.pbirsPath;
+    
+    const drawerSteward = document.getElementById("drawer-steward");
+    const drawerCustodian = document.getElementById("drawer-custodian");
+    if (drawerSteward) drawerSteward.textContent = r.steward || "N/A";
+    if (drawerCustodian) drawerCustodian.textContent = r.custodian || "N/A";
     
     if (drawerTags) {
         drawerTags.innerHTML = "";
@@ -1526,12 +1762,22 @@ function openDrawer(reportId) {
 
     if (drawerAccessList) {
         drawerAccessList.innerHTML = "";
-        r.adGroups.forEach(grp => {
-            const li = document.createElement("li");
-            li.className = "access-user-item";
-            li.innerHTML = `<span class="access-user-dot"></span> Groupe AD '${grp}'`;
-            drawerAccessList.appendChild(li);
-        });
+        if (r.adGroups) {
+            r.adGroups.forEach(grp => {
+                const li = document.createElement("li");
+                li.className = "access-user-item";
+                li.innerHTML = `<span class="access-user-dot" style="background-color: #34c759;"></span> Groupe AD '${grp}'`;
+                drawerAccessList.appendChild(li);
+            });
+        }
+        if (r.users) {
+            r.users.forEach(usr => {
+                const li = document.createElement("li");
+                li.className = "access-user-item";
+                li.innerHTML = `<span class="access-user-dot" style="background-color: #007aff;"></span> Utilisateur '${usr}'`;
+                drawerAccessList.appendChild(li);
+            });
+        }
     }
 
     // Populate view count
@@ -1540,18 +1786,15 @@ function openDrawer(reportId) {
 
     // Role-based visibility rules:
     // "Emplacement technique" and "Accès autorisés" are only visible to Steward, Owner, and Admin.
-    // "Partager" button is only accessible to Steward, Owner, and Admin.
     const hasAdvancedAccess = (currentRole === "Steward" || currentRole === "Owner" || currentRole === "Admin");
     
     const pathContainer = document.getElementById("drawer-technical-path-container");
     const accessContainer = document.getElementById("drawer-access-list-container");
     const viewCountContainer = document.getElementById("drawer-viewcount-container");
-    const shareBtn = document.getElementById("drawer-share-action-btn");
 
     if (pathContainer) pathContainer.style.display = hasAdvancedAccess ? "block" : "none";
     if (accessContainer) accessContainer.style.display = hasAdvancedAccess ? "block" : "none";
     if (viewCountContainer) viewCountContainer.style.display = hasAdvancedAccess ? "block" : "none";
-    if (shareBtn) shareBtn.style.display = hasAdvancedAccess ? "flex" : "none";
 
     const favActionBtn = document.getElementById("drawer-fav-action-btn");
     if (favActionBtn) {
@@ -1632,7 +1875,6 @@ function buildEmbedUrl(r) {
     return embedUrl;
 }
 
-// 10. Report Viewer Simulator Logic (Direct Visualization)
 function openReportViewer(reportId) {
     const r = reports.find(item => item.id === reportId);
     if (!r) return;
@@ -1664,97 +1906,41 @@ function openReportViewer(reportId) {
         viewerClassBadge.textContent = classifLabel;
     }
 
+    // Populate filters chips display
+    const chipsContainer = document.getElementById("viewer-active-filters-chips");
+    if (chipsContainer) {
+        chipsContainer.innerHTML = "";
+        
+        const addChip = (label) => {
+            const span = document.createElement("span");
+            span.style.padding = "2px 8px";
+            span.style.fontSize = "11px";
+            span.style.fontWeight = "600";
+            span.style.borderRadius = "12px";
+            span.style.backgroundColor = "rgba(196, 16, 57, 0.08)";
+            span.style.color = "var(--cfl-crimson)";
+            span.style.border = "1px solid rgba(196, 16, 57, 0.15)";
+            span.textContent = label;
+            chipsContainer.appendChild(span);
+        };
+
+        addChip(`Service : ${r.service.toUpperCase()}`);
+        const classifLabel = r.classification === "dwh" ? "Certifié DWH" : (r.classification === "self-service" ? "Self-Service" : "Public");
+        addChip(`Classification : ${classifLabel}`);
+        addChip(`PSSI : ${r.pssi.toUpperCase()}`);
+        addChip(`Fréquence : ${r.frequency}`);
+        if (r.steward) {
+            addChip(`Steward : ${r.steward}`);
+        }
+        if (r.tags && Array.isArray(r.tags)) {
+            r.tags.forEach(t => addChip(t));
+        }
+    }
+
     // Build embed URL and update iframe
     const embedUrl = buildEmbedUrl(r);
     const iframeEl = document.getElementById("report-iframe");
     if (iframeEl) iframeEl.src = embedUrl;
-
-    const displayUrlEl = document.getElementById("viewer-display-url");
-    if (displayUrlEl) {
-        displayUrlEl.textContent = embedUrl;
-        displayUrlEl.setAttribute("title", embedUrl);
-    }
-
-    // Update status bar RLS & Filters indicators
-    const rlsRoleEl = document.getElementById("viewer-rls-role");
-    if (rlsRoleEl) rlsRoleEl.textContent = currentRole;
-
-    const filtersIndicator = document.getElementById("viewer-integration-filters");
-    let activeFilters = [];
-    if (selectedService !== "all") activeFilters.push(`Service: ${selectedService.toUpperCase()}`);
-    if (selectedClassification !== "all") {
-        const classifLabel = selectedClassification === "dwh" ? "DWH" : "Self-Service";
-        activeFilters.push(`Classif: ${classifLabel}`);
-    }
-    if (selectedPssi !== "all") activeFilters.push(`PSSI: ${selectedPssi.toUpperCase()}`);
-    if (searchQuery.trim() !== "") activeFilters.push(`Recherche: "${searchQuery}"`);
-    
-    if (filtersIndicator) {
-        filtersIndicator.textContent = activeFilters.length > 0 ? activeFilters.join(", ") : "Aucun filtre actif";
-    }
-
-    // Populate RLS & Filters inside offline simulator fallback
-    const simRlsRoleVal = document.getElementById("sim-rls-role-val");
-    if (simRlsRoleVal) simRlsRoleVal.textContent = currentRole;
-
-    const simRlsGroupsVal = document.getElementById("sim-rls-groups-val");
-    if (simRlsGroupsVal) simRlsGroupsVal.textContent = r.adGroups.join(", ");
-
-    const simMetric3 = document.getElementById("sim-metric-3");
-    if (simMetric3) {
-        switch (currentRole) {
-            case "Steward": simMetric3.textContent = "Data Steward"; break;
-            case "Owner": simMetric3.textContent = "Business Owner"; break;
-            case "Admin": simMetric3.textContent = "Admin BI"; break;
-            default: simMetric3.textContent = "Standard User"; break;
-        }
-    }
-
-    const simMetric2 = document.getElementById("sim-metric-2");
-    if (simMetric2) {
-        // Adjust mocked rows count based on RLS role
-        if (currentRole === "Admin" || currentRole === "Owner") {
-            simMetric2.textContent = "1.8M lignes";
-        } else if (currentRole === "Steward") {
-            simMetric2.textContent = "1.2M lignes";
-        } else {
-            simMetric2.textContent = "324K lignes";
-        }
-    }
-
-    const simFiltersList = document.getElementById("sim-applied-filters-list");
-    if (simFiltersList) {
-        simFiltersList.innerHTML = "";
-        if (activeFilters.length === 0) {
-            simFiltersList.innerHTML = `<li><em>Aucun filtre de catalogue n'est actuellement actif.</em></li>`;
-        } else {
-            activeFilters.forEach(f => {
-                const li = document.createElement("li");
-                li.innerHTML = `Paramètre d'URL : <strong>${f}</strong>`;
-                simFiltersList.appendChild(li);
-            });
-        }
-    }
-
-    // Reset Offline Simulator display to off by default
-    const simulator = document.getElementById("fallback-report-simulator");
-    const toggleSimBtn = document.getElementById("viewer-toggle-simulator-btn");
-    if (simulator) simulator.style.display = "none";
-    if (iframeEl) iframeEl.style.opacity = "1";
-    if (toggleSimBtn) {
-        toggleSimBtn.textContent = "Utiliser le simulateur offline";
-        toggleSimBtn.style.backgroundColor = "";
-        toggleSimBtn.style.color = "";
-    }
-
-    // Reset simulator active tab
-    document.querySelectorAll('.viewer-sidebar .viewer-page-item').forEach(p => p.classList.remove('active'));
-    const firstTab = document.querySelector('.viewer-sidebar [data-page="page-1"]');
-    if (firstTab) firstTab.classList.add('active');
-
-    document.querySelectorAll('.viewer-canvas .sim-page').forEach(page => page.classList.remove('active'));
-    const firstPage = document.getElementById("sim-page-1");
-    if (firstPage) firstPage.classList.add('active');
 
     closeDrawer();
 
@@ -1795,73 +1981,7 @@ function closeReportViewer() {
     renderAll();
 }
 
-// 11. Share Modal Logic
-function openShareModal(reportId) {
-    const r = reports.find(item => item.id === reportId);
-    if (!r) return;
 
-    document.getElementById("modal-report-id").value = reportId;
-    document.getElementById("share-user").value = "";
-    document.getElementById("share-reason").value = "";
-    document.getElementById("share-workflow").value = "direct";
-
-    const modal = document.getElementById("share-modal");
-    if (modal) modal.style.display = "flex";
-}
-
-function closeShareModal() {
-    const modal = document.getElementById("share-modal");
-    if (modal) modal.style.display = "none";
-}
-
-function submitShareWorkflow() {
-    const reportId = document.getElementById("modal-report-id").value;
-    const r = reports.find(item => item.id === reportId);
-    if (!r) return;
-
-    const shareUser = document.getElementById("share-user").value.trim();
-    const shareReason = document.getElementById("share-reason").value.trim();
-    const workflowType = document.getElementById("share-workflow").value;
-
-    if (shareUser === "") {
-        alert("Veuillez renseigner le nom ou l'e-mail du collaborateur.");
-        return;
-    }
-
-    const now = new Date();
-    const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-    
-    // Add to pending workflows queue
-    const newWf = {
-        id: "wf-" + Date.now(),
-        timestamp: formattedDate,
-        requester: "Damien G.",
-        beneficiary: shareUser,
-        reportId: reportId,
-        reportTitle: r.title,
-        reason: shareReason,
-        workflowType: workflowType
-    };
-    pendingWorkflows.push(newWf);
-    saveWorkflowsToStorage();
-
-    // Log the request
-    const workflowLog = {
-        timestamp: formattedDate,
-        user: "Damien G.",
-        event: "Workflow Partage",
-        target: `${r.title} -> ${shareUser}`,
-        status: "En attente de validation AD"
-    };
-
-    logs.unshift(workflowLog);
-    saveLogsToStorage();
-
-    closeShareModal();
-    renderAll();
-
-    alert(`Le workflow de partage pour "${r.title}" vers "${shareUser}" a été initié et ajouté aux tâches de validation.`);
-}
 
 function toggleFavorite(reportId) {
     const idx = favorites.indexOf(reportId);
@@ -2078,7 +2198,8 @@ function submitRecertification() {
 // Expose decisions helper globally
 window.openRecertifyModal = openRecertifyModal;
 window.setDecision = setDecision;
-window.resolvePssiCompliance = resolvePssiCompliance;
+window.archiveReport = archiveReport;
+window.notifySteward = notifySteward;
 
 // ========================================================
 // 17. ADMIN BI CONSOLE LOGIC (TELEMETRY, SYNC LOGS, PSSI ALERT)
@@ -2141,53 +2262,101 @@ function renderAdminConsole() {
         });
     }
 
-    const complianceTbody = document.getElementById("pssi-compliance-tbody");
+function checkObsolescenceInactive(r) {
+    if (!r.lastRefresh) return false;
+    if (r.lastRefresh.includes("Modifié à l'instant")) return false;
+    const match = r.lastRefresh.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+    if (!match) return false;
+    const day = parseInt(match[1]);
+    const month = parseInt(match[2]) - 1;
+    const year = parseInt(match[3]);
+    const refreshDate = new Date(year, month, day);
+    const now = new Date(2026, 6, 30); // Simulation: July 30, 2026
+    const diffTime = now - refreshDate;
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+    return diffDays > (365 * 2); // Inactif > 24 mois (environ 730 jours)
+}
+
+function checkVersioningKeywords(r) {
+    const rx = /\b(test|old|backup|bk)\b/i;
+    return rx.test(r.title);
+}
+
+function checkPastYear(r) {
+    const match = r.title.match(/\b(19\d{2}|20\d{2})\b/);
+    if (match) {
+        const year = parseInt(match[1]);
+        return year < 2026;
+    }
+    return false;
+}
+
+function checkTempFolder(r) {
+    if (!r.pbirsPath) return false;
+    const pathUpper = r.pbirsPath.toUpperCase();
+    return pathUpper.includes("/OLD") || pathUpper.includes("/ARCHIVE") || pathUpper.includes("/BACKUP");
+}
+
+function getReportQualityIssues(r) {
+    const issues = [];
+    if (checkObsolescenceInactive(r)) {
+        issues.push({ category: "Obsolescence", rule: "Rapport inactif", criterion: "Inactif > 24 mois" });
+    }
+    if (checkVersioningKeywords(r)) {
+        issues.push({ category: "Obsolescence", rule: "Mots-clés de versioning", criterion: "Nom contient test, old, backup, bk..." });
+    }
+    if (checkPastYear(r)) {
+        issues.push({ category: "Obsolescence", rule: "Année dépassée", criterion: "Année dans le nom antérieure à 2026" });
+    }
+    if (checkTempFolder(r)) {
+        issues.push({ category: "Obsolescence", rule: "Dossier temporaire", criterion: "Présent dans /OLD, /Archive ou /Backup" });
+    }
+    return issues;
+}
+
+    const govTbody = document.getElementById("governance-quality-tbody");
     const summaryCard = document.getElementById("pssi-compliance-alert-summary");
     const summaryText = document.getElementById("pssi-compliance-alert-text");
 
-    if (complianceTbody) {
-        complianceTbody.innerHTML = "";
+    if (govTbody) {
+        govTbody.innerHTML = "";
         let violationsCount = 0;
 
         reports.forEach(r => {
-            const isSensitive = (r.pssi === "restreint" || r.pssi === "confidentiel");
-            const hasBroadGroup = r.adGroups.some(g => 
-                g.includes("PUBLIC") || 
-                g.includes("ALL") || 
-                g.includes("STAFF") || 
-                g.includes("EVERYONE")
-            );
+            const issues = getReportQualityIssues(r);
+            if (issues.length === 0) return;
+
+            violationsCount++;
+
+            const rulesStr = issues.map(i => i.rule).join(", ");
+            const criteriaStr = issues.map(i => i.criterion).join(", ");
 
             const tr = document.createElement("tr");
-            let evaluationCell = "";
-            let actionCell = "";
-
-            if (isSensitive && hasBroadGroup) {
-                violationsCount++;
-                evaluationCell = `<span style="color: #dc3545; font-weight: 700;">⚠️ Alerte: Groupe trop large</span>`;
-                actionCell = `<button class="btn-sm-action danger" onclick="resolvePssiCompliance('${r.id}')" style="background-color: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">Restreindre l'accès</button>`;
-            } else if (isSensitive) {
-                evaluationCell = `<span style="color: #248a3d; font-weight: 600;">✓ Conforme (Groupe restreint)</span>`;
-                actionCell = `<span style="color: var(--text-secondary); font-size: 11.5px;">Aucune action requise</span>`;
-            } else {
-                evaluationCell = `<span style="color: var(--text-secondary);">Non-sensible (PSSI: ${r.pssi.toUpperCase()})</span>`;
-                actionCell = `<span style="color: var(--text-secondary); font-size: 11.5px;">N/A</span>`;
-            }
+            
+            // Build action buttons
+            const notifyBtn = `<button class="btn-sm-action primary" onclick="notifySteward('${r.id}', '${rulesStr}')" style="margin-right: 6px; font-size: 11px; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--cfl-gray-border); background: white; cursor: pointer;">Notifier Steward</button>`;
+            const archiveBtn = `<button class="btn-sm-action danger" onclick="archiveReport('${r.id}')" style="font-size: 11px; padding: 4px 8px; border-radius: 4px; background-color: var(--cfl-crimson); color: white; border: none; cursor: pointer;">Archiver</button>`;
 
             tr.innerHTML = `
-                <td><strong>${r.title}</strong></td>
-                <td><span class="pssi-badge ${r.pssi}">${r.pssi.toUpperCase()}</span></td>
-                <td><code style="font-family: monospace; font-size: 11.5px; background: #e0e0e0; padding: 2px 4px; border-radius: 3px;">${r.adGroups.join(", ")}</code></td>
-                <td>${evaluationCell}</td>
-                <td style="text-align: center;">${actionCell}</td>
+                <td>
+                    <div style="font-weight: 700; color: var(--cfl-gray-dark);">${r.title}</div>
+                    <span class="service-badge ${r.service}" style="font-size: 9px; padding: 1px 4px; margin-top: 4px; display: inline-block;">${r.service.toUpperCase()}</span>
+                </td>
+                <td><code style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">${r.pbirsPath}</code></td>
+                <td><span style="color: #dc3545; font-weight: 600;">${rulesStr}</span></td>
+                <td style="font-size: 12px; color: var(--cfl-gray-dark);">${criteriaStr}</td>
+                <td style="text-align: center; white-space: nowrap;">
+                    ${notifyBtn}
+                    ${archiveBtn}
+                </td>
             `;
-            complianceTbody.appendChild(tr);
+            govTbody.appendChild(tr);
         });
 
         if (summaryCard && summaryText) {
             if (violationsCount > 0) {
                 summaryCard.style.display = "block";
-                summaryText.innerHTML = `Scanner PSSI : <strong>${violationsCount} anomalie(s) active(s)</strong> de droits d'accès détectée(s). Les rapports sensibles disposent de groupes AD trop ouverts.`;
+                summaryText.innerHTML = `Gouvernance de qualité : <strong>${violationsCount} anomalie(s) active(s)</strong> d'obsolescence ou de versioning détectée(s).`;
             } else {
                 summaryCard.style.display = "none";
             }
@@ -2195,34 +2364,55 @@ function renderAdminConsole() {
     }
 }
 
-function resolvePssiCompliance(reportId) {
+function archiveReport(reportId) {
     const r = reports.find(item => item.id === reportId);
     if (!r) return;
 
-    r.adGroups = r.adGroups.map(g => {
-        if (g.includes("ALL") || g.includes("STAFF") || g.includes("PUBLIC")) {
-            return g.replace("_ALL_STAFF", "_RESTRICT").replace("_PUBLIC", "_RESTRICT");
-        }
-        return g;
-    });
+    if (!r.pbirsPath.toUpperCase().includes("/ARCHIVE")) {
+        const parts = r.pbirsPath.split("/");
+        const filename = parts.pop();
+        r.pbirsPath = parts.join("/") + "/Archive/" + filename;
+    }
 
     saveReportsToStorage();
 
     const now = new Date();
     const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-    const newLog = {
+    
+    logs.unshift({
         timestamp: formattedDate,
         user: "Admin BI",
-        event: "Correction PSSI",
+        event: "Archivage Rapport",
         target: r.title,
-        status: "Restreint (AD)"
-    };
-    logs.unshift(newLog);
+        status: "Succès"
+    });
     saveLogsToStorage();
 
-    addSyncLog(formattedDate, "Active Directory", `Correction PSSI appliquée pour "${r.title}". Le groupe AD a été restreint.`, "Succès");
+    addSyncLog(formattedDate, "Système", `Archivage du rapport "${r.title}" pour obsolescence (Chemin mis à jour).`, "Succès");
 
-    alert(`Action corrective appliquée. Le groupe d'accès AD pour le rapport "${r.title}" a été restreint aux seuls agents autorisés.`);
+    alert(`Le rapport "${r.title}" a été déplacé sous le dossier technique des archives :\n${r.pbirsPath}`);
+    renderAll();
+}
+
+function notifySteward(reportId, ruleName) {
+    const r = reports.find(item => item.id === reportId);
+    if (!r) return;
+
+    const now = new Date();
+    const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    
+    logs.unshift({
+        timestamp: formattedDate,
+        user: "Admin BI",
+        event: "Alerte Obsolescence",
+        target: r.title,
+        status: "Steward Notifié"
+    });
+    saveLogsToStorage();
+
+    addSyncLog(formattedDate, "Notification", `Alerte de gouvernance (${ruleName}) transmise au Data Steward ${r.steward}.`, "Succès");
+
+    alert(`Notification envoyée par Teams & E-mail au Data Steward (${r.steward}) pour le rapport "${r.title}".`);
     renderAll();
 }
 
@@ -2262,3 +2452,59 @@ function forceManualSync() {
         }, 1200);
     }
 }
+
+// ========================================================
+// MODERN TAG PILLS EDITOR LOGIC
+// ========================================================
+let currentEditingTags = [];
+
+function renderTagPills() {
+    const editor = document.getElementById("admin-tags-pill-editor");
+    if (!editor) return;
+    
+    const pills = editor.querySelectorAll(".tag-pill");
+    pills.forEach(p => p.remove());
+    
+    const input = document.getElementById("admin-tag-input");
+    
+    currentEditingTags.forEach(tag => {
+        const pill = document.createElement("span");
+        pill.className = "tag-pill";
+        pill.innerHTML = `${tag} <button type="button" class="tag-remove-btn" onclick="removeEditingTag('${tag}')">&times;</button>`;
+        editor.insertBefore(pill, input);
+    });
+}
+
+function removeEditingTag(tag) {
+    currentEditingTags = currentEditingTags.filter(t => t !== tag);
+    renderTagPills();
+}
+
+function initTagEditorEvents() {
+    const input = document.getElementById("admin-tag-input");
+    if (!input) return;
+    
+    input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === ",") {
+            e.preventDefault();
+            const tagValue = input.value.trim().replace(/,/g, "");
+            if (tagValue && !currentEditingTags.includes(tagValue)) {
+                currentEditingTags.push(tagValue);
+                renderTagPills();
+            }
+            input.value = "";
+        }
+    });
+
+    const editor = document.getElementById("admin-tags-pill-editor");
+    if (editor) {
+        editor.addEventListener("click", () => {
+            input.focus();
+        });
+    }
+}
+
+// Expose decisions helper globally
+window.openRecertifyModal = openRecertifyModal;
+window.setDecision = setDecision;
+window.removeEditingTag = removeEditingTag;

@@ -1658,3 +1658,57 @@ textarea.form-control {
     display: block !important;
 }
 
+/* Modern Tag Editor styles */
+.modern-tag-editor {
+    transition: border-color 0.15s ease-in-out;
+}
+.modern-tag-editor:focus-within {
+    border-color: var(--cfl-crimson) !important;
+    box-shadow: 0 0 0 3px rgba(196, 16, 57, 0.15);
+}
+.tag-pill {
+    background-color: rgba(196, 16, 57, 0.08);
+    color: var(--cfl-crimson);
+    border: 1px solid rgba(196, 16, 57, 0.15);
+    padding: 4px 10px;
+    border-radius: 16px;
+    font-size: 12.5px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 2px 0;
+}
+.tag-remove-btn {
+    background: none;
+    border: none;
+    color: var(--cfl-crimson);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-weight: bold;
+}
+.tag-remove-btn:hover {
+    color: #a00b2e;
+}
+
+/* Rich Text Formatter Editor styles */
+.text-formatter-toolbar .format-btn {
+    transition: all 0.15s ease-in-out;
+}
+.text-formatter-toolbar .format-btn:hover {
+    background-color: #f0f0f0 !important;
+    border-color: #999 !important;
+}
+.text-formatter-toolbar .format-btn:active {
+    background-color: #e0e0e0 !important;
+}
+#admin-report-desc-editor:empty:before {
+    content: attr(placeholder);
+    color: #aaa;
+}
+
