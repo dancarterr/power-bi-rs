@@ -1887,22 +1887,45 @@ function buildEmbedUrl(r) {
     return embedUrl;
 }
 
+function getCurrentUserEmail() {
+    if (currentRole === "Admin") return "damien.g@cfl.lu";
+    if (currentRole === "Owner") return "laurent.leclerc@cfl.lu";
+    if (currentRole === "Steward") return "sophie.martin@cfl.lu";
+    return "jean-paul.weber@cfl.lu"; // Standard
+}
+
+function isUserAuthorizedForReport(r) {
+    if (currentRole === "Admin") return true;
+    
+    const email = getCurrentUserEmail();
+    
+    if (r.users && r.users.includes(email)) {
+        return true;
+    }
+    
+    const groups = SIMULATED_USER_GROUPS[email] || [];
+    if (r.adGroups && r.adGroups.some(g => groups.includes(g))) {
+        return true;
+    }
+    
+    if ((!r.adGroups || r.adGroups.length === 0) && (!r.users || r.users.length === 0)) {
+        return true;
+    }
+    
+    return false;
+}
+
 function openReportViewer(reportId) {
     const r = reports.find(item => item.id === reportId);
     if (!r) return;
 
-    // Log the SSO report access event
-    const now = new Date();
-    const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-    const accessLog = {
-        timestamp: formattedDate,
-        user: "Damien G.",
-        event: "Visualisation Rapport",
-        target: r.title,
-        status: "Succès (SSO Actif)"
-    };
-    logs.unshift(accessLog);
-    saveLogsToStorage();
+    // 1. Accessibility Check
+    const isArchived = r.archivedDate !== null || r.pbirsPath.includes("_Archives");
+    const isInvalidUrl = !r.pbirsUrl || r.pbirsUrl === "#" || r.pbirsUrl === "";
+    const isAccessible = !isArchived && !isInvalidUrl;
+
+    // 2. Authorization Check
+    const isAuthorized = isUserAuthorizedForReport(r);
 
     // Populate metadata in report viewer header
     const viewerTitle = document.getElementById("viewer-report-title");
@@ -1968,10 +1991,98 @@ function openReportViewer(reportId) {
         }
     }
 
-    // Build embed URL and update iframe
-    const embedUrl = buildEmbedUrl(r);
     const iframeEl = document.getElementById("report-iframe");
-    if (iframeEl) iframeEl.src = embedUrl;
+    const errContainer = document.getElementById("viewer-error-container");
+    const errIconBox = document.getElementById("viewer-error-icon-box");
+    const errTitle = document.getElementById("viewer-error-title");
+    const errMsg = document.getElementById("viewer-error-message");
+    const errActionBtn = document.getElementById("viewer-error-action-btn");
+
+    if (errContainer) errContainer.style.display = "none";
+    if (iframeEl) iframeEl.style.display = "block";
+
+    if (!isAuthorized) {
+        // Log access denied
+        const now = new Date();
+        const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+        logs.unshift({
+            timestamp: formattedDate,
+            user: getCurrentUserEmail(),
+            event: "Accès Refusé",
+            target: r.title,
+            status: "Échec (Habilitation)"
+        });
+        saveLogsToStorage();
+
+        // Show authorization error
+        if (iframeEl) iframeEl.style.display = "none";
+        if (errContainer) {
+            errContainer.style.display = "flex";
+            errIconBox.innerHTML = `<svg viewBox="0 0 24 24" width="40" height="40" stroke="#dc3545" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
+            errIconBox.style.backgroundColor = "rgba(220, 53, 69, 0.1)";
+            errTitle.textContent = "Accès Refusé : Habilitations Insuffisantes";
+            errMsg.innerHTML = `Vous ne disposez pas des droits d'accès nécessaires (habilitation nominative ou appartenance au groupe Active Directory autorisé) pour visualiser le rapport <strong>"${r.title}"</strong>.<br><br>Veuillez contacter le Data Steward (<strong>${r.steward || "N/A"}</strong>) ou soumettre une demande via le guichet de droits d'accès.`;
+            errActionBtn.style.display = "none";
+        }
+    } else if (!isAccessible) {
+        // Log accessibility error
+        const now = new Date();
+        const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+        logs.unshift({
+            timestamp: formattedDate,
+            user: getCurrentUserEmail(),
+            event: "Erreur Accès",
+            target: r.title,
+            status: "Échec (Inaccessible)"
+        });
+        saveLogsToStorage();
+
+        // Show accessibility error
+        if (iframeEl) iframeEl.style.display = "none";
+        if (errContainer) {
+            errContainer.style.display = "flex";
+            errIconBox.innerHTML = `<svg viewBox="0 0 24 24" width="40" height="40" stroke="#ff9500" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+            errIconBox.style.backgroundColor = "rgba(255, 149, 0, 0.1)";
+            errTitle.textContent = "Rapport Non Accessible";
+            
+            if (isArchived) {
+                errMsg.innerHTML = `Le rapport <strong>"${r.title}"</strong> a été temporairement déplacé vers le sous-dossier <code>_Archives</code> pour inactivité ou obsolescence.<br><br>Veuillez contacter le Data Steward ou l'Administrateur BI pour le restaurer.`;
+                if (currentRole === "Admin") {
+                    errActionBtn.style.display = "block";
+                    errActionBtn.textContent = "Restaurer maintenant";
+                    errActionBtn.style.border = "none";
+                    errActionBtn.style.color = "white";
+                    errActionBtn.style.backgroundColor = "var(--cfl-crimson)";
+                    errActionBtn.style.cursor = "pointer";
+                    errActionBtn.onclick = () => {
+                        restoreFromArchive(r.id);
+                        closeReportViewer();
+                    };
+                } else {
+                    errActionBtn.style.display = "none";
+                }
+            } else {
+                errMsg.innerHTML = `Le lien d'intégration Power BI Report Server pour le rapport <strong>"${r.title}"</strong> n'est pas configuré ou est invalide.<br><br>Veuillez contacter le support technique BI.`;
+                errActionBtn.style.display = "none";
+            }
+        }
+    } else {
+        // Log access success
+        const now = new Date();
+        const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+        logs.unshift({
+            timestamp: formattedDate,
+            user: getCurrentUserEmail(),
+            event: "Visualisation Rapport",
+            target: r.title,
+            status: "Succès (SSO Actif)"
+        });
+        saveLogsToStorage();
+
+        // Build embed URL and update iframe
+        const embedUrl = buildEmbedUrl(r);
+        if (iframeEl) iframeEl.src = embedUrl;
+    }
 
     closeDrawer();
 
@@ -1990,7 +2101,15 @@ function openReportViewer(reportId) {
 
 function closeReportViewer() {
     const iframeEl = document.getElementById("report-iframe");
-    if (iframeEl) iframeEl.src = "about:blank"; // clear iframe context
+    if (iframeEl) {
+        iframeEl.src = "about:blank"; // clear iframe context
+        iframeEl.style.display = "block";
+    }
+
+    const errContainer = document.getElementById("viewer-error-container");
+    if (errContainer) {
+        errContainer.style.display = "none";
+    }
 
     const container = document.getElementById("report-viewer-container");
     const overlay = document.getElementById("drawer-overlay");

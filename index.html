@@ -860,9 +860,22 @@
                 </button>
             </div>
         </header>
-        <div class="viewer-body iframe-mode">
+        <div class="viewer-body iframe-mode" style="position: relative; display: flex; flex-direction: column; flex: 1; height: 100%;">
             <!-- The live iframe -->
             <iframe id="report-iframe" src="" style="width: 100%; height: 100%; border: none; flex: 1;" title="Power BI Live Report Frame"></iframe>
+            
+            <!-- Error message container overlay -->
+            <div id="viewer-error-container" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #f4f5f7; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center; z-index: 10;">
+                <div id="viewer-error-icon-box" style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; font-size: 40px;">
+                    <!-- Dynamically set warning icon -->
+                </div>
+                <h3 id="viewer-error-title" style="font-size: 22px; color: var(--cfl-gray-dark); margin-bottom: 12px; font-weight: 700;"></h3>
+                <p id="viewer-error-message" style="font-size: 15px; color: var(--text-secondary); max-width: 550px; line-height: 1.6; margin-bottom: 30px;"></p>
+                <div style="display: flex; gap: 12px; align-items: center; justify-content: center;">
+                    <button onclick="closeReportViewer()" class="btn-sm-action" style="padding: 10px 20px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid var(--cfl-gray-border); background: white; border-radius: 4px;">Retour au catalogue</button>
+                    <button id="viewer-error-action-btn" class="slide-btn primary-btn" style="border-radius: 4px; padding: 10px 20px; font-size:13px; display: none;"></button>
+                </div>
+            </div>
         </div>
     </div>
 </body>
