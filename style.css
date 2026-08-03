@@ -909,6 +909,173 @@ h1 {
 }
 
 /* ========================================================
+   DRAWER TABS & LINEAGE STYLES
+   ======================================================== */
+/* Drawer Tabs System */
+.drawer-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--cfl-gray-border);
+    margin-bottom: 20px;
+    gap: 16px;
+    padding-bottom: 1px;
+}
+
+.drawer-tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 10px 4px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.drawer-tab-btn:hover {
+    color: var(--cfl-crimson);
+}
+
+.drawer-tab-btn.active {
+    color: var(--cfl-crimson);
+    border-bottom-color: var(--cfl-crimson);
+}
+
+.drawer-tab-content {
+    display: none;
+}
+
+.drawer-tab-content.active {
+    display: block;
+}
+
+/* Interactive Lineage Flow Canvas */
+.lineage-flow-container {
+    animation: slideDown 0.3s ease-out;
+}
+
+#lineage-canvas {
+    width: 100%;
+    height: 350px;
+    border: 1px solid var(--cfl-gray-border);
+    border-radius: var(--border-radius-md);
+    background-color: var(--cfl-gray-light);
+    box-shadow: var(--shadow-sm);
+    cursor: grab;
+}
+
+#lineage-canvas:active {
+    cursor: grabbing;
+}
+
+/* Details Panel Style for Vis.js Graph Node clicks */
+.lineage-details-panel {
+    background-color: var(--cfl-white);
+    border: 1px solid var(--cfl-gray-border);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+
+.lineage-details-header {
+    padding: 10px 14px;
+    font-weight: 600;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--cfl-gray-border);
+}
+
+.lineage-details-header.type-db {
+    background: linear-gradient(135deg, rgba(0, 122, 255, 0.08), rgba(0, 122, 255, 0.15));
+    color: #0056b3;
+    border-bottom-color: rgba(0, 122, 255, 0.2);
+}
+.lineage-details-header.type-table {
+    background: linear-gradient(135deg, rgba(227, 126, 95, 0.08), rgba(227, 126, 95, 0.15));
+    color: #a04328;
+    border-bottom-color: rgba(227, 126, 95, 0.2);
+}
+.lineage-details-header.type-cube {
+    background: linear-gradient(135deg, rgba(175, 82, 222, 0.08), rgba(175, 82, 222, 0.15));
+    color: #7b29a8;
+    border-bottom-color: rgba(175, 82, 222, 0.2);
+}
+.lineage-details-header.type-measure {
+    background: linear-gradient(135deg, rgba(196, 16, 57, 0.08), rgba(196, 16, 57, 0.15));
+    color: #9c0d2d;
+    border-bottom-color: rgba(196, 16, 57, 0.2);
+}
+.lineage-details-header.type-report {
+    background: linear-gradient(135deg, rgba(242, 200, 17, 0.08), rgba(242, 200, 17, 0.18));
+    color: #8c7000;
+    border-bottom-color: rgba(242, 200, 17, 0.25);
+}
+
+.lineage-details-body {
+    padding: 12px 14px;
+}
+
+.lineage-details-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--cfl-gray-dark);
+    margin-bottom: 6px;
+}
+
+.lineage-details-desc {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.45;
+    margin-bottom: 12px;
+}
+
+.lineage-details-tech {
+    padding: 10px 12px;
+    background-color: var(--cfl-gray-light);
+    border: 1px solid var(--cfl-gray-border);
+    border-radius: var(--border-radius-sm);
+}
+
+.lineage-tech-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+    letter-spacing: 0.5px;
+}
+
+.lineage-tech-code {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 11px;
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+    padding: 8px;
+    border-radius: var(--border-radius-sm);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 140px;
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* Keyframes for smooth animations */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================================
    ADMINISTRATION / GOUVERNANCE PANEL
    ======================================================== */
 .admin-grid {

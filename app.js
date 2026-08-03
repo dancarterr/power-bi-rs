@@ -833,6 +833,29 @@ function initEventListeners() {
 
     // Modern Tag Pills Editor
     initTagEditorEvents();
+
+    // Drawer Tabs Event Listeners
+    const drawerTabBtns = document.querySelectorAll(".drawer-tab-btn");
+    drawerTabBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const tabId = btn.getAttribute("data-drawer-tab");
+            
+            // Remove active classes from buttons and contents
+            drawerTabBtns.forEach(b => b.classList.remove("active"));
+            document.querySelectorAll(".drawer-tab-content").forEach(c => {
+                c.classList.remove("active");
+                c.style.display = "none";
+            });
+            
+            // Activate current button and content
+            btn.classList.add("active");
+            const targetContent = document.getElementById(`drawer-tab-content-${tabId}`);
+            if (targetContent) {
+                targetContent.classList.add("active");
+                targetContent.style.display = "block";
+            }
+        });
+    });
 }
 
 function switchTab(tabId) {
@@ -1715,6 +1738,27 @@ function openDrawer(reportId) {
     if (history.length > 15) history.shift();
     saveHistoryToStorage();
 
+    // Reset drawer tabs to default (Details/Fiche Métier)
+    const tabBtns = document.querySelectorAll(".drawer-tab-btn");
+    tabBtns.forEach(btn => {
+        if (btn.getAttribute("data-drawer-tab") === "details") {
+            btn.classList.add("active");
+        } else {
+            btn.classList.remove("active");
+        }
+    });
+
+    const detailsTab = document.getElementById("drawer-tab-content-details");
+    if (detailsTab) {
+        detailsTab.classList.add("active");
+        detailsTab.style.display = "block";
+    }
+    const lineageTab = document.getElementById("drawer-tab-content-lineage");
+    if (lineageTab) {
+        lineageTab.classList.remove("active");
+        lineageTab.style.display = "none";
+    }
+
     const drawerTitle = document.getElementById("drawer-report-title");
     const drawerTitleHeading = document.getElementById("drawer-title-heading");
     const drawerBadge = document.getElementById("drawer-service-badge");
@@ -1821,6 +1865,245 @@ function openDrawer(reportId) {
         drawer.setAttribute("aria-hidden", "false");
     }
     if (overlay) overlay.classList.add("open");
+
+    // Render lineage data
+    renderReportLineage(r);
+}
+
+function renderReportLineage(r) {
+    const canvasContainer = document.getElementById("lineage-canvas");
+    const detailsPanel = document.getElementById("lineage-details-panel");
+    if (!canvasContainer || !detailsPanel) return;
+
+    // Reset details panel
+    detailsPanel.style.display = "none";
+    detailsPanel.innerHTML = "";
+
+    // Determine mock lineage data based on report service
+    const serviceName = r.service || "qualite";
+    let dbName = "CFL_PROD_DWH";
+    let dbType = "SQL Server (Production DWH)";
+    let connString = "Server=cfl-dwh-prod.cfl.lu;Database=CFL_PROD_DWH;Trusted_Connection=True;";
+    let dwhTable = "DWH_GOUV.T_KPI_REPORT_STATS";
+    let dwhSQL = "SELECT \n  ReportId,\n  MetricValue,\n  SnapshotDate \nFROM DWH_GOUV.T_KPI_REPORT_STATS \nWHERE SnapshotDate >= DATEADD(month, -12, GETDATE());";
+    let cubeName = "CUBE_GOUVERNANCE_BI";
+    let measureName = "[Taux de Complétion]";
+    let daxFormula = "Taux de Complétion := \nDIVIDE(\n  CALCULATE(COUNT(T_KPI_REPORT_STATS[ReportId]), T_KPI_REPORT_STATS[HasSteward] = 1),\n  COUNT(T_KPI_REPORT_STATS[ReportId]),\n  0\n)";
+
+    // Customize based on service
+    if (serviceName === "qualite") {
+        dbName = "CFL_TRAFFIC_DB";
+        dbType = "SQL Server (Traffic Ferroviaire)";
+        connString = "Server=cfl-db-traffic.cfl.lu;Database=CFL_TRAFFIC_DB;Integrated Security=SSPI;";
+        dwhTable = "DWH_QUALITE.T_FACT_TRAIN_DELAY";
+        dwhSQL = "SELECT \n  TrainId,\n  StationId,\n  DelayMinutes,\n  PlannedTime,\n  ActualTime\nFROM DWH_QUALITE.T_FACT_TRAIN_DELAY\nWHERE PlannedTime >= '2026-01-01';";
+        cubeName = "CUBE_QUALITE_PERFORMANCE";
+        measureName = "[Taux de Ponctualité]";
+        daxFormula = "Taux de Ponctualité := \nDIVIDE(\n  CALCULATE(\n    COUNTROWS(T_FACT_TRAIN_DELAY),\n    T_FACT_TRAIN_DELAY[DelayMinutes] <= 5\n  ),\n  COUNTROWS(T_FACT_TRAIN_DELAY),\n  0\n)";
+    } else if (serviceName === "finances") {
+        dbName = "CFL_ERP_FINANCE";
+        dbType = "Oracle Database (ERP)";
+        connString = "Data Source=cfl-oracle-erp.cfl.lu:1521/FINPROD;User Id=bi_user;Password=********;";
+        dwhTable = "DWH_FINANCE.FACT_GL_BALANCES";
+        dwhSQL = "SELECT \n  ACCOUNT_ID,\n  PERIOD_NAME,\n  DEBIT_AMOUNT,\n  CREDIT_AMOUNT\nFROM DWH_FINANCE.FACT_GL_BALANCES\nWHERE FISCAL_YEAR = 2026;";
+        cubeName = "CUBE_FINANCIAL_ANALYTICS";
+        measureName = "[Montant Dépenses Réelles]";
+        daxFormula = "Montant Dépenses Réelles := \nCALCULATE(\n  SUM(FACT_GL_BALANCES[DEBIT_AMOUNT]) - SUM(FACT_GL_BALANCES[CREDIT_AMOUNT]),\n  T_DIM_ACCOUNT[Type] = \"Expense\"\n)";
+    } else if (serviceName === "rh") {
+        dbName = "CFL_HR_PROD";
+        dbType = "Oracle Database (PeopleSoft)";
+        connString = "Data Source=cfl-oracle-hr.cfl.lu:1521/HRPROD;User Id=hr_bi;Password=********;";
+        dwhTable = "DWH_HR.FACT_EMPLOYEE_TURNOVER";
+        dwhSQL = "SELECT \n  EMPLOYEE_ID,\n  DEPARTMENT_ID,\n  HIRE_DATE,\n  TERMINATION_DATE\nFROM DWH_HR.FACT_EMPLOYEE_TURNOVER;";
+        cubeName = "CUBE_HR_ANALYTICS";
+        measureName = "[Taux de Rotation RH]";
+        daxFormula = "Taux de Rotation RH := \nDIVIDE(\n  COUNTROWS(CALCULATETABLE(FACT_EMPLOYEE_TURNOVER, NOT ISBLANK(FACT_EMPLOYEE_TURNOVER[TERMINATION_DATE]))),\n  AVERAGEX(VALUES(T_DIM_DATE[MonthKey]), [ActiveEmployees]),\n  0\n)";
+    } else if (serviceName === "voyageurs") {
+        dbName = "CFL_TICKETING_DB";
+        dbType = "PostgreSQL (Ticketing Ventes)";
+        connString = "Host=cfl-pg-ticket.cfl.lu;Port=5432;Database=ticketing;Username=bi_reader;Password=********;";
+        dwhTable = "DWH_VOYAGEURS.F_TICKET_SALES";
+        dwhSQL = "SELECT \n  ticket_id,\n  sale_date,\n  passenger_category,\n  amount_eur\nFROM DWH_VOYAGEURS.F_TICKET_SALES\nWHERE sale_date >= CURRENT_DATE - INTERVAL '1 year';";
+        cubeName = "CUBE_COMMERCIAL_SALES";
+        measureName = "[Revenu Total Billetterie]";
+        daxFormula = "Revenu Total Billetterie := \nSUM(F_TICKET_SALES[amount_eur])";
+    } else if (serviceName === "informatique") {
+        dbName = "CFL_INFRA_MONITORING";
+        dbType = "PostgreSQL (Monitoring Sys)";
+        connString = "Host=cfl-pg-infra.cfl.lu;Database=syslog;Username=bi_infra;Password=********;";
+        dwhTable = "DWH_INFRA.F_SERVER_METRICS";
+        dwhSQL = "SELECT \n  server_id,\n  timestamp,\n  cpu_usage_pct,\n  ram_usage_pct\nFROM DWH_INFRA.F_SERVER_METRICS\nWHERE timestamp >= NOW() - INTERVAL '30 days';";
+        cubeName = "CUBE_SYSTEM_PERFORMANCE";
+        measureName = "[Disponibilité Système]";
+        daxFormula = "Disponibilité Système := \nAVERAGE(F_SERVER_METRICS[cpu_usage_pct])";
+    }
+
+    // Nodes definition for Vis.js
+    const rawNodes = [
+        {
+            id: 1,
+            label: `🗄️\n${dbName}`,
+            type: "db",
+            typeLabel: "Base de Données Source",
+            name: dbName,
+            desc: `Base opérationnelle source (${dbType}) contenant les données brutes.`,
+            techTitle: "Chaîne de connexion (Connection String)",
+            techCode: connString,
+            color: { background: "#e1f5fe", border: "#007aff", hover: { background: "#b3e5fc", border: "#0056b3" }, highlight: { background: "#b3e5fc", border: "#0056b3" } }
+        },
+        {
+            id: 2,
+            label: `📊\n${dwhTable}`,
+            type: "table",
+            typeLabel: "Table DWH / Requête M",
+            name: dwhTable,
+            desc: "Table de faits ou dimensions stockée dans le Data Warehouse CFL après extraction ETL.",
+            techTitle: "Requête SQL Source d'alimentation",
+            techCode: dwhSQL,
+            color: { background: "#fbebe6", border: "#e37e5f", hover: { background: "#f7d7cd", border: "#a04328" }, highlight: { background: "#f7d7cd", border: "#a04328" } }
+        },
+        {
+            id: 3,
+            label: `🧊\n${cubeName}`,
+            type: "cube",
+            typeLabel: "Modèle Sémantique SSAS",
+            name: cubeName,
+            desc: "Modèle tabulaire SSAS hébergé en mémoire. Gère la sémantique et les relations.",
+            techTitle: "Partition & TMSL JSON",
+            techCode: `{\n  "name": "${dwhTable.split('.')[1] || 'Partition'}",\n  "source": {\n    "type": "query",\n    "query": "SELECT * FROM ${dwhTable}",\n    "dataSource": "SqlServerProdDWH"\n  }\n}`,
+            color: { background: "#f7effc", border: "#af52de", hover: { background: "#eddff7", border: "#7b29a8" }, highlight: { background: "#eddff7", border: "#7b29a8" } }
+        },
+        {
+            id: 4,
+            label: `📐\n${measureName}`,
+            type: "measure",
+            typeLabel: "Objet Sémantique (Mesure)",
+            name: measureName,
+            desc: `Mesure analytique métier pré-calculée en langage DAX sur le serveur SSAS.`,
+            techTitle: "Formule DAX (Calcul Sémantique)",
+            techCode: daxFormula,
+            color: { background: "#fdecf0", border: "#c41039", hover: { background: "#fad6de", border: "#9c0d2d" }, highlight: { background: "#fad6de", border: "#9c0d2d" } }
+        },
+        {
+            id: 5,
+            label: `📈\n${r.title}`,
+            type: "report",
+            typeLabel: "Rapport Power BI (PBIRS)",
+            name: r.title,
+            desc: `Rapport de visualisation final hébergé sur Power BI Report Server.`,
+            techTitle: "Métadonnées de Restitution PBIRS",
+            techCode: `ID Unique: ${r.id}\nChemin: ${r.pbirsPath}\nDernier rafraîchissement: ${r.lastRefresh}\nPropriétaire: ${r.owner}\nGroupe de sécurité AD: ${r.adGroups ? r.adGroups.join(', ') : 'Aucun'}`,
+            color: { background: "#fef9e8", border: "#f2c811", hover: { background: "#fdf0c2", border: "#8c7000" }, highlight: { background: "#fdf0c2", border: "#8c7000" } }
+        }
+    ];
+
+    // Edges definition for Vis.js (connecting step-by-step)
+    const rawEdges = [
+        { from: 1, to: 2, arrows: "to", color: { color: "#8e8e93", hover: "#c41039", highlight: "#c41039" }, width: 2 },
+        { from: 2, to: 3, arrows: "to", color: { color: "#8e8e93", hover: "#c41039", highlight: "#c41039" }, width: 2 },
+        { from: 3, to: 4, arrows: "to", color: { color: "#8e8e93", hover: "#c41039", highlight: "#c41039" }, width: 2 },
+        { from: 4, to: 5, arrows: "to", color: { color: "#8e8e93", hover: "#c41039", highlight: "#c41039" }, width: 2 }
+    ];
+
+    // Create node datasets for Vis.js
+    const nodes = new vis.DataSet(rawNodes.map(n => ({
+        id: n.id,
+        label: n.label,
+        shape: "box",
+        font: {
+            face: "Outfit, sans-serif",
+            size: 11,
+            bold: { color: "#141414", size: 12, face: "Outfit" },
+            color: "#141414"
+        },
+        margin: 10,
+        shapeProperties: {
+            borderRadius: 8
+        },
+        borderWidth: 1.5,
+        borderWidthSelected: 2.5,
+        color: n.color,
+        shadow: {
+            enabled: true,
+            color: "rgba(0,0,0,0.06)",
+            size: 4,
+            x: 0,
+            y: 2
+        }
+    })));
+
+    const edges = new vis.DataSet(rawEdges);
+
+    const data = { nodes, edges };
+
+    // Network options
+    const options = {
+        nodes: {
+            chosen: true
+        },
+        edges: {
+            smooth: {
+                type: "cubicBezier",
+                forceDirection: "vertical",
+                roundness: 0.5
+            }
+        },
+        interaction: {
+            hover: true,
+            zoomView: true,
+            dragView: true,
+            selectConnectedEdges: false
+        },
+        layout: {
+            hierarchical: {
+                enabled: true,
+                direction: "UD", // Up-Down flow
+                sortMethod: "directed",
+                nodeSpacing: 110,
+                levelSeparation: 80
+            }
+        },
+        physics: {
+            enabled: false // Static hierarchical layout is cleaner inside a small drawer
+        }
+    };
+
+    // Render Vis.js Network
+    // Timeout helps ensure canvas element is visible and has layouts computed before vis.js draws
+    setTimeout(() => {
+        const network = new vis.Network(canvasContainer, data, options);
+
+        // Click event on nodes
+        network.on("selectNode", function (params) {
+            const nodeId = params.nodes[0];
+            const nodeData = rawNodes.find(n => n.id === nodeId);
+            if (nodeData) {
+                // Populate details panel
+                detailsPanel.innerHTML = `
+                    <div class="lineage-details-header type-${nodeData.type}">
+                        <span style="font-weight: 700; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px;">${nodeData.typeLabel}</span>
+                        <span style="font-family: monospace; font-size: 11px; font-weight: bold;">[ID Nœud: #${nodeData.id}]</span>
+                    </div>
+                    <div class="lineage-details-body">
+                        <div class="lineage-details-name">${nodeData.name}</div>
+                        <div class="lineage-details-desc">${nodeData.desc}</div>
+                        <div class="lineage-details-tech">
+                            <div class="lineage-tech-title">${nodeData.techTitle}</div>
+                            <pre class="lineage-tech-code"><code>${nodeData.techCode}</code></pre>
+                        </div>
+                    </div>
+                `;
+                detailsPanel.style.display = "block";
+            }
+        });
+
+        // Deselect event (click on empty space in canvas)
+        network.on("deselectNode", function () {
+            detailsPanel.style.display = "none";
+            detailsPanel.innerHTML = "";
+        });
+        
+    }, 100);
 }
 
 function updateDrawerFavButton(reportId) {

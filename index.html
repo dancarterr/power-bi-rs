@@ -6,6 +6,7 @@
     <meta name="description" content="CFL Analysis - Portail de gouvernance et de navigation sémantique pour Power BI Report Server. Solution de restructuration de la plateforme BI CFL.">
     <title>CFL Analysis — Portail de gouvernance BI</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <script src="app.js" defer></script>
 </head>
 <body>
@@ -690,67 +691,92 @@
                     <span id="drawer-classification-badge" class="classif-badge dwh">Certifie DWH</span>
                     <span id="drawer-pssi-badge" class="pssi-badge interne">PSSI: INTERNE</span>
                 </div>
-                <h3 id="drawer-title-heading" style="font-size: 20px; font-weight: 700; color: var(--cfl-gray-dark);">Nom du Rapport</h3>
+                <h3 id="drawer-title-heading" style="font-size: 20px; font-weight: 700; color: var(--cfl-gray-dark); margin-bottom: 12px;">Nom du Rapport</h3>
             </div>
             
-            <!-- Description -->
-            <div>
-                <h4 class="drawer-section-title">Description metier</h4>
-                <div id="drawer-description" class="drawer-desc" style="font-size: 13.5px; line-height: 1.5; color: var(--cfl-gray-dark);">Description du rapport...</div>
+            <!-- Menu des Onglets du Drawer -->
+            <div class="drawer-tabs">
+                <button class="drawer-tab-btn active" data-drawer-tab="details">Fiche Métier</button>
+                <button class="drawer-tab-btn" data-drawer-tab="lineage">Lignage des Données</button>
             </div>
+            
+            <!-- Contenu Onglet Détails (Fiche Métier) -->
+            <div id="drawer-tab-content-details" class="drawer-tab-content active">
+                <!-- Description -->
+                <div>
+                    <h4 class="drawer-section-title">Description metier</h4>
+                    <div id="drawer-description" class="drawer-desc" style="font-size: 13.5px; line-height: 1.5; color: var(--cfl-gray-dark);">Description du rapport...</div>
+                </div>
 
-            <!-- Summary -->
-            <div style="margin-top: 12px; margin-bottom: 12px; padding: 10px; border-left: 3px solid var(--cfl-crimson); background-color: var(--cfl-gray-light); border-radius: 0 4px 4px 0;">
-                <h4 class="drawer-section-title" style="margin-bottom: 4px; font-size: 12px; text-transform: uppercase; color: var(--text-secondary);">Résumé</h4>
-                <p id="drawer-summary" style="font-size: 13.5px; line-height: 1.5; color: var(--cfl-gray-dark); margin: 0; font-style: italic;">Résumé analytique du rapport...</p>
-            </div>
-            
-            <!-- Info Grid -->
-            <div>
-                <h4 class="drawer-section-title">Gouvernance & cycle de vie</h4>
-                <div class="drawer-info-grid">
-                    <div class="drawer-info-item">
-                        <span class="info-label">Business Owner</span>
-                        <span id="drawer-owner" class="info-value">Jean Dupont</span>
+                <!-- Summary -->
+                <div style="margin-top: 12px; margin-bottom: 12px; padding: 10px; border-left: 3px solid var(--cfl-crimson); background-color: var(--cfl-gray-light); border-radius: 0 4px 4px 0;">
+                    <h4 class="drawer-section-title" style="margin-bottom: 4px; font-size: 12px; text-transform: uppercase; color: var(--text-secondary);">Résumé</h4>
+                    <p id="drawer-summary" style="font-size: 13.5px; line-height: 1.5; color: var(--cfl-gray-dark); margin: 0; font-style: italic;">Résumé analytique du rapport...</p>
+                </div>
+                
+                <!-- Info Grid -->
+                <div>
+                    <h4 class="drawer-section-title">Gouvernance & cycle de vie</h4>
+                    <div class="drawer-info-grid">
+                        <div class="drawer-info-item">
+                            <span class="info-label">Business Owner</span>
+                            <span id="drawer-owner" class="info-value">Jean Dupont</span>
+                        </div>
+                        <div class="drawer-info-item">
+                            <span class="info-label">Frequence de refresh</span>
+                            <span id="drawer-frequency" class="info-value">Mensuel</span>
+                        </div>
+                        <div class="drawer-info-item">
+                            <span class="info-label">Data Steward</span>
+                            <span id="drawer-steward" class="info-value">Damien G.</span>
+                        </div>
+                        <div class="drawer-info-item">
+                            <span class="info-label">Data Custodian</span>
+                            <span id="drawer-custodian" class="info-value">Damien G.</span>
+                        </div>
+                        <div class="drawer-info-item" id="drawer-technical-path-container" style="grid-column: span 2;">
+                            <span class="info-label">Emplacement technique PBIRS</span>
+                            <span id="drawer-pbirs-path" class="info-value" style="font-family: monospace; font-size: 11px;">/Voyageurs/Mensuel/KPI_Ponctualite</span>
+                        </div>
+                        <div class="drawer-info-item" id="drawer-viewcount-container" style="grid-column: span 2;">
+                            <span class="info-label">Nombre de visualisations</span>
+                            <span id="drawer-viewcount" class="info-value" style="font-weight: 600; color: var(--cfl-crimson);">0</span>
+                        </div>
                     </div>
-                    <div class="drawer-info-item">
-                        <span class="info-label">Frequence de refresh</span>
-                        <span id="drawer-frequency" class="info-value">Mensuel</span>
+                </div>
+                
+                <!-- Tags -->
+                <div>
+                    <h4 class="drawer-section-title">Tags stockes dans Data Galaxy</h4>
+                    <div id="drawer-tags-container" class="drawer-tags">
+                        <span class="drawer-tag">KPI</span>
                     </div>
-                    <div class="drawer-info-item">
-                        <span class="info-label">Data Steward</span>
-                        <span id="drawer-steward" class="info-value">Damien G.</span>
-                    </div>
-                    <div class="drawer-info-item">
-                        <span class="info-label">Data Custodian</span>
-                        <span id="drawer-custodian" class="info-value">Damien G.</span>
-                    </div>
-                    <div class="drawer-info-item" id="drawer-technical-path-container" style="grid-column: span 2;">
-                        <span class="info-label">Emplacement technique PBIRS</span>
-                        <span id="drawer-pbirs-path" class="info-value" style="font-family: monospace; font-size: 11px;">/Voyageurs/Mensuel/KPI_Ponctualite</span>
-                    </div>
-                    <div class="drawer-info-item" id="drawer-viewcount-container" style="grid-column: span 2;">
-                        <span class="info-label">Nombre de visualisations</span>
-                        <span id="drawer-viewcount" class="info-value" style="font-weight: 600; color: var(--cfl-crimson);">0</span>
-                    </div>
+                </div>
+                
+                <!-- Users with Access (Simulated AD logic) -->
+                <div id="drawer-access-list-container">
+                    <h4 class="drawer-section-title">Acces autorises (Synchronise AD/EntraID)</h4>
+                    <ul id="drawer-access-list" class="access-user-list">
+                        <li class="access-user-item"><span class="access-user-dot"></span> Groupe AD 'CFL-Voyageurs-Editeurs'</li>
+                        <li class="access-user-item"><span class="access-user-dot"></span> Groupe AD 'CFL-Data-Analysts'</li>
+                    </ul>
                 </div>
             </div>
             
-            <!-- Tags -->
-            <div>
-                <h4 class="drawer-section-title">Tags stockes dans Data Galaxy</h4>
-                <div id="drawer-tags-container" class="drawer-tags">
-                    <span class="drawer-tag">KPI</span>
+            <!-- Contenu Onglet Lignage des Données -->
+            <div id="drawer-tab-content-lineage" class="drawer-tab-content" style="display: none;">
+                <div class="lineage-flow-container">
+                    <p style="font-size: 13px; line-height: 1.4; color: var(--text-secondary); margin-bottom: 12px;">
+                        Flux d'alimentation technique. <strong>Glissez pour déplacer, molette pour zoomer</strong>. Cliquez sur un nœud pour inspecter ses détails.
+                    </p>
+                    <!-- Zone du graphe interactif Vis.js -->
+                    <div id="lineage-canvas" style="height: 350px; border: 1px solid var(--cfl-gray-border); border-radius: var(--border-radius-md); background-color: var(--cfl-gray-light); overflow: hidden; position: relative;"></div>
+                    
+                    <!-- Panneau de détails d'inspection d'un nœud -->
+                    <div id="lineage-details-panel" class="lineage-details-panel" style="display: none; margin-top: 16px; animation: slideDown 0.2s ease-out;">
+                        <!-- Rempli dynamiquement au clic d'un nœud dans app.js -->
+                    </div>
                 </div>
-            </div>
-            
-            <!-- Users with Access (Simulated AD logic) -->
-            <div id="drawer-access-list-container">
-                <h4 class="drawer-section-title">Acces autorises (Synchronise AD/EntraID)</h4>
-                <ul id="drawer-access-list" class="access-user-list">
-                    <li class="access-user-item"><span class="access-user-dot"></span> Groupe AD 'CFL-Voyageurs-Editeurs'</li>
-                    <li class="access-user-item"><span class="access-user-dot"></span> Groupe AD 'CFL-Data-Analysts'</li>
-                </ul>
             </div>
         </div>
         
