@@ -1913,27 +1913,46 @@ function openReportViewer(reportId) {
         
         const addChip = (label) => {
             const span = document.createElement("span");
-            span.style.padding = "2px 8px";
-            span.style.fontSize = "11px";
-            span.style.fontWeight = "600";
-            span.style.borderRadius = "12px";
-            span.style.backgroundColor = "rgba(196, 16, 57, 0.08)";
-            span.style.color = "var(--cfl-crimson)";
-            span.style.border = "1px solid rgba(196, 16, 57, 0.15)";
+            span.style.padding = "3px 10px";
+            span.style.fontSize = "11.5px";
+            span.style.fontWeight = "500";
+            span.style.borderRadius = "4px";
+            span.style.backgroundColor = "rgba(255, 255, 255, 0.12)";
+            span.style.color = "rgba(255, 255, 255, 0.9)";
+            span.style.border = "1px solid rgba(255, 255, 255, 0.2)";
+            span.style.whiteSpace = "nowrap";
             span.textContent = label;
             chipsContainer.appendChild(span);
         };
 
-        addChip(`Service : ${r.service.toUpperCase()}`);
-        const classifLabel = r.classification === "dwh" ? "Certifié DWH" : (r.classification === "self-service" ? "Self-Service" : "Public");
-        addChip(`Classification : ${classifLabel}`);
-        addChip(`PSSI : ${r.pssi.toUpperCase()}`);
-        addChip(`Fréquence : ${r.frequency}`);
-        if (r.steward) {
-            addChip(`Steward : ${r.steward}`);
+        let hasActiveFilters = false;
+        
+        if (selectedService !== "all") {
+            addChip(`Service : ${selectedService === "qualite" ? "Qualité" : "Informatique"}`);
+            hasActiveFilters = true;
         }
-        if (r.tags && Array.isArray(r.tags)) {
-            r.tags.forEach(t => addChip(t));
+        if (selectedClassification !== "all") {
+            const classifLabel = selectedClassification === "dwh" ? "Certifié DWH" : (selectedClassification === "self-service" ? "Self-Service" : "Public");
+            addChip(`Classification : ${classifLabel}`);
+            hasActiveFilters = true;
+        }
+        if (selectedPssi !== "all") {
+            addChip(`PSSI : ${selectedPssi.toUpperCase()}`);
+            hasActiveFilters = true;
+        }
+        if (selectedTags && selectedTags.length > 0) {
+            selectedTags.forEach(t => {
+                addChip(`Tag : ${t}`);
+                hasActiveFilters = true;
+            });
+        }
+        if (searchQuery && searchQuery.trim() !== "") {
+            addChip(`Recherche : "${searchQuery.trim()}"`);
+            hasActiveFilters = true;
+        }
+
+        if (!hasActiveFilters) {
+            addChip("Aucun filtre appliqué");
         }
     }
 

@@ -827,6 +827,7 @@
                 <div class="logo-separator"></div>
                 <h2 id="viewer-report-title" class="viewer-title">Nom du Rapport</h2>
                 <span id="viewer-classif-badge" class="classif-badge dwh" style="margin-left: 12px;">Certifie DWH</span>
+                <div id="viewer-active-filters-chips" style="display: flex; gap: 8px; align-items: center; margin-left: 20px; flex-wrap: wrap;"></div>
             </div>
             <div class="viewer-header-right" style="display: flex; align-items: center; gap: 16px;">
                 <span class="viewer-refresh-text">Donnees actualisees : <strong id="viewer-refresh-date">Aujourd'hui à 14:15</strong></span>
@@ -837,146 +838,8 @@
             </div>
         </header>
         <div class="viewer-body iframe-mode">
-            <!-- Integration details & parameters visualization -->
-            <div class="integration-status-bar" style="background-color: var(--cfl-gray-light); border-bottom: 1px solid var(--cfl-gray-border); padding: 12px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; font-size: 13px;">
-                <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <span style="color: #34c759; font-weight: bold;">● SSO Actif (EntraID)</span>
-                    </div>
-                    <div style="color: var(--text-secondary);">
-                        RLS (Rôle) : <strong style="color: var(--cfl-crimson);" id="viewer-rls-role">Standard</strong>
-                    </div>
-                    <div style="color: var(--text-secondary);">
-                        Filtres d'intégration : <strong id="viewer-integration-filters">Aucun</strong>
-                    </div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="color: var(--text-secondary); font-family: monospace; font-size: 11px; background: #ffffff; padding: 4px 8px; border: 1px solid var(--cfl-gray-border); border-radius: 4px; max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="viewer-display-url">https://powerbi.cfl.lu/...</span>
-                    <button class="btn-sm-action" id="viewer-copy-url-btn" style="padding: 4px 8px; font-size: 12px;">Copier l'URL d'intégration</button>
-                </div>
-            </div>
-            
-            <!-- Real Frame Container with fallback notification -->
-            <div style="flex: 1; position: relative; background: #ffffff; display: flex; flex-direction: column; overflow: hidden;">
-                <div id="iframe-network-warning" style="background-color: #fff3cd; color: #856404; padding: 10px 24px; font-size: 12.5px; border-bottom: 1px solid #ffeeba; display: flex; align-items: center; justify-content: space-between;">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color: #856404;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                        Le chargement nécessite d'être connecté au réseau interne CFL (<strong>https://powerbi.cfl.lu</strong>).
-                    </span>
-                    <button class="btn-sm-action" id="viewer-toggle-simulator-btn" style="padding: 2px 8px; font-size: 11px; background-color: #ffeeba; border-color: #856404; color: #856404;">Utiliser le simulateur offline</button>
-                </div>
-                
-                <!-- The live iframe -->
-                <iframe id="report-iframe" src="" style="width: 100%; height: 100%; border: none; flex: 1;" title="Power BI Live Report Frame"></iframe>
-                
-                <!-- The simulated interactive canvas (rendered if iframe is toggled off or unavailable) -->
-                <div id="fallback-report-simulator" style="display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background: #ffffff; z-index: 10;">
-                    <div style="display: flex; height: 100%; width: 100%;">
-                        <!-- Simulated Power BI Sidebar (Pages Navigation) -->
-                        <aside class="viewer-sidebar" style="height: 100%;">
-                            <div class="viewer-sidebar-title">Pages (Simulateur)</div>
-                            <div class="viewer-page-item active" data-page="page-1">
-                                <svg class="icon-svg" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" style="margin-right: 8px; vertical-align: text-bottom;"><path d="M3 3h18v18H3z"></path><path d="M21 9H3"></path><path d="M21 15H3"></path><path d="M12 3v18"></path></svg>
-                                Vue d'ensemble
-                            </div>
-                            <div class="viewer-page-item" data-page="page-2">
-                                <svg class="icon-svg" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" style="margin-right: 8px; vertical-align: text-bottom;"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-                                Tendances
-                            </div>
-                            <div class="viewer-page-item" data-page="page-3">
-                                <svg class="icon-svg" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" style="margin-right: 8px; vertical-align: text-bottom;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                                RLS & BVU details
-                            </div>
-                        </aside>
-                        
-                        <!-- Simulated PBI Canvas -->
-                        <main class="viewer-canvas" style="flex: 1; padding: 20px; overflow-y: auto; height: 100%;">
-                            <!-- Page 1 Content -->
-                            <div id="sim-page-1" class="sim-page active">
-                                <div class="pbi-stats-row">
-                                    <div class="pbi-stat-card">
-                                        <span class="pbi-stat-label">Performance Ponctualité</span>
-                                        <span class="pbi-stat-value" style="color: #34c759;" id="sim-metric-1">94.8%</span>
-                                        <span class="pbi-stat-sub">Objectif: 92.0%</span>
-                                    </div>
-                                    <div class="pbi-stat-card">
-                                        <span class="pbi-stat-label">Volume de données</span>
-                                        <span class="pbi-stat-value" id="sim-metric-2">1.8M</span>
-                                        <span class="pbi-stat-sub">Filtré par RLS</span>
-                                    </div>
-                                    <div class="pbi-stat-card">
-                                        <span class="pbi-stat-label">Statut RLS Habilité</span>
-                                        <span class="pbi-stat-value" style="font-size: 18px; color: var(--cfl-crimson); font-weight: 700; margin: 8px 0;" id="sim-metric-3">Standard User</span>
-                                        <span class="pbi-stat-sub">Règles AD appliquées</span>
-                                    </div>
-                                </div>
-                                <div class="pbi-visuals-grid" style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                                    <div class="pbi-visual-card card">
-                                        <h4 class="pbi-visual-title">Évolution des Indicateurs (Simulé)</h4>
-                                        <div class="pbi-mock-chart bar-chart" style="height: 150px; display: flex; align-items: flex-end; justify-content: space-around; padding-bottom: 20px;">
-                                            <div class="chart-bar-col" style="display:flex; flex-direction:column; align-items:center; flex:1;"><div class="bar-fill" style="height: 80px; width: 30px; background-color: var(--cfl-crimson); border-radius: 4px 4px 0 0;"></div><span class="bar-label" style="font-size:11px; margin-top:4px;">S1</span></div>
-                                            <div class="chart-bar-col" style="display:flex; flex-direction:column; align-items:center; flex:1;"><div class="bar-fill" style="height: 110px; width: 30px; background-color: var(--cfl-crimson); border-radius: 4px 4px 0 0;"></div><span class="bar-label" style="font-size:11px; margin-top:4px;">S2</span></div>
-                                            <div class="chart-bar-col" style="display:flex; flex-direction:column; align-items:center; flex:1;"><div class="bar-fill" style="height: 95px; width: 30px; background-color: var(--cfl-crimson); border-radius: 4px 4px 0 0;"></div><span class="bar-label" style="font-size:11px; margin-top:4px;">S3</span></div>
-                                        </div>
-                                    </div>
-                                    <div class="pbi-visual-card card">
-                                        <h4 class="pbi-visual-title">Distribution des Activités</h4>
-                                        <div style="height: 150px; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, var(--cfl-crimson-light) 40%, transparent 41%); border-radius: 50%; width: 150px; margin: 0 auto;">
-                                            <span style="font-size: 14px; font-weight: bold; color: var(--cfl-crimson);">CFL RLS</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Page 2 Content -->
-                            <div id="sim-page-2" class="sim-page" style="display: none; padding: 20px;">
-                                <h4 style="font-size:18px; margin-bottom: 12px;">Filtres d'intégration Power BI Report Server</h4>
-                                <p class="text-secondary" style="font-size:14px; margin-bottom: 16px;">
-                                    L'intégration transmet l'état des filtres du catalogue sous forme de paramètres OData au serveur de rapports PBIRS.
-                                </p>
-                                <div class="card" style="background:#f9f9f9; border: 1px solid var(--cfl-gray-border); margin-bottom: 0;">
-                                    <h5 style="font-size:14px; margin-bottom:8px; color:var(--cfl-gray-dark);">Filtres actifs transmis via URL :</h5>
-                                    <ul style="margin-left: 20px; line-height: 1.8; font-size:13.5px;" id="sim-applied-filters-list">
-                                        <!-- Dynamic -->
-                                    </ul>
-                                </div>
-                            </div>
-                            <!-- Page 3 Content -->
-                            <div id="sim-page-3" class="sim-page" style="display: none; padding: 20px;">
-                                <h4 style="font-size:18px; margin-bottom:12px;">Sécurité au niveau des lignes (RLS) active</h4>
-                                <p class="text-secondary" style="font-size:14px; margin-bottom:16px;">
-                                    Le serveur de rapports filtre dynamiquement le jeu de données SQL Server / SSAS tabulaire selon l'identité Windows SSO du collaborateur.
-                                </p>
-                                <table class="admin-table" style="margin-bottom: 0;">
-                                    <thead>
-                                        <tr>
-                                            <th>Paramètre d'identité</th>
-                                            <th>Valeur transmise au modèle de données</th>
-                                            <th>Statut de la règle</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td><strong>UserPrincipalName</strong></td>
-                                            <td><code style="background:var(--cfl-gray-light); padding:2px 6px;">damien.g@cfl.lu</code></td>
-                                            <td><span style="color:#34c759; font-weight:600;">Appliqué (AD Sync)</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>CustomData (Rôle RLS)</strong></td>
-                                            <td><code style="background:var(--cfl-gray-light); padding:2px 6px;" id="sim-rls-role-val">Standard</code></td>
-                                            <td><span style="color:#34c759; font-weight:600;">Actif</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>AD Security Group mappings</strong></td>
-                                            <td><code style="background:var(--cfl-gray-light); padding:2px 6px;" id="sim-rls-groups-val">DW_POWERBI_QUALITE_ANALYSESADHOC</code></td>
-                                            <td><span style="color:#34c759; font-weight:600;">Vérifié</span></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </main>
-                    </div>
-                </div>
-            </div>
+            <!-- The live iframe -->
+            <iframe id="report-iframe" src="" style="width: 100%; height: 100%; border: none; flex: 1;" title="Power BI Live Report Frame"></iframe>
         </div>
     </div>
 </body>
