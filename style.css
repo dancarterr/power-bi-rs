@@ -655,6 +655,14 @@ h1 {
     background-color: rgba(88, 86, 214, 0.08);
     color: var(--finances-color);
 }
+.service-badge.achats {
+    background-color: rgba(220, 53, 69, 0.08);
+    color: #dc3545;
+}
+.service-badge.juridique {
+    background-color: rgba(23, 162, 184, 0.08);
+    color: #17a2b8;
+}
 
 .card-tags {
     display: flex;

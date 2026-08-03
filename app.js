@@ -150,7 +150,13 @@ const INITIAL_LOGS = [
 const DEFAULT_CONFIG = {
     services: [
         { id: "qualite", label: "Qualité", color: "#00a896" },
-        { id: "informatique", label: "Informatique", color: "#536dfe" }
+        { id: "informatique", label: "Informatique", color: "#536dfe" },
+        { id: "voyageurs", label: "Activité Voyageur", color: "#007aff" },
+        { id: "infra", label: "Gestion Infrastructure", color: "#ff9500" },
+        { id: "finances", label: "Finance", color: "#5856d6" },
+        { id: "rh", label: "RH", color: "#af52de" },
+        { id: "achats", label: "Achats", color: "#dc3545" },
+        { id: "juridique", label: "Juridique", color: "#17a2b8" }
     ],
     classifications: [
         { id: "dwh", label: "Certifié DWH", class: "dwh" },
@@ -481,6 +487,8 @@ function loadState() {
     if (needsSave) {
         saveReportsToStorage();
     }
+
+    evaluateArchiveWorkflow();
 
     const savedLogs = localStorage.getItem("cfl_bi_logs");
     if (savedLogs) {
@@ -884,18 +892,20 @@ function renderAll() {
 
 // --- DASHBOARD RENDERING ---
 function renderDashboard() {
-    document.getElementById("kpi-total-reports").textContent = reports.length;
+    const activeReports = reports.filter(r => !r.isPurged);
+    document.getElementById("kpi-total-reports").textContent = activeReports.length;
     
-    const certifiedReports = reports.filter(r => r.classification === "dwh");
+    const certifiedReports = activeReports.filter(r => r.classification === "dwh");
     document.getElementById("kpi-total-certified").textContent = certifiedReports.length;
     
-    document.getElementById("kpi-total-favorites").textContent = favorites.length;
+    const activeFavorites = favorites.filter(favId => reports.some(r => r.id === favId && !r.isPurged));
+    document.getElementById("kpi-total-favorites").textContent = activeFavorites.length;
 
     // Render Favorites List (Dashboard Panel)
     const favListContainer = document.getElementById("dashboard-favorites-list");
     favListContainer.innerHTML = "";
     
-    const favReports = reports.filter(r => favorites.includes(r.id));
+    const favReports = activeReports.filter(r => activeFavorites.includes(r.id));
     if (favReports.length === 0) {
         favListContainer.innerHTML = `<p class="text-secondary" style="font-size: 14px; font-style: italic; padding: 10px 0;">Vous n'avez aucun rapport en favori. Allez dans le catalogue pour en ajouter.</p>`;
     } else {
@@ -996,6 +1006,8 @@ function renderCatalog() {
     grid.innerHTML = "";
 
     let filteredReports = reports.filter(r => {
+        if (r.isPurged) return false;
+        
         if (selectedService !== "all" && r.service !== selectedService) {
             return false;
         }
@@ -1170,7 +1182,7 @@ function filterCatalogByFavorites() {
     const grid = document.getElementById("catalog-reports-grid");
     grid.innerHTML = "";
     
-    const filteredReports = reports.filter(r => favorites.includes(r.id));
+    const filteredReports = reports.filter(r => favorites.includes(r.id) && !r.isPurged);
     
     const activeFiltersInfo = document.getElementById("active-filters-info");
     const activeFiltersText = document.getElementById("active-filters-text");
@@ -2381,6 +2393,7 @@ function getReportQualityIssues(r) {
             }
         }
     }
+    renderArchiveWorkflow();
 }
 
 function archiveReport(reportId) {
@@ -2527,3 +2540,280 @@ function initTagEditorEvents() {
 window.openRecertifyModal = openRecertifyModal;
 window.setDecision = setDecision;
 window.removeEditingTag = removeEditingTag;
+
+// Helper for days difference
+function getDaysDiff(dateStr1, dateStr2) {
+    const d1 = new Date(dateStr1);
+    const d2 = new Date(dateStr2);
+    const diffTime = d2 - d1;
+    return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+}
+
+function evaluateArchiveWorkflow() {
+    let needsSave = false;
+    const nowSim = "2026-08-03";
+    
+    reports.forEach(r => {
+        if (r.isPurged) return;
+
+        // Ensure lastViewed is set
+        if (!r.lastViewed) {
+            if (r.id === "rep-13") r.lastViewed = "2025-05-15";
+            else if (r.id === "rep-14") r.lastViewed = "2024-05-10";
+            else if (r.id === "rep-33") r.lastViewed = "2024-03-10";
+            else r.lastViewed = "2026-07-01";
+            needsSave = true;
+        }
+
+        const daysInactive = getDaysDiff(r.lastViewed, nowSim);
+        const titleLower = r.title.toLowerCase();
+        const hasNamingTerm = titleLower.includes("backup") || titleLower.includes("old") || titleLower.includes("archive");
+
+        const shouldArchiveGeneral = daysInactive >= (30 * 24); // 24 months
+        const shouldArchiveNaming = hasNamingTerm && daysInactive >= (30 * 6); // 6 months
+
+        if (r.archivedDate === undefined) {
+            r.archivedDate = null;
+            needsSave = true;
+        }
+
+        if (r.archivedDate === null) {
+            // Check if it should be archived
+            if (shouldArchiveGeneral || shouldArchiveNaming) {
+                r.originalPath = r.pbirsPath;
+                
+                const parts = r.pbirsPath.split("/");
+                const filename = parts.pop();
+                r.pbirsPath = parts.join("/") + "/_Archives/" + filename;
+                
+                if (r.id === "rep-13") {
+                    r.archivedDate = "2026-01-15"; // 200 days ago (Notified, purge in 10 days)
+                } else if (r.id === "rep-33") {
+                    r.archivedDate = "2026-06-03"; // 61 days ago (Archived, waiting notification)
+                } else {
+                    r.archivedDate = nowSim; // Newly archived today
+                }
+                
+                needsSave = true;
+
+                const logTime = "2026-08-03 09:00";
+                logs.unshift({
+                    timestamp: logTime,
+                    user: "Système",
+                    event: "Archivage Auto",
+                    target: r.title,
+                    status: "Déplacé dans _Archives"
+                });
+                saveLogsToStorage();
+                
+                addSyncLog(logTime, "Système", `Déplacement automatique de "${r.title}" vers le sous-dossier _Archives pour inactivité (${Math.floor(daysInactive/30)} mois).`, "Succès");
+            }
+        } else {
+            const daysInArchive = getDaysDiff(r.archivedDate, nowSim);
+            if (daysInArchive >= 210) { // 6 months + 30 days
+                r.isPurged = true;
+                needsSave = true;
+                
+                const logTime = "2026-08-03 10:00";
+                logs.unshift({
+                    timestamp: logTime,
+                    user: "Système",
+                    event: "Purge Auto",
+                    target: r.title,
+                    status: "Rapport Supprimé"
+                });
+                saveLogsToStorage();
+                
+                addSyncLog(logTime, "Système", `Purge définitive du rapport "${r.title}" après 6 mois d'archivage et 30 jours sans réponse.`, "Succès");
+            } else if (daysInArchive >= 180) {
+                if (!r.ownerNotified) {
+                    r.ownerNotified = true;
+                    needsSave = true;
+                    
+                    const logTime = "2026-08-03 09:30";
+                    logs.unshift({
+                        timestamp: logTime,
+                        user: "Système",
+                        event: "Notification Propriétaire",
+                        target: r.title,
+                        status: "Notifié"
+                    });
+                    saveLogsToStorage();
+                    
+                    addSyncLog(logTime, "Système", `Notification automatique envoyée à ${r.steward} (propriétaire) pour le rapport "${r.title}" archivé depuis 6 mois.`, "Succès");
+                }
+            }
+        }
+    });
+
+    if (needsSave) {
+        saveReportsToStorage();
+    }
+}
+
+function renderArchiveWorkflow() {
+    const tbody = document.getElementById("archive-workflow-tbody");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+
+    const nowSim = "2026-08-03";
+    let count = 0;
+
+    reports.forEach(r => {
+        if (r.archivedDate === null && !r.isPurged) return;
+
+        count++;
+        const tr = document.createElement("tr");
+
+        let statusBadge = "";
+        let actionCell = "";
+        let durationStr = "N/A";
+        let archiveDateStr = r.archivedDate || "N/A";
+        let triggerStr = "";
+
+        const daysInactive = getDaysDiff(r.lastViewed || r.lastRefresh || "2026-07-01", r.archivedDate || nowSim);
+        const monthsInactive = Math.floor(daysInactive / 30);
+        const titleLower = r.title.toLowerCase();
+        const hasNamingTerm = titleLower.includes("backup") || titleLower.includes("old") || titleLower.includes("archive");
+
+        if (hasNamingTerm && daysInactive >= 180) {
+            triggerStr = `Inactivité Naming (${monthsInactive} mois)`;
+        } else {
+            triggerStr = `Inactivité Générale (${monthsInactive} mois)`;
+        }
+
+        if (r.isPurged) {
+            statusBadge = `<span style="background-color: rgba(220, 53, 69, 0.1); color: #dc3545; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">Purgé (Définitif)</span>`;
+            actionCell = `<span style="color: var(--text-secondary); font-size: 11.5px;">Supprimé de la plateforme</span>`;
+            durationStr = "Purgé";
+        } else {
+            const daysInArchive = getDaysDiff(r.archivedDate, nowSim);
+            durationStr = `${daysInArchive} jours`;
+
+            if (daysInArchive >= 180) {
+                const daysLeft = 210 - daysInArchive;
+                const displayDaysLeft = daysLeft > 0 ? daysLeft : 0;
+                statusBadge = `<span style="background-color: rgba(255, 149, 0, 0.1); color: #ff9500; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">Alerte Propriétaire (Purge sous ${displayDaysLeft}j)</span>`;
+                actionCell = `
+                    <button class="btn-sm-action primary" onclick="restoreFromArchive('${r.id}')" style="margin-right: 6px; font-size: 11px; padding: 4px 8px; border-radius: 4px; cursor: pointer; border: 1px solid var(--cfl-gray-border); background: white;">Restaurer</button>
+                    <button class="btn-sm-action danger" onclick="purgeImmediately('${r.id}')" style="font-size: 11px; padding: 4px 8px; border-radius: 4px; background-color: var(--cfl-crimson); color: white; border: none; cursor: pointer;">Purger</button>
+                `;
+            } else {
+                statusBadge = `<span style="background-color: rgba(0, 122, 255, 0.1); color: #007aff; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">Archivé (_Archives)</span>`;
+                actionCell = `
+                    <button class="btn-sm-action primary" onclick="restoreFromArchive('${r.id}')" style="margin-right: 6px; font-size: 11px; padding: 4px 8px; border-radius: 4px; cursor: pointer; border: 1px solid var(--cfl-gray-border); background: white;">Restaurer</button>
+                    <button class="btn-sm-action" onclick="simulateOwnerNotification('${r.id}')" style="font-size: 11px; padding: 4px 8px; border-radius: 4px; cursor: pointer; border: 1px solid var(--cfl-gray-border); background: white;">Simuler Alerte</button>
+                `;
+            }
+        }
+
+        tr.innerHTML = `
+            <td>
+                <div style="font-weight: 700; color: var(--cfl-gray-dark);">${r.title}</div>
+                <span class="service-badge ${r.service}" style="font-size: 9px; padding: 1px 4px; margin-top: 4px; display: inline-block;">${r.service.toUpperCase()}</span>
+            </td>
+            <td><span style="font-size: 12px; font-weight: 500; color: var(--cfl-gray-dark);">${triggerStr}</span></td>
+            <td><code style="font-family: monospace; font-size: 11.5px;">${archiveDateStr}</code></td>
+            <td><strong style="color: var(--cfl-crimson);">${durationStr}</strong></td>
+            <td>${statusBadge}</td>
+            <td style="text-align: center; white-space: nowrap;">${actionCell}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    if (count === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); font-style: italic; padding: 15px 0;">Aucun rapport dans le cycle d'archivage.</td></tr>`;
+    }
+}
+
+function restoreFromArchive(reportId) {
+    const r = reports.find(item => item.id === reportId);
+    if (!r) return;
+
+    if (r.originalPath) {
+        r.pbirsPath = r.originalPath;
+    } else {
+        r.pbirsPath = r.pbirsPath.replace("/_Archives/", "/");
+    }
+
+    r.archivedDate = null;
+    r.ownerNotified = false;
+    r.lastViewed = "2026-08-03";
+    r.isPurged = false;
+
+    saveReportsToStorage();
+
+    const now = new Date();
+    const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    
+    logs.unshift({
+        timestamp: formattedDate,
+        user: "Admin BI",
+        event: "Restauration Rapport",
+        target: r.title,
+        status: "Succès (Actif)"
+    });
+    saveLogsToStorage();
+
+    addSyncLog(formattedDate, "Système", `Le rapport "${r.title}" a été restauré par l'administrateur (Déplacé hors de _Archives et inactivité réinitialisée).`, "Succès");
+
+    alert(`Le rapport "${r.title}" a été restauré avec succès dans son dossier d'origine.`);
+    renderAll();
+}
+
+function purgeImmediately(reportId) {
+    const r = reports.find(item => item.id === reportId);
+    if (!r) return;
+
+    if (confirm(`Voulez-vous vraiment purger définitivement le rapport "${r.title}" de la plateforme ? Cette action est irréversible.`)) {
+        r.isPurged = true;
+        saveReportsToStorage();
+
+        const now = new Date();
+        const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+        
+        logs.unshift({
+            timestamp: formattedDate,
+            user: "Admin BI",
+            event: "Purge Rapport",
+            target: r.title,
+            status: "Purgé"
+        });
+        saveLogsToStorage();
+
+        addSyncLog(formattedDate, "Système", `Purge manuelle définitive du rapport "${r.title}".`, "Succès");
+
+        alert(`Le rapport "${r.title}" a été purgé définitivement.`);
+        renderAll();
+    }
+}
+
+function simulateOwnerNotification(reportId) {
+    const r = reports.find(item => item.id === reportId);
+    if (!r) return;
+
+    const now = new Date();
+    const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    
+    r.ownerNotified = true;
+    r.archivedDate = "2026-01-15"; // 200 days ago
+    saveReportsToStorage();
+
+    logs.unshift({
+        timestamp: formattedDate,
+        user: "Système",
+        event: "Notification Force",
+        target: r.title,
+        status: "Propriétaire Notifié"
+    });
+    saveLogsToStorage();
+
+    addSyncLog(formattedDate, "Notification", `Simulation d'alerte d'archivage envoyée au propriétaire ${r.steward} pour le rapport "${r.title}".`, "Succès");
+
+    alert(`Alerte de cycle de vie simulée : E-mail de notification envoyé au propriétaire ${r.steward}.\nLe rapport est passé au statut "Alerte Propriétaire" avec 30 jours de délai de relance.`);
+    renderAll();
+}
+
+window.restoreFromArchive = restoreFromArchive;
+window.purgeImmediately = purgeImmediately;
+window.simulateOwnerNotification = simulateOwnerNotification;

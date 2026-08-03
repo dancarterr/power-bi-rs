@@ -6,6 +6,24 @@ services:
   - id: informatique
     label: Informatique
     color: "#536dfe"
+  - id: voyageurs
+    label: Activité Voyageur
+    color: "#007aff"
+  - id: infra
+    label: Gestion Infrastructure
+    color: "#ff9500"
+  - id: finances
+    label: Finance
+    color: "#5856d6"
+  - id: rh
+    label: RH
+    color: "#af52de"
+  - id: achats
+    label: Achats
+    color: "#dc3545"
+  - id: juridique
+    label: Juridique
+    color: "#17a2b8"
 
 classifications:
   - id: dwh

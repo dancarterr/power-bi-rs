@@ -643,6 +643,29 @@
                             </table>
                         </div>
                     </div>
+
+                    <!-- Workflow d'Archivage & de Purge Automatique -->
+                    <div class="card" style="margin-top: 24px;">
+                        <h3 style="font-size: 17px; margin-bottom: 16px; color: var(--cfl-gray-dark);">🔄 Workflow d'Archivage & de Purge Automatique</h3>
+                        <p class="section-desc">Supervision du cycle de vie des rapports inactifs. Déplacement automatique dans le sous-dossier <code>_Archives</code>, alerte propriétaire après 6 mois, et purge définitive sous 30 jours sans retour.</p>
+                        <div class="admin-table-container">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Rapport</th>
+                                        <th>Déclencheur d'Archivage</th>
+                                        <th>Date d'Archivage</th>
+                                        <th>Délai dans _Archives</th>
+                                        <th>Statut du Cycle de Vie</th>
+                                        <th style="text-align: center; width: 250px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="archive-workflow-tbody">
+                                    <!-- Dynamic workflow rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </section>
                 
             </main>
