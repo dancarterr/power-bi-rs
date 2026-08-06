@@ -1,0 +1,1053 @@
+﻿{
+    "value":  [
+                  {
+                      "Id":  "rep-1",
+                      "Name":  "Analyse de la ponctualité au départ",
+                      "Description":  "Analyse des performances de ponctualité des trains au point de départ de leur circulation.",
+                      "Path":  "/QUALITE/ANALYSES AD HOC/Analyse de la ponctualité au départ",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Analyse%20de%20la%20ponctualité%20au%20départ",
+                      "Service":  "qualité",
+                      "Classification":  "self-service",
+                      "PSSI":  "public",
+                      "Tags":  [
+                                   "Ponctualité",
+                                   "Performance opérationnelle"
+                               ],
+                      "Owner":  "Sylvain Rauch",
+                      "Frequency":  "Hebdomadaire",
+                      "LastRefresh":  "03/06/2026 Ã  22:37",
+                      "ViewCount":  1712,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_ANALYSESADHOC"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Analyse de la ponctualité au départ pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-2",
+                      "Name":  "Analyse hebdo des causes retard",
+                      "Description":  "Suivi hebdomadaire des principales causes de retards observées sur le réseau.",
+                      "Path":  "/QUALITE/ANALYSES AD HOC/Analyse hebdo des causes retard",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Analyse%20hebdo%20des%20causes%20retard",
+                      "Service":  "qualité",
+                      "Classification":  "self-service",
+                      "PSSI":  "interne",
+                      "Tags":  [
+                                   "Ponctualité",
+                                   "Performance opérationnelle"
+                               ],
+                      "Owner":  "Gilles Becker",
+                      "Frequency":  "Mensuel",
+                      "LastRefresh":  "16/01/2026 Ã  17:09",
+                      "ViewCount":  1774,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_ANALYSESADHOC"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Analyse hebdo des causes retard pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-3",
+                      "Name":  "Analyse train",
+                      "Description":  "Analyse détaillée de la performance et des incidents d\u0027un train ou d\u0027un ensemble de trains.",
+                      "Path":  "/QUALITE/ANALYSES AD HOC/Analyse train",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Analyse%20train",
+                      "Service":  "qualité",
+                      "Classification":  "self-service",
+                      "PSSI":  "public",
+                      "Tags":  [
+                                   "Performance opérationnelle",
+                                   "Ponctualité"
+                               ],
+                      "Owner":  "Sylvain Rauch",
+                      "Frequency":  "Hebdomadaire",
+                      "LastRefresh":  "25/01/2026 Ã  08:26",
+                      "ViewCount":  368,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_ANALYSESADHOC"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Analyse train pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-4",
+                      "Name":  "Annonces GSM-R",
+                      "Description":  "Suivi des annonces et communications diffusées via le réseau GSM-R.",
+                      "Path":  "/QUALITE/ANALYSES AD HOC/Annonces GSM-R",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Annonces%20GSM-R",
+                      "Service":  "qualité",
+                      "Classification":  "self-service",
+                      "PSSI":  "public",
+                      "Tags":  [
+                                   "Information voyageurs",
+                                   "Performance opérationnelle"
+                               ],
+                      "Owner":  "Gilles Becker",
+                      "Frequency":  "Mensuel",
+                      "LastRefresh":  "02/01/2026 Ã  03:01",
+                      "ViewCount":  1116,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_ANALYSESADHOC"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Annonces GSM-R pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-5",
+                      "Name":  "Nb trains (planifiés) et voyageurs passant par établissement",
+                      "Description":  "Statistiques des trains planifiés et des flux voyageurs par établissement.",
+                      "Path":  "/QUALITE/ANALYSES AD HOC/Nb trains (planifiés) et voyageurs passant par établissement",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Nb%20trains%20(planifiés)%20et%20voyageurs%20passant%20par%20établissement",
+                      "Service":  "qualité",
+                      "Classification":  "self-service",
+                      "PSSI":  "public",
+                      "Tags":  [
+                                   "Volume d\u0027activité",
+                                   "Performance opérationnelle"
+                               ],
+                      "Owner":  "Gilles Becker",
+                      "Frequency":  "Mensuel",
+                      "LastRefresh":  "16/01/2026 Ã  20:25",
+                      "ViewCount":  1179,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_ANALYSESADHOC"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Nb trains (planifiés) et voyageurs passant par établissement pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-6",
+                      "Name":  "Rapport forces majeures",
+                      "Description":  "Identification et suivi des impacts liés aux événements de force majeure.",
+                      "Path":  "/QUALITE/ANALYSES AD HOC/Rapport forces majeures",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Rapport%20forces%20majeures",
+                      "Service":  "qualité",
+                      "Classification":  "self-service",
+                      "PSSI":  "public",
+                      "Tags":  [
+                                   "Performance opérationnelle",
+                                   "Infrastructure"
+                               ],
+                      "Owner":  "Gilles Becker",
+                      "Frequency":  "Hebdomadaire",
+                      "LastRefresh":  "22/02/2026 Ã  15:28",
+                      "ViewCount":  391,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_ANALYSESADHOC"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Rapport forces majeures pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-7",
+                      "Name":  "Rapports ponctualité",
+                      "Description":  "Vue consolidée des indicateurs de ponctualité du trafic ferroviaire.",
+                      "Path":  "/QUALITE/ANALYSES AD HOC/Rapports ponctualité",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Rapports%20ponctualité",
+                      "Service":  "qualité",
+                      "Classification":  "self-service",
+                      "PSSI":  "interne",
+                      "Tags":  [
+                                   "Ponctualité",
+                                   "Pilotage direction"
+                               ],
+                      "Owner":  "Gilles Becker",
+                      "Frequency":  "Hebdomadaire",
+                      "LastRefresh":  "16/07/2026 Ã  15:48",
+                      "ViewCount":  888,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_ANALYSESADHOC"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Rapports ponctualité pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-8",
+                      "Name":  "Retards réguliers",
+                      "Description":  "Analyse des retards récurrents afin d\u0027identifier les problématiques structurelles.",
+                      "Path":  "/QUALITE/ANALYSES AD HOC/Retards réguliers",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Retards%20réguliers",
+                      "Service":  "qualité",
+                      "Classification":  "self-service",
+                      "PSSI":  "public",
+                      "Tags":  [
+                                   "Ponctualité",
+                                   "Performance opérationnelle"
+                               ],
+                      "Owner":  "Gilles Becker",
+                      "Frequency":  "Quotidien",
+                      "LastRefresh":  "20/06/2026 Ã  11:31",
+                      "ViewCount":  1556,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_ANALYSESADHOC"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Retards réguliers pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-9",
+                      "Name":  "Clearing Code 5XX",
+                      "Description":  "Suivi et analyse des retards associés aux codes causes de la série 5XX.",
+                      "Path":  "/QUALITE/Clearing/Clearing Code 5XX",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Clearing/Clearing%20Code%205XX",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "public",
+                      "Tags":  [
+                                   "Ponctualité",
+                                   "Performance opérationnelle"
+                               ],
+                      "Owner":  "Gilles Becker",
+                      "Frequency":  "Hebdomadaire",
+                      "LastRefresh":  "21/04/2026 Ã  16:12",
+                      "ViewCount":  1410,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_CLEARINGEF"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Clearing Code 5XX pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-10",
+                      "Name":  "Écrans H00",
+                      "Description":  "Visualisation synthétique des indicateurs opérationnels utilisés lors du point H00.",
+                      "Path":  "/QUALITE/H00/Écrans H00",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/H00/Écrans%20H00",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "confidentiel",
+                      "Tags":  [
+                                   "Performance opérationnelle",
+                                   "Pilotage direction"
+                               ],
+                      "Owner":  "Gilles Becker",
+                      "Frequency":  "Mensuel",
+                      "LastRefresh":  "08/07/2026 Ã  05:10",
+                      "ViewCount":  483,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_H00"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Écrans H00 pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-11",
+                      "Name":  "Quotidienne H00",
+                      "Description":  "Rapport quotidien des principaux indicateurs de qualité et d\u0027exploitation.",
+                      "Path":  "/QUALITE/H00/Quotidienne H00",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/H00/Quotidienne%20H00",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "confidentiel",
+                      "Tags":  [
+                                   "Performance opérationnelle",
+                                   "Pilotage direction"
+                               ],
+                      "Owner":  "Sylvain Rauch",
+                      "Frequency":  "Mensuel",
+                      "LastRefresh":  "28/06/2026 Ã  18:17",
+                      "ViewCount":  1296,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_H01"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Quotidienne H00 pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-12",
+                      "Name":  "Tableau de bord H00",
+                      "Description":  "Tableau de bord centralisant les indicateurs clés suivis lors des réunions H00.",
+                      "Path":  "/QUALITE/H00/Tableau de bord H00",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/H00/Tableau%20de%20bord%20H00",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "interne",
+                      "Tags":  [
+                                   "Performance opérationnelle",
+                                   "Pilotage direction"
+                               ],
+                      "Owner":  "Sylvain Rauch",
+                      "Frequency":  "Hebdomadaire",
+                      "LastRefresh":  "01/01/2026 Ã  16:48",
+                      "ViewCount":  1999,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_H02"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Tableau de bord H00 pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-13",
+                      "Name":  "Internet - DE",
+                      "Description":  "Publication des indicateurs qualité destinés au site internet en allemand.",
+                      "Path":  "/QUALITE/PUBLIC/OLD/Internet - DE",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/PUBLIC/OLD/Internet%20-%20DE",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "public",
+                      "Tags":  [
+                                   "Publication",
+                                   "Ponctualité"
+                               ],
+                      "Owner":  "Gilles Becker",
+                      "Frequency":  "Hebdomadaire",
+                      "LastRefresh":  "19/07/2026 Ã  13:42",
+                      "ViewCount":  403,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Internet - DE pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-14",
+                      "Name":  "Internet - EN",
+                      "Description":  "Publication des indicateurs qualité destinés au site internet en anglais.",
+                      "Path":  "/QUALITE/PUBLIC/OLD/Internet - EN",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/PUBLIC/OLD/Internet%20-%20EN",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "public",
+                      "Tags":  [
+                                   "Publication",
+                                   "Ponctualité"
+                               ],
+                      "Owner":  "Gilles Becker",
+                      "Frequency":  "Mensuel",
+                      "LastRefresh":  "10/03/2026 Ã  05:32",
+                      "ViewCount":  518,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Internet - EN pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-15",
+                      "Name":  "Internet - FR",
+                      "Description":  "Publication des indicateurs qualité destinés au site internet en français.",
+                      "Path":  "/QUALITE/PUBLIC/OLD/Internet - FR",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/PUBLIC/OLD/Internet%20-%20FR",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "public",
+                      "Tags":  [
+                                   "Publication",
+                                   "Ponctualité"
+                               ],
+                      "Owner":  "Gilles Becker",
+                      "Frequency":  "Quotidien",
+                      "LastRefresh":  "27/05/2026 Ã  20:53",
+                      "ViewCount":  892,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Internet - FR pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-16",
+                      "Name":  "Ponctualité",
+                      "Description":  "Présentation publique des résultats de ponctualité du réseau ferroviaire.",
+                      "Path":  "/QUALITE/PUBLIC/Ponctualité",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/PUBLIC/Ponctualité",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "public",
+                      "Tags":  [
+                                   "Publication",
+                                   "Ponctualité"
+                               ],
+                      "Owner":  "Gilles Becker",
+                      "Frequency":  "Hebdomadaire",
+                      "LastRefresh":  "03/04/2026 Ã  22:15",
+                      "ViewCount":  885,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Ponctualité pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-17",
+                      "Name":  "Rapport de publication mensuelle de ponctualité",
+                      "Description":  "Rapport mensuel destiné à la communication des performances de ponctualité.",
+                      "Path":  "/QUALITE/PUBLIC/Rapport de publication mensuelle de ponctualité",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/PUBLIC/Rapport%20de%20publication%20mensuelle%20de%20ponctualité",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "public",
+                      "Tags":  [
+                                   "Publication",
+                                   "Ponctualité"
+                               ],
+                      "Owner":  "Gilles Becker",
+                      "Frequency":  "Mensuel",
+                      "LastRefresh":  "12/04/2026 Ã  07:49",
+                      "ViewCount":  887,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Rapport de publication mensuelle de ponctualité pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-18",
+                      "Name":  "Qualité des données",
+                      "Description":  "Contrôle et suivi de la qualité des données utilisées pour le reporting.",
+                      "Path":  "/QUALITE/Qualité des données/Qualité des données",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Qualité%20des%20données/Qualité%20des%20données",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "restreint",
+                      "Tags":  [
+                                   "Qualité des données"
+                               ],
+                      "Owner":  "Sylvain Rauch",
+                      "Frequency":  "Quotidien",
+                      "LastRefresh":  "07/05/2026 Ã  19:13",
+                      "ViewCount":  943,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_ALL_STAFF"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Qualité des données pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-19",
+                      "Name":  "Vérification des heures BVU",
+                      "Description":  "Contrôle de cohérence des horaires et événements enregistrés dans BVU.",
+                      "Path":  "/QUALITE/Qualité des données/Vérification des heures BVU",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Qualité%20des%20données/Vérification%20des%20heures%20BVU",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "interne",
+                      "Tags":  [
+                                   "Qualité des données"
+                               ],
+                      "Owner":  "Sylvain Rauch",
+                      "Frequency":  "Quotidien",
+                      "LastRefresh":  "19/03/2026 Ã  02:59",
+                      "ViewCount":  1827,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Vérification des heures BVU pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-20",
+                      "Name":  "Réclamations",
+                      "Description":  "Analyse des réclamations clients et de leur évolution dans le temps.",
+                      "Path":  "/QUALITE/Réclamations/Réclamations",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Réclamations/Réclamations",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "interne",
+                      "Tags":  [
+                                   "Satisfaction client"
+                               ],
+                      "Owner":  "Gilles Becker",
+                      "Frequency":  "Hebdomadaire",
+                      "LastRefresh":  "14/02/2026 Ã  23:56",
+                      "ViewCount":  28,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Réclamations pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-21",
+                      "Name":  "Roadmap IV",
+                      "Description":  "Suivi global des actions et indicateurs liés à l\u0027information voyageurs.",
+                      "Path":  "/QUALITE/ROADMAP IV/Roadmap IV",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ROADMAP%20IV/Roadmap%20IV",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "interne",
+                      "Tags":  [
+                                   "Information voyageurs",
+                                   "Pilotage direction"
+                               ],
+                      "Owner":  "Sylvain Rauch",
+                      "Frequency":  "Quotidien",
+                      "LastRefresh":  "16/02/2026 Ã  07:17",
+                      "ViewCount":  1516,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_TBOPERATIONNELS_INFOVOY"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Roadmap IV pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-22",
+                      "Name":  "Roadmap IV - 2024",
+                      "Description":  "Suivi des objectifs et réalisations de la Roadmap IV pour l\u0027année 2024.",
+                      "Path":  "/QUALITE/ROADMAP IV/Roadmap IV - 2024",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ROADMAP%20IV/Roadmap%20IV%20-%202024",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "interne",
+                      "Tags":  [
+                                   "Information voyageurs",
+                                   "Pilotage direction"
+                               ],
+                      "Owner":  "Sylvain Rauch",
+                      "Frequency":  "Hebdomadaire",
+                      "LastRefresh":  "15/07/2026 Ã  17:31",
+                      "ViewCount":  1857,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_TBOPERATIONNELS_INFOVOY"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Roadmap IV - 2024 pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-23",
+                      "Name":  "Roadmap IV - 2025",
+                      "Description":  "Suivi des objectifs et réalisations de la Roadmap IV pour l\u0027année 2025.",
+                      "Path":  "/QUALITE/ROADMAP IV/Roadmap IV - 2025",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ROADMAP%20IV/Roadmap%20IV%20-%202025",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "public",
+                      "Tags":  [
+                                   "Information voyageurs",
+                                   "Pilotage direction"
+                               ],
+                      "Owner":  "Gilles Becker",
+                      "Frequency":  "Mensuel",
+                      "LastRefresh":  "21/01/2026 Ã  06:08",
+                      "ViewCount":  396,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_TBOPERATIONNELS_INFOVOY"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Roadmap IV - 2025 pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-24",
+                      "Name":  "Barometre Qualite",
+                      "Description":  "Suivi des indicateurs de satisfaction et de perception de la qualité de service.",
+                      "Path":  "/QUALITE/Satisfaction Clients/Barometre Qualite",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Satisfaction%20Clients/Barometre%20Qualite",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "confidentiel",
+                      "Tags":  [
+                                   "Satisfaction client",
+                                   "Pilotage direction"
+                               ],
+                      "Owner":  "Sylvain Rauch",
+                      "Frequency":  "Quotidien",
+                      "LastRefresh":  "13/01/2026 Ã  10:49",
+                      "ViewCount":  1142,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_BAROMETRE"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Barometre Qualite pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-25",
+                      "Name":  "Satisfaction clients des espaces sanitaires",
+                      "Description":  "Mesure de la satisfaction des voyageurs concernant les installations sanitaires.",
+                      "Path":  "/QUALITE/Satisfaction Clients/Satisfaction clients des espaces sanitaires",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Satisfaction%20Clients/Satisfaction%20clients%20des%20espaces%20sanitaires",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "confidentiel",
+                      "Tags":  [
+                                   "Satisfaction client"
+                               ],
+                      "Owner":  "Gilles Becker",
+                      "Frequency":  "Quotidien",
+                      "LastRefresh":  "08/07/2026 Ã  15:05",
+                      "ViewCount":  1688,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Satisfaction clients des espaces sanitaires pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-26",
+                      "Name":  "1 Objectifs",
+                      "Description":  "Suivi des objectifs stratégiques et de leur niveau d\u0027atteinte.",
+                      "Path":  "/QUALITE/TB Direction/1 Objectifs",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Direction/1%20Objectifs",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "confidentiel",
+                      "Tags":  [
+                                   "Pilotage direction"
+                               ],
+                      "Owner":  "Sylvain Rauch",
+                      "Frequency":  "Quotidien",
+                      "LastRefresh":  "30/03/2026 Ã  04:50",
+                      "ViewCount":  684,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 1 Objectifs pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-27",
+                      "Name":  "2 Ponctualité et continuité",
+                      "Description":  "Tableau de bord des indicateurs de ponctualité et de continuité de service.",
+                      "Path":  "/QUALITE/TB Direction/2 Ponctualité et continuité",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/TB%20Direction/2%20Ponctualité%20et%20continuité",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "public",
+                      "Tags":  [
+                                   "Pilotage direction",
+                                   "Ponctualité"
+                               ],
+                      "Owner":  "Sylvain Rauch",
+                      "Frequency":  "Quotidien",
+                      "LastRefresh":  "26/01/2026 Ã  21:44",
+                      "ViewCount":  820,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 2 Ponctualité et continuité pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-28",
+                      "Name":  "2b Ponctualité - Commentaires détaillés",
+                      "Description":  "Analyse détaillée et commentaires explicatifs des résultats de ponctualité.",
+                      "Path":  "/QUALITE/TB Direction/2b Ponctualité - Commentaires détaillés",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Direction/2b%20Ponctualité%20-%20Commentaires%20détaillés",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "confidentiel",
+                      "Tags":  [
+                                   "Pilotage direction",
+                                   "Ponctualité"
+                               ],
+                      "Owner":  "Gilles Becker",
+                      "Frequency":  "Mensuel",
+                      "LastRefresh":  "26/03/2026 Ã  11:17",
+                      "ViewCount":  260,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 2b Ponctualité - Commentaires détaillés pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-29",
+                      "Name":  "3 Causes de retards et de suppressions - Vue client voyageur",
+                      "Description":  "Analyse des retards et suppressions selon leur impact sur les voyageurs.",
+                      "Path":  "/QUALITE/TB Direction/3 Causes de retards et de suppressions - Vue client voyageur",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/TB%20Direction/3%20Causes%20de%20retards%20et%20de%20suppressions%20-%20Vue%20client%20voyageur",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "public",
+                      "Tags":  [
+                                   "Ponctualité",
+                                   "Satisfaction client"
+                               ],
+                      "Owner":  "Sylvain Rauch",
+                      "Frequency":  "Quotidien",
+                      "LastRefresh":  "12/02/2026 Ã  14:40",
+                      "ViewCount":  301,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 3 Causes de retards et de suppressions - Vue client voyageur pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-30",
+                      "Name":  "4 Ponctualité des trains transfrontaliers",
+                      "Description":  "Suivi des performances de ponctualité des trains internationaux.",
+                      "Path":  "/QUALITE/TB Direction/4 Ponctualité des trains transfrontaliers",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/TB%20Direction/4%20Ponctualité%20des%20trains%20transfrontaliers",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "confidentiel",
+                      "Tags":  [
+                                   "Ponctualité",
+                                   "Coopération externe"
+                               ],
+                      "Owner":  "Sylvain Rauch",
+                      "Frequency":  "Hebdomadaire",
+                      "LastRefresh":  "05/03/2026 Ã  16:03",
+                      "ViewCount":  502,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 4 Ponctualité des trains transfrontaliers pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-31",
+                      "Name":  "5 Rapport Commun CFL-SNCB",
+                      "Description":  "Rapport partagé entre CFL et SNCB sur les indicateurs communs de performance.",
+                      "Path":  "/QUALITE/TB Direction/5 Rapport Commun CFL-SNCB",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Direction/5%20Rapport%20Commun%20CFL-SNCB",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "restreint",
+                      "Tags":  [
+                                   "Coopération externe",
+                                   "Pilotage direction"
+                               ],
+                      "Owner":  "Sylvain Rauch",
+                      "Frequency":  "Quotidien",
+                      "LastRefresh":  "14/01/2026 Ã  11:11",
+                      "ViewCount":  1287,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 5 Rapport Commun CFL-SNCB pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-32",
+                      "Name":  "6 Correspondances train-train",
+                      "Description":  "Analyse de la qualité des correspondances entre trains.",
+                      "Path":  "/QUALITE/TB Direction/6 Correspondances train-train",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Direction/6%20Correspondances%20train-train",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "restreint",
+                      "Tags":  [
+                                   "Ponctualité",
+                                   "Satisfaction client"
+                               ],
+                      "Owner":  "Sylvain Rauch",
+                      "Frequency":  "Hebdomadaire",
+                      "LastRefresh":  "17/01/2026 Ã  10:40",
+                      "ViewCount":  1092,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 6 Correspondances train-train pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-33",
+                      "Name":  "1 Objectifs 2024",
+                      "Description":  "Historique du suivi des objectifs stratégiques pour l\u0027année 2024.",
+                      "Path":  "/QUALITE/TB Direction/Années précédentes/1 Objectifs 2024",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Direction/Années%20précédentes/1%20Objectifs%202024",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "public",
+                      "Tags":  [
+                                   "Pilotage direction"
+                               ],
+                      "Owner":  "Gilles Becker",
+                      "Frequency":  "Quotidien",
+                      "LastRefresh":  "13/06/2026 Ã  02:19",
+                      "ViewCount":  170,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 1 Objectifs 2024 pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-34",
+                      "Name":  "1 Objectifs 2025",
+                      "Description":  "Historique du suivi des objectifs stratégiques pour l\u0027année 2025.",
+                      "Path":  "/QUALITE/TB Direction/Années précédentes/1 Objectifs 2025",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Direction/Années%20précédentes/1%20Objectifs%202025",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "public",
+                      "Tags":  [
+                                   "Pilotage direction"
+                               ],
+                      "Owner":  "Sylvain Rauch",
+                      "Frequency":  "Hebdomadaire",
+                      "LastRefresh":  "21/05/2026 Ã  01:46",
+                      "ViewCount":  1989,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 1 Objectifs 2025 pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-35",
+                      "Name":  "Indicateurs info voy basés sur les messages UIC",
+                      "Description":  "Suivi des indicateurs d\u0027information voyageurs issus des messages UIC.",
+                      "Path":  "/QUALITE/TB Opérationnels – Info Voy/Indicateurs info voy basés sur les messages UIC",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Opérationnels%20–%20Info%20Voy/Indicateurs%20info%20voy%20basés%20sur%20les%20messages%20UIC",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "interne",
+                      "Tags":  [
+                                   "Information voyageurs",
+                                   "Performance opérationnelle"
+                               ],
+                      "Owner":  "Sylvain Rauch",
+                      "Frequency":  "Hebdomadaire",
+                      "LastRefresh":  "17/06/2026 Ã  05:03",
+                      "ViewCount":  1654,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_TBOPERATIONNELS"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Indicateurs info voy basés sur les messages UIC pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-36",
+                      "Name":  "Info voy app CFL",
+                      "Description":  "Analyse de l\u0027information voyageurs diffusée via l\u0027application CFL.",
+                      "Path":  "/QUALITE/TB Opérationnels – Info Voy/Info voy app CFL",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Opérationnels%20–%20Info%20Voy/Info%20voy%20app%20CFL",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "public",
+                      "Tags":  [
+                                   "Information voyageurs",
+                                   "Satisfaction client"
+                               ],
+                      "Owner":  "Sylvain Rauch",
+                      "Frequency":  "Quotidien",
+                      "LastRefresh":  "18/06/2026 Ã  13:07",
+                      "ViewCount":  1154,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_TBOPERATIONNELS"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Info voy app CFL pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-37",
+                      "Name":  "Info voy en situation normale",
+                      "Description":  "Évaluation de la qualité de l\u0027information voyageurs en exploitation normale.",
+                      "Path":  "/QUALITE/TB Opérationnels – Info Voy/Info voy en situation normale",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Opérationnels%20–%20Info%20Voy/Info%20voy%20en%20situation%20normale",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "interne",
+                      "Tags":  [
+                                   "Information voyageurs",
+                                   "Performance opérationnelle"
+                               ],
+                      "Owner":  "Gilles Becker",
+                      "Frequency":  "Mensuel",
+                      "LastRefresh":  "12/01/2026 Ã  03:42",
+                      "ViewCount":  1100,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_TBOPERATIONNELS"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Info voy en situation normale pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-38",
+                      "Name":  "Info voy en situation perturbée",
+                      "Description":  "Évaluation de la qualité de l\u0027information voyageurs lors des perturbations.",
+                      "Path":  "/QUALITE/TB Opérationnels – Info Voy/Info voy en situation perturbée",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Opérationnels%20–%20Info%20Voy/Info%20voy%20en%20situation%20perturbée",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "restreint",
+                      "Tags":  [
+                                   "Information voyageurs",
+                                   "Performance opérationnelle"
+                               ],
+                      "Owner":  "Gilles Becker",
+                      "Frequency":  "Mensuel",
+                      "LastRefresh":  "03/06/2026 Ã  04:41",
+                      "ViewCount":  1951,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_TBOPERATIONNELS"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Info voy en situation perturbée pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-39",
+                      "Name":  "Objectifs EF sur les causes de retards et de suppressions",
+                      "Description":  "Suivi des objectifs de l\u0027Entreprise Ferroviaire relatifs aux causes de retards et suppressions.",
+                      "Path":  "/QUALITE/TB Opérationnels - Ponctualité/Objectifs EF sur les causes de retards et de suppressions",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Opérationnels%20-%20Ponctualité/Objectifs%20EF%20sur%20les%20causes%20de%20retards%20et%20de%20suppressions",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "interne",
+                      "Tags":  [
+                                   "Ponctualité",
+                                   "Pilotage direction"
+                               ],
+                      "Owner":  "Gilles Becker",
+                      "Frequency":  "Mensuel",
+                      "LastRefresh":  "21/04/2026 Ã  23:20",
+                      "ViewCount":  690,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_TBOPERATIONNELS"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Objectifs EF sur les causes de retards et de suppressions pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-40",
+                      "Name":  "Objectifs GI sur les causes de retards et de suppressions",
+                      "Description":  "Suivi des objectifs du Gestionnaire d\u0027Infrastructure relatifs aux causes de retards et suppressions.",
+                      "Path":  "/QUALITE/TB Opérationnels - Ponctualité/Objectifs GI sur les causes de retards et de suppressions",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Opérationnels%20-%20Ponctualité/Objectifs%20GI%20sur%20les%20causes%20de%20retards%20et%20de%20suppressions",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "restreint",
+                      "Tags":  [
+                                   "Ponctualité",
+                                   "Infrastructure"
+                               ],
+                      "Owner":  "Gilles Becker",
+                      "Frequency":  "Mensuel",
+                      "LastRefresh":  "11/07/2026 Ã  04:06",
+                      "ViewCount":  265,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_TBOPERATIONNELS"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Objectifs GI sur les causes de retards et de suppressions pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-41",
+                      "Name":  "Rapport hebdomadaire sur les codes causes",
+                      "Description":  "Analyse hebdomadaire de la répartition des causes de retards et suppressions.",
+                      "Path":  "/QUALITE/TB Opérationnels - Ponctualité/Rapport hebdomadaire sur les codes causes",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Opérationnels%20-%20Ponctualité/Rapport%20hebdomadaire%20sur%20les%20codes%20causes",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "restreint",
+                      "Tags":  [
+                                   "Ponctualité",
+                                   "Performance opérationnelle"
+                               ],
+                      "Owner":  "Sylvain Rauch",
+                      "Frequency":  "Hebdomadaire",
+                      "LastRefresh":  "08/06/2026 Ã  03:43",
+                      "ViewCount":  1116,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE_TBOPERATIONNELS"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Rapport hebdomadaire sur les codes causes pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-42",
+                      "Name":  "Analyse des périodes de travaux",
+                      "Description":  "Étude de l\u0027impact des périodes de travaux sur l\u0027exploitation ferroviaire et la qualité de service.",
+                      "Path":  "/QUALITE/Travaux/Analyse des périodes de travaux",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Travaux/Analyse%20des%20périodes%20de%20travaux",
+                      "Service":  "qualité",
+                      "Classification":  "dwh",
+                      "PSSI":  "restreint",
+                      "Tags":  [
+                                   "Infrastructure",
+                                   "Performance opérationnelle"
+                               ],
+                      "Owner":  "Sylvain Rauch",
+                      "Frequency":  "Quotidien",
+                      "LastRefresh":  "07/06/2026 Ã  04:41",
+                      "ViewCount":  803,
+                      "AdGroups":  [
+                                       "DW_POWERBI_QUALITE"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Analyse des périodes de travaux pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-43",
+                      "Name":  "Suivi plateforme BI",
+                      "Description":  "Suivi des droits et accès sur la plateforme BI, et gestion des incohérences des droits",
+                      "Path":  "/SUIVI PLATEFORME BI/Suivi plateforme BI",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/SUIVI%20PLATEFORME%20BI/Suivi%20plateforme%20BI",
+                      "Service":  "informatique",
+                      "Classification":  "dwh",
+                      "PSSI":  "restreint",
+                      "Tags":  [
+                                   "Informatique",
+                                   "Dashbaord"
+                               ],
+                      "Owner":  "Stephane Hoff",
+                      "Frequency":  "Quotidien",
+                      "LastRefresh":  "27/05/2026 Ã  20:53",
+                      "ViewCount":  2524,
+                      "AdGroups":  [
+                                       "DW_POWERBI_CONTENT_MANAGERS_PROD"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Suivi plateforme BI pour les Ã©quipes CFL."
+                  },
+                  {
+                      "Id":  "rep-44",
+                      "Name":  "Revue des accès Teams et SharePoint 2026 - DM Maison Mère",
+                      "Description":  "Rapport de suivi de projet sur la revue des Teams et Sharepoint",
+                      "Path":  "/Data Gouvernance/Revue des accès/Data Manager",
+                      "EmbedUrl":  "https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/Data%20Gouvernance/Revue%20des%20acc%C3%A8s/Data%20Manager/Revue%20des%20acc%C3%A8s%20Teams%20et%20SharePoint%202026%20-%20DM%20Maison%20M%C3%A8re",
+                      "Service":  "informatique",
+                      "Classification":  "dwh",
+                      "PSSI":  "restreint",
+                      "Tags":  [
+                                   "Informatique",
+                                   "Dashbaord"
+                               ],
+                      "Owner":  "Pauline Bouard",
+                      "Frequency":  "Hebdomadaire",
+                      "LastRefresh":  "30/03/2026 Ã  04:50",
+                      "ViewCount":  718,
+                      "AdGroups":  [
+                                       "DW_POWERBI_CONTENT_MANAGERS_PROD"
+                                   ],
+                      "Steward":  "Damien G.",
+                      "Custodian":  "Stephane Hoff",
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Revue des accès Teams et SharePoint 2026 - DM Maison Mère pour les Ã©quipes CFL."
+                  }
+              ]
+}

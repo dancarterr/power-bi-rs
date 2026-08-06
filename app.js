@@ -1,140 +1,37 @@
 // app.js - CFL Analysis Interactive Engine
 
-// Raw CSV Database with simplified tags format [tag1,tag2,...]
-const RAW_CSV_DATA = `id;title;desc;service;classification;pssi;tags;owner;frequency;lastRefresh;pbirsPath;viewcount;adGroups;pbirsUrl
-rep-1;Analyse de la ponctualité au départ;Analyse des performances de ponctualité des trains au point de départ de leur circulation.;Qualité;self-service;public;[Ponctualité, Performance opérationnelle];Sylvain Rauch;Hebdomadaire;46176,94305;/QUALITE/ANALYSES AD HOC/Analyse de la ponctualité au départ;1712;DW_POWERBI_QUALITE_ANALYSESADHOC;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Analyse%20de%20la%20ponctualité%20au%20départ
-rep-2;Analyse hebdo des causes retard;Suivi hebdomadaire des principales causes de retards observées sur le réseau.;Qualité;self-service;interne;[Ponctualité, Performance opérationnelle];Gilles Becker;Mensuel;46038,71527;/QUALITE/ANALYSES AD HOC/Analyse hebdo des causes retard;1774;DW_POWERBI_QUALITE_ANALYSESADHOC;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Analyse%20hebdo%20des%20causes%20retard
-rep-3;Analyse train;Analyse détaillée de la performance et des incidents d'un train ou d'un ensemble de trains.;Qualité;self-service;public;[Performance opérationnelle, Ponctualité];Sylvain Rauch;Hebdomadaire;46047,35143;/QUALITE/ANALYSES AD HOC/Analyse train;368;DW_POWERBI_QUALITE_ANALYSESADHOC;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Analyse%20train
-rep-4;Annonces GSM-R;Suivi des annonces et communications diffusées via le réseau GSM-R.;Qualité;self-service;public;[Information voyageurs, Performance opérationnelle];Gilles Becker;Mensuel;46024,12619;/QUALITE/ANALYSES AD HOC/Annonces GSM-R;1116;DW_POWERBI_QUALITE_ANALYSESADHOC;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Annonces%20GSM-R
-rep-5;Nb trains (planifiés) et voyageurs passant par établissement;Statistiques des trains planifiés et des flux voyageurs par établissement.;Qualité;self-service;public;[Volume d'activité, Performance opérationnelle];Gilles Becker;Mensuel;46038,85115;/QUALITE/ANALYSES AD HOC/Nb trains (planifiés) et voyageurs passant par établissement;1179;DW_POWERBI_QUALITE_ANALYSESADHOC;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Nb%20trains%20(planifiés)%20et%20voyageurs%20passant%20par%20établissement
-rep-6;Rapport forces majeures;Identification et suivi des impacts liés aux événements de force majeure.;Qualité;self-service;public;[Performance opérationnelle, Infrastructure];Gilles Becker;Hebdomadaire;46075,64475;/QUALITE/ANALYSES AD HOC/Rapport forces majeures;391;DW_POWERBI_QUALITE_ANALYSESADHOC;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Rapport%20forces%20majeures
-rep-7;Rapports ponctualité;Vue consolidée des indicateurs de ponctualité du trafic ferroviaire.;Qualité;self-service;interne;[Ponctualité, Pilotage direction];Gilles Becker;Hebdomadaire;46219,65834;/QUALITE/ANALYSES AD HOC/Rapports ponctualité;888;DW_POWERBI_QUALITE_ANALYSESADHOC;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Rapports%20ponctualité
-rep-8;Retards réguliers;Analyse des retards récurrents afin d'identifier les problématiques structurelles.;Qualité;self-service;public;[Ponctualité, Performance opérationnelle];Gilles Becker;Quotidien;46193,48031;/QUALITE/ANALYSES AD HOC/Retards réguliers;1556;DW_POWERBI_QUALITE_ANALYSESADHOC;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ANALYSES%20AD%20HOC/Retards%20réguliers
-rep-9;Clearing Code 5XX;Suivi et analyse des retards associés aux codes causes de la série 5XX.;Qualité;dwh;public;[Ponctualité, Performance opérationnelle];Gilles Becker;Hebdomadaire;46133,67525;/QUALITE/Clearing/Clearing Code 5XX;1410;DW_POWERBI_QUALITE_CLEARINGEF;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Clearing/Clearing%20Code%205XX
-rep-10;Écrans H00;Visualisation synthétique des indicateurs opérationnels utilisés lors du point H00.;Qualité;dwh;confidentiel;[Performance opérationnelle, Pilotage direction];Gilles Becker;Mensuel;46211,2153;/QUALITE/H00/Écrans H00;483;DW_POWERBI_QUALITE_H00;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/H00/Écrans%20H00
-rep-11;Quotidienne H00;Rapport quotidien des principaux indicateurs de qualité et d'exploitation.;Qualité;dwh;confidentiel;[Performance opérationnelle, Pilotage direction];Sylvain Rauch;Mensuel;46201,76182;/QUALITE/H00/Quotidienne H00;1296;DW_POWERBI_QUALITE_H01;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/H00/Quotidienne%20H00
-rep-12;Tableau de bord H00;Tableau de bord centralisant les indicateurs clés suivis lors des réunions H00.;Qualité;dwh;interne;[Performance opérationnelle, Pilotage direction];Sylvain Rauch;Hebdomadaire;46023,7002;/QUALITE/H00/Tableau de bord H00;1999;DW_POWERBI_QUALITE_H02;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/H00/Tableau%20de%20bord%20H00
-rep-13;Internet - DE;Publication des indicateurs qualité destinés au site internet en allemand.;Qualité;dwh;public;[Publication, Ponctualité];Gilles Becker;Hebdomadaire;46222,57127;/QUALITE/PUBLIC/OLD/Internet - DE;403;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/PUBLIC/OLD/Internet%20-%20DE
-rep-14;Internet - EN;Publication des indicateurs qualité destinés au site internet en anglais.;Qualité;dwh;public;[Publication, Ponctualité];Gilles Becker;Mensuel;46091,23106;/QUALITE/PUBLIC/OLD/Internet - EN;518;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/PUBLIC/OLD/Internet%20-%20EN
-rep-15;Internet - FR;Publication des indicateurs qualité destinés au site internet en français.;Qualité;dwh;public;[Publication, Ponctualité];Gilles Becker;Quotidien;46169,87032;/QUALITE/PUBLIC/OLD/Internet - FR;892;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/PUBLIC/OLD/Internet%20-%20FR
-rep-16;Ponctualité;Présentation publique des résultats de ponctualité du réseau ferroviaire.;Qualité;dwh;public;[Publication, Ponctualité];Gilles Becker;Hebdomadaire;46115,92717;/QUALITE/PUBLIC/Ponctualité;885;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/PUBLIC/Ponctualité
-rep-17;Rapport de publication mensuelle de ponctualité;Rapport mensuel destiné à la communication des performances de ponctualité.;Qualité;dwh;public;[Publication, Ponctualité];Gilles Becker;Mensuel;46124,32626;/QUALITE/PUBLIC/Rapport de publication mensuelle de ponctualité;887;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/PUBLIC/Rapport%20de%20publication%20mensuelle%20de%20ponctualité
-rep-18;Qualité des données;Contrôle et suivi de la qualité des données utilisées pour le reporting.;Qualité;dwh;restreint;[Qualité des données];Sylvain Rauch;Quotidien;46149,80087;/QUALITE/Qualité des données/Qualité des données;943;DW_POWERBI_QUALITE_ALL_STAFF;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Qualité%20des%20données/Qualité%20des%20données
-rep-19;Vérification des heures BVU;Contrôle de cohérence des horaires et événements enregistrés dans BVU.;Qualité;dwh;interne;[Qualité des données];Sylvain Rauch;Quotidien;46100,12446;/QUALITE/Qualité des données/Vérification des heures BVU;1827;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Qualité%20des%20données/Vérification%20des%20heures%20BVU
-rep-20;Réclamations;Analyse des réclamations clients et de leur évolution dans le temps.;Qualité;dwh;interne;[Satisfaction client];Gilles Becker;Hebdomadaire;46067,99758;/QUALITE/Réclamations/Réclamations;28;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Réclamations/Réclamations
-rep-21;Roadmap IV;Suivi global des actions et indicateurs liés à l'information voyageurs.;Qualité;dwh;interne;[Information voyageurs, Pilotage direction];Sylvain Rauch;Quotidien;46069,30387;/QUALITE/ROADMAP IV/Roadmap IV;1516;DW_POWERBI_QUALITE_TBOPERATIONNELS_INFOVOY;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ROADMAP%20IV/Roadmap%20IV
-rep-22;Roadmap IV - 2024;Suivi des objectifs et réalisations de la Roadmap IV pour l'année 2024.;Qualité;dwh;interne;[Information voyageurs, Pilotage direction];Sylvain Rauch;Hebdomadaire;46218,73013;/QUALITE/ROADMAP IV/Roadmap IV - 2024;1857;DW_POWERBI_QUALITE_TBOPERATIONNELS_INFOVOY;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ROADMAP%20IV/Roadmap%20IV%20-%202024
-rep-23;Roadmap IV - 2025;Suivi des objectifs et réalisations de la Roadmap IV pour l'année 2025.;Qualité;dwh;public;[Information voyageurs, Pilotage direction];Gilles Becker;Mensuel;46043,25597;/QUALITE/ROADMAP IV/Roadmap IV - 2025;396;DW_POWERBI_QUALITE_TBOPERATIONNELS_INFOVOY;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/ROADMAP%20IV/Roadmap%20IV%20-%202025
-rep-24;Barometre Qualite;Suivi des indicateurs de satisfaction et de perception de la qualité de service.;Qualité;dwh;confidentiel;[Satisfaction client, Pilotage direction];Sylvain Rauch;Quotidien;46035,45123;/QUALITE/Satisfaction Clients/Barometre Qualite;1142;DW_POWERBI_QUALITE_BAROMETRE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Satisfaction%20Clients/Barometre%20Qualite
-rep-25;Satisfaction clients des espaces sanitaires;Mesure de la satisfaction des voyageurs concernant les installations sanitaires.;Qualité;dwh;confidentiel;[Satisfaction client];Gilles Becker;Quotidien;46211,62882;/QUALITE/Satisfaction Clients/Satisfaction clients des espaces sanitaires;1688;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Satisfaction%20Clients/Satisfaction%20clients%20des%20espaces%20sanitaires
-rep-26;1 Objectifs;Suivi des objectifs stratégiques et de leur niveau d'atteinte.;Qualité;dwh;confidentiel;[Pilotage direction];Sylvain Rauch;Quotidien;46111,20149;/QUALITE/TB Direction/1 Objectifs;684;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Direction/1%20Objectifs
-rep-27;2 Ponctualité et continuité;Tableau de bord des indicateurs de ponctualité et de continuité de service.;Qualité;dwh;public;[Pilotage direction, Ponctualité];Sylvain Rauch;Quotidien;46048,90617;/QUALITE/TB Direction/2 Ponctualité et continuité;820;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/TB%20Direction/2%20Ponctualité%20et%20continuité
-rep-28;2b Ponctualité - Commentaires détaillés;Analyse détaillée et commentaires explicatifs des résultats de ponctualité.;Qualité;dwh;confidentiel;[Pilotage direction, Ponctualité];Gilles Becker;Mensuel;46107,4707;/QUALITE/TB Direction/2b Ponctualité - Commentaires détaillés;260;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Direction/2b%20Ponctualité%20-%20Commentaires%20détaillés
-rep-29;3 Causes de retards et de suppressions - Vue client voyageur;Analyse des retards et suppressions selon leur impact sur les voyageurs.;Qualité;dwh;public;[Ponctualité, Satisfaction client];Sylvain Rauch;Quotidien;46065,61122;/QUALITE/TB Direction/3 Causes de retards et de suppressions - Vue client voyageur;301;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/TB%20Direction/3%20Causes%20de%20retards%20et%20de%20suppressions%20-%20Vue%20client%20voyageur
-rep-30;4 Ponctualité des trains transfrontaliers;Suivi des performances de ponctualité des trains internationaux.;Qualité;dwh;confidentiel;[Ponctualité, Coopération externe];Sylvain Rauch;Hebdomadaire;46086,66902;/QUALITE/TB Direction/4 Ponctualité des trains transfrontaliers;502;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/TB%20Direction/4%20Ponctualité%20des%20trains%20transfrontaliers
-rep-31;5 Rapport Commun CFL-SNCB;Rapport partagé entre CFL et SNCB sur les indicateurs communs de performance.;Qualité;dwh;restreint;[Coopération externe, Pilotage direction];Sylvain Rauch;Quotidien;46036,46642;/QUALITE/TB Direction/5 Rapport Commun CFL-SNCB;1287;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Direction/5%20Rapport%20Commun%20CFL-SNCB
-rep-32;6 Correspondances train-train;Analyse de la qualité des correspondances entre trains.;Qualité;dwh;restreint;[Ponctualité, Satisfaction client];Sylvain Rauch;Hebdomadaire;46039,44452;/QUALITE/TB Direction/6 Correspondances train-train;1092;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Direction/6%20Correspondances%20train-train
-rep-33;1 Objectifs 2024;Historique du suivi des objectifs stratégiques pour l'année 2024.;Qualité;dwh;public;[Pilotage direction];Gilles Becker;Quotidien;46186,09696;/QUALITE/TB Direction/Années précédentes/1 Objectifs 2024;170;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Direction/Années%20précédentes/1%20Objectifs%202024
-rep-34;1 Objectifs 2025;Historique du suivi des objectifs stratégiques pour l'année 2025.;Qualité;dwh;public;[Pilotage direction];Sylvain Rauch;Hebdomadaire;46163,0743;/QUALITE/TB Direction/Années précédentes/1 Objectifs 2025;1989;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Direction/Années%20précédentes/1%20Objectifs%202025
-rep-35;Indicateurs info voy basés sur les messages UIC;Suivi des indicateurs d'information voyageurs issus des messages UIC.;Qualité;dwh;interne;[Information voyageurs, Performance opérationnelle];Sylvain Rauch;Hebdomadaire;46190,21106;/QUALITE/TB Opérationnels – Info Voy/Indicateurs info voy basés sur les messages UIC;1654;DW_POWERBI_QUALITE_TBOPERATIONNELS;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Opérationnels%20–%20Info%20Voy/Indicateurs%20info%20voy%20basés%20sur%20les%20messages%20UIC
-rep-36;Info voy app CFL;Analyse de l'information voyageurs diffusée via l'application CFL.;Qualité;dwh;public;[Information voyageurs, Satisfaction client];Sylvain Rauch;Quotidien;46191,54686;/QUALITE/TB Opérationnels – Info Voy/Info voy app CFL;1154;DW_POWERBI_QUALITE_TBOPERATIONNELS;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Opérationnels%20–%20Info%20Voy/Info%20voy%20app%20CFL
-rep-37;Info voy en situation normale;Évaluation de la qualité de l'information voyageurs en exploitation normale.;Qualité;dwh;interne;[Information voyageurs, Performance opérationnelle];Gilles Becker;Mensuel;46034,15417;/QUALITE/TB Opérationnels – Info Voy/Info voy en situation normale;1100;DW_POWERBI_QUALITE_TBOPERATIONNELS;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Opérationnels%20–%20Info%20Voy/Info%20voy%20en%20situation%20normale
-rep-38;Info voy en situation perturbée;Évaluation de la qualité de l'information voyageurs lors des perturbations.;Qualité;dwh;restreint;[Information voyageurs, Performance opérationnelle];Gilles Becker;Mensuel;46176,19528;/QUALITE/TB Opérationnels – Info Voy/Info voy en situation perturbée;1951;DW_POWERBI_QUALITE_TBOPERATIONNELS;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Opérationnels%20–%20Info%20Voy/Info%20voy%20en%20situation%20perturbée
-rep-39;Objectifs EF sur les causes de retards et de suppressions;Suivi des objectifs de l'Entreprise Ferroviaire relatifs aux causes de retards et suppressions.;Qualité;dwh;interne;[Ponctualité, Pilotage direction];Gilles Becker;Mensuel;46133,97229;/QUALITE/TB Opérationnels - Ponctualité/Objectifs EF sur les causes de retards et de suppressions;690;DW_POWERBI_QUALITE_TBOPERATIONNELS;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Opérationnels%20-%20Ponctualité/Objectifs%20EF%20sur%20les%20causes%20de%20retards%20et%20de%20suppressions
-rep-40;Objectifs GI sur les causes de retards et de suppressions;Suivi des objectifs du Gestionnaire d'Infrastructure relatifs aux causes de retards et suppressions.;Qualité;dwh;restreint;[Ponctualité, Infrastructure];Gilles Becker;Mensuel;46214,17105;/QUALITE/TB Opérationnels - Ponctualité/Objectifs GI sur les causes de retards et de suppressions;265;DW_POWERBI_QUALITE_TBOPERATIONNELS;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Opérationnels%20-%20Ponctualité/Objectifs%20GI%20sur%20les%20causes%20de%20retards%20et%20de%20suppressions
-rep-41;Rapport hebdomadaire sur les codes causes;Analyse hebdomadaire de la répartition des causes de retards et suppressions.;Qualité;dwh;restreint;[Ponctualité, Performance opérationnelle];Sylvain Rauch;Hebdomadaire;46181,15494;/QUALITE/TB Opérationnels - Ponctualité/Rapport hebdomadaire sur les codes causes;1116;DW_POWERBI_QUALITE_TBOPERATIONNELS;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/TB%20Opérationnels%20-%20Ponctualité/Rapport%20hebdomadaire%20sur%20les%20codes%20causes
-rep-42;Analyse des périodes de travaux;Étude de l'impact des périodes de travaux sur l'exploitation ferroviaire et la qualité de service.;Qualité;dwh;restreint;[Infrastructure, Performance opérationnelle];Sylvain Rauch;Quotidien;46180,19542;/QUALITE/Travaux/Analyse des périodes de travaux;803;DW_POWERBI_QUALITE;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/QUALITE/Travaux/Analyse%20des%20périodes%20de%20travaux
-rep-43;Suivi plateforme BI;Suivi des droits et accès sur la plateforme BI, et gestion des incohérences des droits;Informatique;dwh;restreint;[Informatique, Dashbaord];Stephane Hoff;Quotidien;46169,87032;/SUIVI PLATEFORME BI/Suivi plateforme BI;2524;DW_POWERBI_CONTENT_MANAGERS_PROD;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/SUIVI%20PLATEFORME%20BI/Suivi%20plateforme%20BI
-rep-44;Revue des accès Teams et SharePoint 2026 - DM Maison Mère;Rapport de suivi de projet sur la revue des Teams et Sharepoint;Informatique;dwh;restreint;[Informatique, Dashbaord];Pauline Bouard;Hebdomadaire;46111,20149;/Data Gouvernance/Revue des accès/Data Manager;718;DW_POWERBI_CONTENT_MANAGERS_PROD;https://powerbi.cfl.lu/reports/powerbi/DW_FOLDER/Data%20Gouvernance/Revue%20des%20acc%C3%A8s/Data%20Manager/Revue%20des%20acc%C3%A8s%20Teams%20et%20SharePoint%202026%20-%20DM%20Maison%20M%C3%A8re`;
-
-// Parse CSV Reports to Object Array
-function parseCSVReports(csvText) {
-    const lines = csvText.trim().split("\n");
-    const reportsList = [];
-    
-    // Excel serial date to JS string helper
-    const excelDateToStr = (serialStr) => {
-        try {
-            const serial = parseFloat(serialStr.replace(",", "."));
-            // Dec 30, 1899 + serial days
-            const date = new Date((serial - 25569) * 86400 * 1000);
-            
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            
-            return `${day}/${month}/${year} à ${hours}:${minutes}`;
-        } catch (e) {
-            return "Récemment";
+// Map fetched PBIRS reports to our internal report objects
+function mapPbirsReports(pbirsValue) {
+    return pbirsValue.map(item => {
+        let service = (item.Service || item.service || "qualite").toLowerCase();
+        const accents = {'é': 'e', 'è': 'e', 'à': 'a', 'ù': 'u', 'ç': 'c', 'â': 'a', 'ê': 'e', 'î': 'i', 'ô': 'o', 'û': 'u'};
+        for (let k in accents) {
+            service = service.split(k).join(accents[k]);
         }
-    };
-
-    for (let i = 1; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (line === "") continue;
-
-        const parts = line.split(";");
-        if (parts.length < 14) continue;
-
-        const id = parts[0];
-        const title = parts[1];
-        const desc = parts[2];
-        // Strip accents and lowercase the service to match CSS badges (Qualité -> qualite, Informatique -> informatique)
-        const service = parts[3].toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        const classification = parts[4];
-        const pssi = parts[5];
         
-        // Robust tags parser splitting bracketed comma-separated strings [tag1, tag2]
-        let tags = [];
-        let tagsRaw = parts[6].trim();
-        // Remove outer quotes if present
-        if (tagsRaw.startsWith('"') && tagsRaw.endsWith('"')) {
-            tagsRaw = tagsRaw.slice(1, -1);
-        }
-        // Remove brackets
-        if (tagsRaw.startsWith('[') && tagsRaw.endsWith(']')) {
-            tagsRaw = tagsRaw.slice(1, -1);
-        }
-        // Split by comma and clean up double-quotes or remaining spaces
-        tags = tagsRaw.split(",")
-            .map(t => t.trim().replace(/^["']|["']$/g, "").replace(/""/g, "").replace(/"/g, ""))
-            .filter(t => t !== "");
-
-        const owner = parts[7];
-        const frequency = parts[8];
-        const lastRefresh = excelDateToStr(parts[9]);
-        const pbirsPath = parts[10];
-        const viewCount = parseInt(parts[11]) || 0;
-        const adGroups = [parts[12]];
-        const pbirsUrl = parts[13];
-        const steward = service === "qualite" ? (i % 2 === 0 ? "Sylvain Rauch" : "Gilles Becker") : "Damien G.";
-        const custodian = service === "qualite" ? "Marc Weber" : "Stephane Hoff";
-        const summary = `Résumé analytique du rapport : Suivi et pilotage de l'activité ${title} pour les équipes CFL.`;
-
-        reportsList.push({
-            id,
-            title,
-            desc,
-            service,
-            classification,
-            pssi,
-            tags,
-            owner,
-            frequency,
-            lastRefresh,
-            pbirsPath,
-            viewCount,
-            adGroups,
-            pbirsUrl,
-            steward,
-            custodian,
-            summary
-        });
-    }
-    return reportsList;
+        return {
+            id: item.Id || item.id,
+            title: item.Name || item.name,
+            desc: item.Description || item.description || "",
+            pbirsPath: item.Path || item.path || "",
+            pbirsUrl: item.EmbedUrl || item.embedUrl || "",
+            service: service,
+            classification: item.Classification || item.classification || "self-service",
+            pssi: item.PSSI || item.pssi || "public",
+            tags: item.Tags || item.tags || [],
+            owner: item.Owner || item.owner || "",
+            frequency: item.Frequency || item.frequency || "Mensuel",
+            lastRefresh: item.LastRefresh || item.lastRefresh || "Récemment",
+            viewcount: item.ViewCount || item.viewcount || 0,
+            adGroups: item.AdGroups || item.adGroups || [],
+            steward: item.Steward || item.steward || "",
+            custodian: item.Custodian || item.custodian || "",
+            summary: item.Summary || item.summary || ""
+        };
+    });
 }
+
+
 
 // Audit logs base adjusted for Qualité / Informatique reports
 const INITIAL_LOGS = [
@@ -419,19 +316,19 @@ function updateTabPermissions() {
 // 3. Initialize App
 document.addEventListener("DOMContentLoaded", async () => {
     await loadConfig();
-    loadState();
+    await loadState();
     initEventListeners();
     renderAll();
 });
 
 // 4. State Persistence Helpers
-function loadState() {
+async function loadState() {
     const savedReports = localStorage.getItem("cfl_bi_reports");
     let needsParse = true;
     if (savedReports) {
         try {
             reports = JSON.parse(savedReports);
-            if (Array.isArray(reports) && reports.length > 0 && reports[0].tags && Array.isArray(reports[0].tags) && !reports[0].tags.some(t => typeof t === "string" && (t.includes('"') || t.startsWith('[')))) {
+            if (Array.isArray(reports) && reports.length > 0 && reports[0].tags && Array.isArray(reports[0].tags)) {
                 needsParse = false;
             }
         } catch (e) {
@@ -440,7 +337,17 @@ function loadState() {
     }
     
     if (needsParse) {
-        reports = parseCSVReports(RAW_CSV_DATA);
+        try {
+            const response = await fetch('pbirs_reports.json');
+            if (response.ok) {
+                const data = await response.json();
+                reports = mapPbirsReports(data.value);
+            } else {
+                console.error("Failed to load reports from PBIRS mock endpoint");
+            }
+        } catch (e) {
+            console.error("Error fetching PBIRS reports:", e);
+        }
     }
 
     let needsSave = needsParse;
@@ -915,13 +822,13 @@ function renderAll() {
 
 // --- DASHBOARD RENDERING ---
 function renderDashboard() {
-    const activeReports = reports.filter(r => !r.isPurged);
+    const activeReports = reports.filter(r => !r.isPurged && isUserAuthorizedForReport(r));
     document.getElementById("kpi-total-reports").textContent = activeReports.length;
     
     const certifiedReports = activeReports.filter(r => r.classification === "dwh");
     document.getElementById("kpi-total-certified").textContent = certifiedReports.length;
     
-    const activeFavorites = favorites.filter(favId => reports.some(r => r.id === favId && !r.isPurged));
+    const activeFavorites = favorites.filter(favId => reports.some(r => r.id === favId && !r.isPurged && isUserAuthorizedForReport(r)));
     document.getElementById("kpi-total-favorites").textContent = activeFavorites.length;
 
     // Render Favorites List (Dashboard Panel)
@@ -958,7 +865,7 @@ function renderDashboard() {
     const popularContainer = document.getElementById("dashboard-popular-list");
     popularContainer.innerHTML = "";
     
-    const popularReports = [...reports].sort((a, b) => b.viewCount - a.viewCount).slice(0, 3);
+    const popularReports = [...activeReports].sort((a, b) => b.viewCount - a.viewCount).slice(0, 3);
     popularReports.forEach((r, idx) => {
         const item = document.createElement("div");
         item.className = "list-item-row";
@@ -984,7 +891,7 @@ function renderDashboard() {
         historyContainer.innerHTML = `<p class="text-secondary" style="font-size: 13px; font-style: italic;">Aucun rapport consulté récemment.</p>`;
     } else {
         const historyReports = history
-            .map(id => reports.find(r => r.id === id))
+            .map(id => activeReports.find(r => r.id === id))
             .filter(r => r !== undefined)
             .reverse()
             .slice(0, 5); // Extended to 5 elements
@@ -1011,7 +918,7 @@ function renderDashboard() {
 function renderCatalog() {
     const tagsContainer = document.getElementById("filter-tags-container");
     const allTags = new Set();
-    reports.forEach(r => r.tags.forEach(t => allTags.add(t)));
+    reports.filter(r => !r.isPurged && isUserAuthorizedForReport(r)).forEach(r => r.tags.forEach(t => allTags.add(t)));
     
     const prevSelectedTags = [...selectedTags];
     tagsContainer.innerHTML = "";
@@ -1029,7 +936,7 @@ function renderCatalog() {
     grid.innerHTML = "";
 
     let filteredReports = reports.filter(r => {
-        if (r.isPurged) return false;
+        if (r.isPurged || !isUserAuthorizedForReport(r)) return false;
         
         if (selectedService !== "all" && r.service !== selectedService) {
             return false;
@@ -1205,7 +1112,7 @@ function filterCatalogByFavorites() {
     const grid = document.getElementById("catalog-reports-grid");
     grid.innerHTML = "";
     
-    const filteredReports = reports.filter(r => favorites.includes(r.id) && !r.isPurged);
+    const filteredReports = reports.filter(r => favorites.includes(r.id) && !r.isPurged && isUserAuthorizedForReport(r));
     
     const activeFiltersInfo = document.getElementById("active-filters-info");
     const activeFiltersText = document.getElementById("active-filters-text");
@@ -1285,7 +1192,7 @@ function renderRightsPanel() {
     // 1. Populate reports dropdown sorted alphabetically
     const prevVal = reportSelect.value;
     reportSelect.innerHTML = "";
-    const sortedReports = [...reports].sort((a, b) => a.title.localeCompare(b.title));
+    const sortedReports = reports.filter(r => !r.isPurged && isUserAuthorizedForReport(r)).sort((a, b) => a.title.localeCompare(b.title));
     sortedReports.forEach(r => {
         const opt = document.createElement("option");
         opt.value = r.id;
@@ -1293,7 +1200,7 @@ function renderRightsPanel() {
         reportSelect.appendChild(opt);
     });
 
-    if (prevVal && reports.some(r => r.id === prevVal)) {
+    if (prevVal && sortedReports.some(r => r.id === prevVal)) {
         reportSelect.value = prevVal;
     } else if (sortedReports.length > 0) {
         reportSelect.value = sortedReports[0].id;
