@@ -1380,6 +1380,37 @@ textarea.form-control {
     box-shadow: 0 0 6px rgba(255, 59, 48, 0.6) !important;
 }
 
+/* PBIRS API status indicator in top-header */
+.header-pbirs-badge {
+    display: flex;
+    align-items: center;
+    background-color: rgba(0, 120, 212, 0.08);
+    border: 1px solid rgba(0, 120, 212, 0.2);
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #0078d4;
+    transition: var(--transition-fast);
+}
+
+.pbirs-status-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #34c759;
+    border-radius: 50%;
+    margin-right: 6px;
+    margin-left: 6px;
+    display: inline-block;
+    box-shadow: 0 0 6px rgba(52, 199, 89, 0.6);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pbirs-status-dot.offline {
+    background-color: #ff9500 !important;
+    box-shadow: 0 0 6px rgba(255, 149, 0, 0.6) !important;
+}
+
 /* Sélecteur de rôle dans le profil */
 .user-profile-card {
     border: 1px solid var(--cfl-gray-border);

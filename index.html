@@ -19,7 +19,13 @@
                 <div class="logo-separator"></div>
                 <span class="app-title">CFL Analysis</span>
             </div>
-            <div class="header-right">
+            <div class="header-right" style="display: flex; gap: 12px; align-items: center;">
+                <!-- PBIRS API status indicator in the top-header -->
+                <div class="header-pbirs-badge" id="header-pbirs-badge" title="Statut de la connexion en temps réel avec l'API REST de Power BI Report Server (PBIRS)">
+                    <svg class="icon-svg" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" style="margin-right: 6px; vertical-align: middle;"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                    <span class="dg-status-text" id="header-pbirs-status-text">API Live</span>
+                    <span class="pbirs-status-dot" id="header-pbirs-status-dot"></span>
+                </div>
                 <!-- Data Galaxy status indicator in the top-header -->
                 <div class="header-datagalaxy-badge" id="header-datagalaxy-badge" title="Cliquez pour simuler une erreur de synchronisation Data Galaxy" style="cursor: pointer;">
                     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTPKJ3gyA5rFLC2d2XaykmOm-tzmW9hrk4IvdDDtM4uCe3JyPanZ2IN2Y&s=10" alt="Data Galaxy" style="height: 22px; margin-right: 6px; border-radius: 2px; vertical-align: middle;">

@@ -323,25 +323,32 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // 4. State Persistence Helpers
 async function loadState() {
-    const savedReports = localStorage.getItem("cfl_bi_reports");
-    let needsParse = true;
-    if (savedReports) {
-        try {
-            reports = JSON.parse(savedReports);
-            if (Array.isArray(reports) && reports.length > 0 && reports[0].tags && Array.isArray(reports[0].tags)) {
-                needsParse = false;
-            }
-        } catch (e) {
-            console.error("Error loading reports state, resetting database:", e);
+    let loaded = false;
+    let isLive = false;
+
+    // 1. Always attempt to fetch from the real PBIRS API endpoint first (real-time)
+    try {
+        const response = await fetch('https://powerbi.cfl.lu/reports/api/v2.0/PowerBIReports');
+        if (response.ok) {
+            const data = await response.json();
+            reports = mapPbirsReports(data.value);
+            loaded = true;
+            isLive = true;
+        } else {
+            console.warn(`Real-time PBIRS API returned status: ${response.status}`);
         }
+    } catch (e) {
+        console.warn("Could not connect to real-time PBIRS API (CORS restriction or network offline). Using local data.", e);
     }
-    
-    if (needsParse) {
+
+    // 2. Fallback to pbirs_reports.json if the live API call failed
+    if (!loaded) {
         try {
             const response = await fetch('pbirs_reports.json');
             if (response.ok) {
                 const data = await response.json();
                 reports = mapPbirsReports(data.value);
+                loaded = true;
             } else {
                 console.error("Failed to load reports from PBIRS mock endpoint");
             }
@@ -350,7 +357,22 @@ async function loadState() {
         }
     }
 
-    let needsSave = needsParse;
+    // 3. Update the UI connection status badge in real-time
+    const badgeText = document.getElementById("header-pbirs-status-text");
+    const badgeDot = document.getElementById("header-pbirs-status-dot");
+    if (badgeText && badgeDot) {
+        if (isLive) {
+            badgeText.textContent = "API Live";
+            badgeDot.className = "pbirs-status-dot"; // Green dot
+            badgeDot.style.backgroundColor = "#34c759";
+            badgeDot.style.boxShadow = "0 0 6px rgba(52, 199, 89, 0.6)";
+        } else {
+            badgeText.textContent = "API Local";
+            badgeDot.className = "pbirs-status-dot offline"; // Orange dot
+        }
+    }
+
+    let needsSave = true;
     reports.forEach((r, idx) => {
         if (!r.steward) {
             r.steward = r.service === "qualite" ? (idx % 2 === 0 ? "Sylvain Rauch" : "Gilles Becker") : "Damien G.";
