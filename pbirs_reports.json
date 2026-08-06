@@ -22,7 +22,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Analyse de la ponctualité au départ pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Analyse de la ponctualité au départ pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-2",
@@ -46,7 +47,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Analyse hebdo des causes retard pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Analyse hebdo des causes retard pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-3",
@@ -70,7 +72,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Analyse train pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Analyse train pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-4",
@@ -94,7 +97,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Annonces GSM-R pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Annonces GSM-R pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-5",
@@ -118,7 +122,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Nb trains (planifiés) et voyageurs passant par établissement pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Nb trains (planifiés) et voyageurs passant par établissement pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-6",
@@ -142,7 +147,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Rapport forces majeures pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Rapport forces majeures pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-7",
@@ -166,7 +172,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Rapports ponctualité pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Rapports ponctualité pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-8",
@@ -190,7 +197,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Retards réguliers pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Retards réguliers pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-9",
@@ -214,7 +222,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Clearing Code 5XX pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Clearing Code 5XX pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-10",
@@ -238,7 +247,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Écrans H00 pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Écrans H00 pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-11",
@@ -262,7 +272,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Quotidienne H00 pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Quotidienne H00 pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-12",
@@ -286,7 +297,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Tableau de bord H00 pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Tableau de bord H00 pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-13",
@@ -310,7 +322,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Internet - DE pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Internet - DE pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-14",
@@ -334,7 +347,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Internet - EN pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Internet - EN pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-15",
@@ -358,7 +372,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Internet - FR pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Internet - FR pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-16",
@@ -382,7 +397,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Ponctualité pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Ponctualité pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-17",
@@ -406,7 +422,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Rapport de publication mensuelle de ponctualité pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Rapport de publication mensuelle de ponctualité pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-18",
@@ -429,7 +446,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Qualité des données pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Qualité des données pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-19",
@@ -452,7 +470,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Vérification des heures BVU pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Vérification des heures BVU pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-20",
@@ -475,7 +494,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Réclamations pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Réclamations pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-21",
@@ -499,7 +519,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Roadmap IV pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Roadmap IV pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-22",
@@ -523,7 +544,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Roadmap IV - 2024 pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Roadmap IV - 2024 pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-23",
@@ -547,7 +569,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Roadmap IV - 2025 pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Roadmap IV - 2025 pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-24",
@@ -571,7 +594,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Barometre Qualite pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Barometre Qualite pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-25",
@@ -594,7 +618,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Satisfaction clients des espaces sanitaires pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Satisfaction clients des espaces sanitaires pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-26",
@@ -617,7 +642,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 1 Objectifs pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 1 Objectifs pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-27",
@@ -641,7 +667,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 2 Ponctualité et continuité pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 2 Ponctualité et continuité pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-28",
@@ -665,7 +692,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 2b Ponctualité - Commentaires détaillés pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 2b Ponctualité - Commentaires détaillés pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-29",
@@ -689,7 +717,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 3 Causes de retards et de suppressions - Vue client voyageur pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 3 Causes de retards et de suppressions - Vue client voyageur pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-30",
@@ -713,7 +742,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 4 Ponctualité des trains transfrontaliers pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 4 Ponctualité des trains transfrontaliers pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-31",
@@ -737,7 +767,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 5 Rapport Commun CFL-SNCB pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 5 Rapport Commun CFL-SNCB pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-32",
@@ -761,7 +792,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 6 Correspondances train-train pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 6 Correspondances train-train pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-33",
@@ -784,7 +816,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 1 Objectifs 2024 pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 1 Objectifs 2024 pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-34",
@@ -807,7 +840,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 1 Objectifs 2025 pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© 1 Objectifs 2025 pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-35",
@@ -831,7 +865,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Indicateurs info voy basés sur les messages UIC pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Indicateurs info voy basés sur les messages UIC pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-36",
@@ -855,7 +890,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Info voy app CFL pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Info voy app CFL pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-37",
@@ -879,7 +915,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Info voy en situation normale pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Info voy en situation normale pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-38",
@@ -903,7 +940,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Info voy en situation perturbée pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Info voy en situation perturbée pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-39",
@@ -927,7 +965,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Objectifs EF sur les causes de retards et de suppressions pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Objectifs EF sur les causes de retards et de suppressions pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-40",
@@ -951,7 +990,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Objectifs GI sur les causes de retards et de suppressions pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Objectifs GI sur les causes de retards et de suppressions pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-41",
@@ -975,7 +1015,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Rapport hebdomadaire sur les codes causes pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Rapport hebdomadaire sur les codes causes pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-42",
@@ -999,7 +1040,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Analyse des périodes de travaux pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Analyse des périodes de travaux pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-43",
@@ -1023,7 +1065,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Suivi plateforme BI pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Suivi plateforme BI pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   },
                   {
                       "Id":  "rep-44",
@@ -1047,7 +1090,8 @@
                                    ],
                       "Steward":  "Damien G.",
                       "Custodian":  "Stephane Hoff",
-                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Revue des accès Teams et SharePoint 2026 - DM Maison Mère pour les Ã©quipes CFL."
+                      "Summary":  "RÃ©sumÃ© analytique du rapport : Suivi et pilotage de l\u0027activitÃ© Revue des accès Teams et SharePoint 2026 - DM Maison Mère pour les Ã©quipes CFL.",
+                      "Type":  "PowerBIReport"
                   }
               ]
 }

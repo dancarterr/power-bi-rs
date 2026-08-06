@@ -332,21 +332,37 @@ async function loadState() {
     let loaded = false;
     let isLive = false;
 
-    // 1. Always attempt to fetch from the real PBIRS API endpoint first (real-time)
+    // 1. Always attempt to fetch from the real PBIRS API endpoint first (real-time) using /api/v2.0/CatalogItems
     try {
-        const response = await fetch('https://powerbi.cfl.lu/reports/api/v2.0/PowerBIReports', {
-            credentials: 'include'
+        const serverUrl = 'https://powerbi.cfl.lu/reports'; 
+        const endpoint = `${serverUrl}/api/v2.0/CatalogItems`;
+        
+        const response = await fetch(endpoint, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            },
+            credentials: 'include' 
         });
+
         if (response.ok) {
             const data = await response.json();
-            reports = mapPbirsReports(data.value);
+            const rawItems = data.value || [];
+            
+            // Filter items: PowerBIReport or Report (CatalogItemType)
+            const filteredItems = rawItems.filter(item => {
+                const type = item.Type || item.type || "";
+                return type === 'PowerBIReport' || type === 'Report';
+            });
+            
+            reports = mapPbirsReports(filteredItems);
             loaded = true;
             isLive = true;
         } else {
             console.warn(`Real-time PBIRS API returned status: ${response.status}`);
         }
     } catch (e) {
-        console.warn("Could not connect to real-time PBIRS API (CORS restriction or network offline). Using local data.", e);
+        console.warn("Could not connect to real-time PBIRS API (CORS restriction or network offline). Using local fallback.", e);
     }
 
     // 2. Fallback to pbirs_reports.json if the live API call failed
@@ -355,7 +371,13 @@ async function loadState() {
             const response = await fetch('pbirs_reports.json');
             if (response.ok) {
                 const data = await response.json();
-                reports = mapPbirsReports(data.value);
+                const rawItems = data.value || [];
+                const filteredItems = rawItems.filter(item => {
+                    const type = item.Type || item.type || "";
+                    return type === 'PowerBIReport' || type === 'Report';
+                });
+                
+                reports = mapPbirsReports(filteredItems);
                 loaded = true;
             } else {
                 console.error("Failed to load reports from PBIRS mock endpoint");
