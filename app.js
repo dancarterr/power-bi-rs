@@ -9,12 +9,18 @@ function mapPbirsReports(pbirsValue) {
             service = service.split(k).join(accents[k]);
         }
         
+        // Construct Web URL exactly as the PowerShell script: $webUrl = "$ReportServerUrl/powerbi$encodedPath"
+        const ReportServerUrl = "https://powerbi.cfl.lu/reports";
+        const rawPath = item.Path || item.path || "";
+        const encodedPath = encodeURIComponent(rawPath);
+        const webUrl = `${ReportServerUrl}/powerbi${encodedPath}`;
+        
         return {
             id: item.Id || item.id,
             title: item.Name || item.name,
             desc: item.Description || item.description || "",
-            pbirsPath: item.Path || item.path || "",
-            pbirsUrl: item.EmbedUrl || item.embedUrl || "",
+            pbirsPath: rawPath,
+            pbirsUrl: webUrl,
             service: service,
             classification: item.Classification || item.classification || "self-service",
             pssi: item.PSSI || item.pssi || "public",
@@ -328,7 +334,9 @@ async function loadState() {
 
     // 1. Always attempt to fetch from the real PBIRS API endpoint first (real-time)
     try {
-        const response = await fetch('https://powerbi.cfl.lu/reports/api/v2.0/PowerBIReports');
+        const response = await fetch('https://powerbi.cfl.lu/reports/api/v2.0/PowerBIReports', {
+            credentials: 'include'
+        });
         if (response.ok) {
             const data = await response.json();
             reports = mapPbirsReports(data.value);
